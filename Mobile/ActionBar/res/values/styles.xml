@@ -20,6 +20,15 @@
         <item name="android:orientation">horizontal</item>
         <item name="android:background">@drawable/actionbar_background</item>
     </style>
+    <style name="ActionBarTitle">
+        <item name="android:textSize">@dimen/actionbar_textsize</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/actionbar_title</item>
+        <item name="android:shadowColor">@color/actionbar_shadow</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+    </style>
     <style name="ActionBarItem">
         <item name="android:layout_width">@dimen/actionbar_item_width</item>
         <item name="android:layout_height">@dimen/actionbar_height</item>

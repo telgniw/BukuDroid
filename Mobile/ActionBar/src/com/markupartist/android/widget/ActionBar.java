@@ -42,7 +42,6 @@ public class ActionBar extends RelativeLayout implements OnClickListener {
     private RelativeLayout mBarView;
     private ImageView mLogoView;
     private View mBackIndicator;
-    //private View mHomeView;
     private TextView mTitleView;
     private LinearLayout mActionsView;
     private ImageButton mHomeBtn;
@@ -245,7 +244,8 @@ public class ActionBar extends RelativeLayout implements OnClickListener {
     /**
      * A {@link LinkedList} that holds a list of {@link Action}s.
      */
-    public static class ActionList extends LinkedList<Action> {
+    @SuppressWarnings("serial")
+	public static class ActionList extends LinkedList<Action> {
     }
 
     /**
