@@ -4,10 +4,6 @@ Tips for Setup the Projects
 Git
 ---
 
-### Setup Git
-    git config --global user.name "Your Name"
-    git config --global user.email "Your Email"
-
 ### Clone the Repo to Local
     git clone git@github.com:telgniw/BukuDroid.git
 
@@ -22,4 +18,9 @@ Eclipse
 -------
 
 ### Import Eclipse Project
-1. `File`->`Import`->`Existing Projects into Workspace`->`BukuDroid/Mobile/`
+`File`->`Import`->`Existing Projects into Workspace`->Select a Folder
+
+### Setup Project Dependency
+1. Import all projects `/Mobile/*`.
+2. `ActionBar`->`Preferences`->`Android`: Ensure `Is Library` is checked.
+3. `BukuDroid`->`Preferences`->`Android`: Add `ActionBar` to `Library`.
