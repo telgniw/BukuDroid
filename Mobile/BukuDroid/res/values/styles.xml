@@ -17,8 +17,5 @@
     </style>
     
     <style name="BukuTheme" parent="android:Theme.Light">
-        <item name="android:windowTitleStyle">@style/Font.Title</item>
-        <item name="android:windowTitleSize">@dimen/windowTitleSize</item>
-        <item name="android:windowTitleBackgroundStyle">@style/Background.Dark</item>
     </style>
 </resources>
