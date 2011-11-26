@@ -22,4 +22,4 @@ Eclipse
 -------
 
 ### Import Eclipse Project
-    `File`->`Import`->`Existing Projects into Workspace`->`BukuDroid/Mobile/`
+1. `File`->`Import`->`Existing Projects into Workspace`->`BukuDroid/Mobile/`
