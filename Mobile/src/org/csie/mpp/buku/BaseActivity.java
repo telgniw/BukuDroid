@@ -1,11 +1,11 @@
 package org.csie.mpp.buku;
 
+import android.app.Activity;
 import android.os.Bundle;
 
-public class MainActivity extends BaseActivity {
+public abstract class BaseActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
     }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="windowTitleSize">40dip</dimen>
+    <dimen name="windowTitleFontSize">24dip</dimen>
+    <dimen name="windowTitlePadding">6dip</dimen>
+</resources>

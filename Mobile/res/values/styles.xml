@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Background"></style>
+    <style name="Background.Dark">
+        <item name="android:background">#990000</item>
+    </style>
+    
+    <style name="Font"></style>
+    <style name="Font.Title">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textSize">@dimen/windowTitleFontSize</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+        <item name="android:padding">@dimen/windowTitlePadding</item>
+    </style>
+    
+    <style name="BukuTheme" parent="android:Theme.Light">
+        <item name="android:windowTitleStyle">@style/Font.Title</item>
+        <item name="android:windowTitleSize">@dimen/windowTitleSize</item>
+        <item name="android:windowTitleBackgroundStyle">@style/Background.Dark</item>
+    </style>
+</resources>
