@@ -12,7 +12,19 @@
         app:title="@string/app_name"
         style="@style/ActionBar"
     />
+    <com.viewpagerindicator.TitlePageIndicator
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/indicatorSize"
+        android:background="#FFFFFF"
+        app:footerColor="#FFCCCC"
+        app:footerLineHeight="1dip"
+        app:textSize="@dimen/indicatorFontSize"
+        app:textColor="#CC9999"
+        app:selectedColor="#CC3333"
+    />
     <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
     />

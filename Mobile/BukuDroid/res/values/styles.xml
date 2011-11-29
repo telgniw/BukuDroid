@@ -16,6 +16,6 @@
         <item name="android:padding">@dimen/windowTitlePadding</item>
     </style>
     
-    <style name="BukuTheme" parent="android:Theme.Light">
+    <style name="BukuTheme" parent="android:Theme.Light.NoTitleBar">
     </style>
 </resources>
