@@ -29,9 +29,9 @@ public class MainActivity extends FragmentActivity {
         indicator = (TitlePageIndicator)findViewById(R.id.indicator);
         viewpager = (ViewPager)findViewById(R.id.viewpager);
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), new ViewPageFragment[] {
-        	new ViewPageFragment("Bookshelf", R.layout.shelf),
-        	new ViewPageFragment("Stream", R.layout.stream),
-        	new ViewPageFragment("Friends", R.layout.friends)
+        	new ViewPageFragment(getString(R.string.bookshelf), R.layout.shelf),
+        	new ViewPageFragment(getString(R.string.stream), R.layout.stream),
+        	new ViewPageFragment(getString(R.string.friends), R.layout.friends)
         });
 
         viewpager.setAdapter(viewpagerAdapter);

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BukuDroid</string>
+    <string name="bookshelf">Bookshelf</string>
+    <string name="friends">Friends</string>
+    <string name="stream">Stream</string>
 </resources>
