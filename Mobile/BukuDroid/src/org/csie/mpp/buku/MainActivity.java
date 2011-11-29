@@ -1,5 +1,6 @@
 package org.csie.mpp.buku;
 
+import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
 import android.os.Bundle;
@@ -27,9 +28,15 @@ public class MainActivity extends FragmentActivity {
         
         indicator = (TitlePageIndicator)findViewById(R.id.indicator);
         viewpager = (ViewPager)findViewById(R.id.viewpager);
-        viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), new ViewPageFragment[] {
+        	new ViewPageFragment("Bookshelf", R.layout.shelf),
+        	new ViewPageFragment("Stream", R.layout.stream),
+        	new ViewPageFragment("Friends", R.layout.friends)
+        });
 
         viewpager.setAdapter(viewpagerAdapter);
         indicator.setViewPager(viewpager);
+        
+        indicator.setCurrentItem(1);
     }
 }
