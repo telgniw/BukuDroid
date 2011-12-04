@@ -12,17 +12,17 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
 import com.facebook.android.SessionEvents.AuthListener;
-import com.facebook.android.SessionEvents.LogoutListener;
 import com.facebook.android.SessionStore;
 import com.facebook.android.view.FbLoginButton;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends FragmentActivity implements AuthListener, LogoutListener {
+public class MainActivity extends FragmentActivity implements DialogActionListener {
 	protected ActionBar actionbar;
 	
 	protected TitlePageIndicator indicator;
@@ -40,36 +40,13 @@ public class MainActivity extends FragmentActivity implements AuthListener, Logo
 
         /* initialize FB */
         SessionStore.restore(App.fb, this);
-        SessionEvents.addAuthListener(this);
-        SessionEvents.addLogoutListener(this);
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
         actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.star));
         
-        if(App.fb.isSessionValid() == false) {
-        	actionbar.addAction(new DialogAction(this, R.layout.login, R.drawable.star, new DialogActionListener() {
-				@Override
-				public void onCreate(final Dialog dialog) {
-					SessionEvents.addAuthListener(new AuthListener() {
-						@Override
-						public void onAuthSucceed() {
-							dialog.dismiss();
-						}
-
-						@Override
-						public void onAuthFail(String error) {	
-						}
-					});
-				}
-				
-				@Override
-				public void onDisplay(final Dialog dialog) {
-		        	FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
-		        	loginButton.init(MainActivity.this, App.fb, App.FB_APP_PERMS);
-				}
-        	}), 0);
-        }
+        if(!App.fb.isSessionValid())
+        	actionbar.addAction(new DialogAction(this, R.layout.login, R.drawable.star, this), 0);
 
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -109,26 +86,28 @@ public class MainActivity extends FragmentActivity implements AuthListener, Logo
     	super.onDestroy();
     }
 
-    /* --- AuthListener		(start) --- */
 	@Override
-	public void onAuthSucceed() {
-		createSessionView();
-		actionbar.removeActionAt(0);
-		viewpagerAdapter.notifyDataSetChanged();
+	public void onCreate(final Dialog dialog) {
+		SessionEvents.addAuthListener(new AuthListener() {
+			@Override
+			public void onAuthSucceed() {
+				dialog.dismiss();
+				createSessionView();
+				actionbar.removeActionAt(0);
+				viewpagerAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onAuthFail(String error) {
+				dialog.dismiss();
+				Toast.makeText(MainActivity.this, R.string.login_failed, App.TOAST_TIME).show();
+			}
+		});
 	}
 
 	@Override
-	public void onAuthFail(String error) {
+	public void onDisplay(final Dialog dialog) {
+		FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
+    	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
-	/* --- AuthListener		(end) --- */
-
-	/* --- LogoutListener	(start) --- */
-	@Override
-	public void onLogoutBegin() {
-	}
-
-	@Override
-	public void onLogoutFinish() {
-	}
-	/* --- LogoutListener	(end) --- */
 }
