@@ -17,11 +17,11 @@
         android:layout_width="fill_parent"
         android:layout_height="@dimen/indicatorSize"
         android:background="#FFFFFF"
-        app:footerColor="#FFCCCC"
+        app:footerColor="@color/lightLineColor"
         app:footerLineHeight="1dip"
         app:textSize="@dimen/indicatorFontSize"
-        app:textColor="#CC9999"
-        app:selectedColor="#CC3333"
+        app:textColor="@color/dimTextColor"
+        app:selectedColor="@color/brightTextColor"
     />
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"

@@ -7,10 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ViewPageFragment extends Fragment {
-	private String title;
-	private int resource;
-	
-	private View view;
+	protected String title;
+	protected int resource;
 	
 	public ViewPageFragment(String title, int resource) {
 		this.title = title;
@@ -23,7 +21,6 @@ public class ViewPageFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
-		view = inflater.inflate(resource, container, false);
-		return view;
+		return inflater.inflate(resource, container, false);
 	}
 }

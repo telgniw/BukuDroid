@@ -5,4 +5,5 @@
     <dimen name="windowTitlePadding">6dip</dimen>
     <dimen name="indicatorSize">20dip</dimen>
     <dimen name="indicatorFontSize">12dip</dimen>
+    <dimen name="margin">10dip</dimen>
 </resources>

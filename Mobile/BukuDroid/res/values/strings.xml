@@ -4,4 +4,7 @@
     <string name="bookshelf">Bookshelf</string>
     <string name="friends">Friends</string>
     <string name="stream">Stream</string>
+    <string name="scan">Scan</string>
+    <string name="login">Login</string>
+    <string name="login_to_see">Login to see what your friends have read!</string>
 </resources>
