@@ -22,6 +22,8 @@ Eclipse
 
 ### Setup Project Dependency
 1. Import all projects `/Mobile/*`.
-2. `ActionBar`->`Preferences`->`Android`: Ensure `Is Library` is checked.
-3. `ViewPagerIndicator`->`Preferences`->`Android`: Ensure `Is Library` is checked.
-4. `BukuDroid`->`Preferences`->`Android`: Add `ActionBar` and `ViewPagerIndicator` to `Library`.
+2. Right-Click on the Project->`Preferences`->`Android`: Ensure `Is Library` is checked.
+  - `ActionBar`
+  - `FacebookAPI`
+  - `ViewPagerIndicator`
+3. `BukuDroid`->`Preferences`->`Android`: Add the above Projects to `Library`.
