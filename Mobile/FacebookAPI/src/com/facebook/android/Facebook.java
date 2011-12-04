@@ -20,6 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import com.facebook.android.view.FbDialog;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
