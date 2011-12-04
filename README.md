@@ -18,12 +18,12 @@ Eclipse
 -------
 
 ### Import Eclipse Project
-`File`->`Import`->`Existing Projects into Workspace`->Select a Folder
+`File` -> `Import` -> `Existing Projects into Workspace` -> Select a Folder
 
 ### Setup Project Dependency
 1. Import all projects `/Mobile/*`.
-2. Right-Click on the Project->`Preferences`->`Android`: Ensure `Is Library` is checked.
+2. Right-Click on the Projects -> `Preferences` -> `Android`: Ensure `Is Library` is checked.
   - `ActionBar`
   - `FacebookAPI`
   - `ViewPagerIndicator`
-3. `BukuDroid`->`Preferences`->`Android`: Add the above Projects to `Library`.
+3. `BukuDroid` -> `Preferences` -> `Android`: Add the above Projects to `Library`.
