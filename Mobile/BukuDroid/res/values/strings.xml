@@ -10,4 +10,5 @@
     <string name="login_failed">Login failed!</string>
     <string name="add_book_to_start">Click the button on the upper-right corner to add some books.</string>
     <string name="link_account">Sync with Other Account</string>
+    <string name="add">Add to Bookshelf</string>
 </resources>

@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
-        actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.star));
+        actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.star, ScanActivity.REQUEST_CODE));
         
         if(!App.fb.isSessionValid())
         	actionbar.addAction(new DialogAction(this, R.layout.login, R.drawable.star, this), 0);
@@ -73,6 +73,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	App.fb.authorizeCallback(requestCode, resultCode, data);
+    	bookMan.onResultCallback(requestCode, resultCode, data);
     }
     
     @Override

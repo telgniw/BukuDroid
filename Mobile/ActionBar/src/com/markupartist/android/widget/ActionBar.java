@@ -20,6 +20,7 @@ import java.util.LinkedList;
 
 import com.markupartist.android.widget.actionbar.R;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -271,22 +272,33 @@ public class ActionBar extends RelativeLayout implements OnClickListener {
     }
 
     public static class IntentAction extends AbstractAction {
-        private Context mContext;
+        private Activity mActivity;
         private Intent mIntent;
+        
+        private int mRequestCode;
 
-        public IntentAction(Context context, Intent intent, int drawable) {
-            super(drawable);
-            mContext = context;
+        public IntentAction(Activity activity, Intent intent, int drawable) {
+        	this(activity, intent, drawable, -1);
+        	
+        }
+        
+        public IntentAction(Activity activity, Intent intent, int drawable, int requestCode) {
+        	super(drawable);
+            mActivity = activity;
             mIntent = intent;
+        	mRequestCode = requestCode;
         }
 
         @Override
         public void performAction(View view) {
             try {
-               mContext.startActivity(mIntent); 
+            	if(mRequestCode < 0)
+            		mActivity.startActivity(mIntent);
+            	else
+            		mActivity.startActivityForResult(mIntent, mRequestCode);
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(mContext,
-                        mContext.getText(R.string.actionbar_activity_not_found),
+                Toast.makeText(mActivity,
+                        mActivity.getText(R.string.actionbar_activity_not_found),
                         Toast.LENGTH_SHORT).show();
             }
         }

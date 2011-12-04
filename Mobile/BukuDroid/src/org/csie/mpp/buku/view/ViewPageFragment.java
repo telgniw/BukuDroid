@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ViewPageFragment extends Fragment {
-	public interface ViewPageFragmentListener {
+	public static interface ViewPageFragmentListener {
 		void onCreate(View view);
 	}
 	

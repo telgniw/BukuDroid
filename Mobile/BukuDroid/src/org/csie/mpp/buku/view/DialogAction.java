@@ -6,17 +6,16 @@ import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.markupartist.android.widget.ActionBar.Action;
+import com.markupartist.android.widget.ActionBar.AbstractAction;
 
-public class DialogAction implements Action {
-	public interface DialogActionListener {
+public class DialogAction extends AbstractAction {
+	public static interface DialogActionListener {
 		void onCreate(Dialog dialog);
 		void onDisplay(Dialog dialog);
 	}
 	
 	private Activity activity;
 	private int layout;
-	private int drawable;
 	private DialogActionListener callback;
 	
 	private Dialog dialog;
@@ -26,15 +25,10 @@ public class DialogAction implements Action {
 	}
 	
 	public DialogAction(Activity activity, int layout, int drawable, DialogActionListener callback) {
+		super(drawable);
 		this.activity = activity;
 		this.layout = layout;
-		this.drawable = drawable;
 		this.callback = callback;
-	}
-	
-	@Override
-	public int getDrawable() {
-		return drawable;
 	}
 	
 	@Override
