@@ -5,8 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public abstract class Entry {
@@ -34,10 +37,23 @@ public abstract class Entry {
 	public static class Schema {
 		private Class<? extends Entry> cls;
 		private Field[] fields;
+		private String[] columns;
 		
 		public Schema(Class<? extends Entry> cls) {
 			this.cls = cls;
-			this.fields = cls.getDeclaredFields();
+			
+			List<Field> fl = new ArrayList<Field>();
+			List<String> cl = new ArrayList<String>();
+			for(Field field: cls.getDeclaredFields()) {
+				Column c = field.getAnnotation(Column.class);
+				if(c == null)
+					continue;
+				fl.add(field);
+				cl.add(c.name());
+			}
+			
+			fields = fl.toArray(new Field[fl.size()]);
+			columns = cl.toArray(new String[cl.size()]);
 		}
 		
 		public String getName() {
@@ -46,15 +62,10 @@ public abstract class Entry {
 		
 		public void create(SQLiteDatabase db) {
 			StringBuilder stmt = new StringBuilder("CREATE TABLE " + getName() + " (");
-			boolean flag = false;
-			for(Field field: fields) {
-				Column c = field.getAnnotation(Column.class);
-				if(c == null)
-					continue;
-				if(flag)
+			for(int i = 0; i < fields.length; i++) {
+				Column c = fields[i].getAnnotation(Column.class);
+				if(i > 0)
 					stmt.append(",");
-				else
-					flag = true;
 				stmt.append(c.name() + " " + c.type());
 				if(c.defaultVal().length() > 0)
 					stmt.append(" DEFAULT " + c.defaultVal());
@@ -72,13 +83,17 @@ public abstract class Entry {
 			try {
 				for(Field field: fields) {
 					Column c = field.getAnnotation(Column.class);
-					if(c == null || c.skip())
+					if(c.skip())
 						continue;
 					switch(c.type()) {
 						case BOOLEAN:
+							values.put(c.name(), field.getShort(entry));
+							break;
 						case INTEGER:
-						case DATE:
 							values.put(c.name(), field.getInt(entry));
+							break;
+						case DATE:
+							values.put(c.name(), field.getLong(entry));
 							break;
 						case TEXT:
 							values.put(c.name(), (String)field.get(entry));
@@ -95,6 +110,44 @@ public abstract class Entry {
 				throw new RuntimeException(e);
 			}
 			return db.insert(getName(), null, values) != -1;
+		}
+		
+		public int count(SQLiteDatabase db) {
+			return db.query(getName(), null, null, null, null, null, null).getCount();
+		}
+		
+		public Cursor queryAll(SQLiteDatabase db, String orderBy) {
+			return db.query(getName(), columns, null, null, null, null, orderBy);
+		}
+		
+		protected <T extends Entry> void extract(Cursor cursor, T entry) {
+			try {
+				for(int i = 0; i < fields.length; i++) {
+					Column c = fields[i].getAnnotation(Column.class);
+					switch(c.type()) {
+						case BOOLEAN:
+							fields[i].set(entry, cursor.getShort(i));
+							break;
+						case INTEGER:
+							fields[i].set(entry, cursor.getInt(i));
+							break;
+						case DATE:
+							fields[i].set(entry, cursor.getLong(i));
+							break;
+						case TEXT:
+							fields[i].set(entry, cursor.isNull(i)? null : cursor.getString(i));
+							break;
+						case BLOB:
+							fields[i].set(entry, cursor.isNull(i)? null : cursor.getBlob(i));
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			catch(IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

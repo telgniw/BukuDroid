@@ -1,5 +1,6 @@
 package org.csie.mpp.buku.db;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class BookEntry extends Entry {
@@ -19,6 +20,20 @@ public class BookEntry extends Entry {
 	}
 	
 	public static int count(SQLiteDatabase db) {
-		return db.query(SCHEMA.getName(), null, null, null, null, null, null).getCount();
+		return SCHEMA.count(db);
+	}
+	
+	public static BookEntry[] queryAll(SQLiteDatabase db) {
+		return queryAll(db, null);
+	}
+	
+	public static BookEntry[] queryAll(SQLiteDatabase db, String orderBy) {
+		Cursor cursor = SCHEMA.queryAll(db, orderBy);
+		BookEntry[] entries = new BookEntry[cursor.getCount()];
+		for(int i = 0; cursor.moveToNext(); i++) {
+			entries[i] = new BookEntry();
+			SCHEMA.extract(cursor, entries[i]);
+		}
+		return entries;
 	}
 }

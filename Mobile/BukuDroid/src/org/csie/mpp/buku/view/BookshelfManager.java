@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 
 public class BookshelfManager implements ViewPageFragmentListener {
 	private Activity activity;
@@ -20,6 +22,8 @@ public class BookshelfManager implements ViewPageFragmentListener {
 	private SQLiteDatabase rdb, wdb;
 	
 	protected FrameLayout frame;
+	protected ListView booklist;
+	protected ArrayAdapter<String> booklistAdapter;
 	
 	public BookshelfManager(Activity activity) {
 		this.activity = activity;
@@ -36,8 +40,19 @@ public class BookshelfManager implements ViewPageFragmentListener {
 				entry.isbn = data.getStringExtra(ScanActivity.ISBN);
 				if(!entry.insert(wdb))
 					Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
-				updateView();
+				updateBooklist();
 			}
+		}
+	}
+	
+	private void updateBooklist() {
+		if(booklist == null)
+			updateView();
+		else {
+			BookEntry[] entries = BookEntry.queryAll(rdb);
+			for(BookEntry entry: entries)
+				booklistAdapter.add(entry.isbn);
+					booklistAdapter.notifyDataSetChanged();
 		}
 	}
 	
@@ -47,8 +62,12 @@ public class BookshelfManager implements ViewPageFragmentListener {
 		if(BookEntry.count(rdb) == 0)
 			frame.addView(activity.getLayoutInflater().inflate(R.layout.books_none, null));
 		else {
-			frame.addView(activity.getLayoutInflater().inflate(R.layout.books_list, null));
-			// TODO
+			View view = activity.getLayoutInflater().inflate(R.layout.books_list, null);
+			frame.addView(view);
+			booklist = (ListView)view.findViewById(R.id.book_list);
+			booklistAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1);
+			booklist.setAdapter(booklistAdapter);
+			updateBooklist();
 		}
 	}
 
