@@ -54,9 +54,6 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf);
         viewpagerAdapter.addItem(bookshelf);
         
-    	if(App.fb.isSessionValid())
-    		createSessionView();
-        
         /* initialize ViewPager */
         indicator = (TitlePageIndicator)findViewById(R.id.indicator);
         viewpager = (ViewPager)findViewById(R.id.viewpager);
@@ -65,7 +62,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         indicator.setViewPager(viewpager);
 
         if(App.fb.isSessionValid())
-        	indicator.setCurrentItem(1);
+        	createSessionView();
     }
     
     private void createSessionView() {
@@ -74,6 +71,9 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		
 		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends);
 		viewpagerAdapter.addItem(friends);
+		
+		viewpagerAdapter.notifyDataSetChanged();
+		indicator.setCurrentItem(1);
     }
     
     @Override
@@ -86,6 +86,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	super.onDestroy();
     }
 
+    /* --- DialogActionListener	(start) --- */
 	@Override
 	public void onCreate(final Dialog dialog) {
 		SessionEvents.addAuthListener(new AuthListener() {
@@ -94,7 +95,6 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 				dialog.dismiss();
 				createSessionView();
 				actionbar.removeActionAt(0);
-				viewpagerAdapter.notifyDataSetChanged();
 			}
 
 			@Override
@@ -110,4 +110,5 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
     	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
+	/* --- DialogActionListener	(end) --- */
 }
