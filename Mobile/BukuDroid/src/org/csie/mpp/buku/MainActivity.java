@@ -1,5 +1,6 @@
 package org.csie.mpp.buku;
 
+import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.DialogAction;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
 import org.csie.mpp.buku.view.ViewPageFragment;
@@ -11,7 +12,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
@@ -30,7 +30,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	protected ViewPagerAdapter viewpagerAdapter;
 	
 	protected ViewPageFragment bookshelf, stream, friends;
-	protected ListView booklist;
+	
+	private BookshelfManager bookMan;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
-        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf);
+        bookMan = new BookshelfManager(this);
+        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
         /* initialize ViewPager */
@@ -86,7 +88,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	super.onDestroy();
     }
 
-    /* --- DialogActionListener	(start) --- */
+    /* --- DialogActionListener		(start) --- */
 	@Override
 	public void onCreate(final Dialog dialog) {
 		SessionEvents.addAuthListener(new AuthListener() {
@@ -110,5 +112,5 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
     	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
-	/* --- DialogActionListener	(end) --- */
+	/* --- DialogActionListener		(end) --- */
 }
