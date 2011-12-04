@@ -12,6 +12,9 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
@@ -67,6 +70,16 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         	createSessionView();
     }
     
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	App.fb.authorizeCallback(requestCode, resultCode, data);
+    }
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    }
+    
     private void createSessionView() {
     	stream = new ViewPageFragment(getString(R.string.stream), R.layout.stream);
 		viewpagerAdapter.addItem(stream);
@@ -77,18 +90,27 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		viewpagerAdapter.notifyDataSetChanged();
 		indicator.setCurrentItem(1);
     }
-    
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	App.fb.authorizeCallback(requestCode, resultCode, data);
-    }
-    
-    @Override
-    public void onDestroy() {
-    	super.onDestroy();
-    }
 
-    /* --- DialogActionListener		(start) --- */
+    /* --- OptionsMenu			(start) --- */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.main, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    		case R.id.menu_link:
+    			return true;
+    		default:
+    			return super.onOptionsItemSelected(item);
+    	}
+    }
+    /* --- OptionsMenu			(end) --- */
+
+    /* --- DialogActionListener	(start) --- */
 	@Override
 	public void onCreate(final Dialog dialog) {
 		SessionEvents.addAuthListener(new AuthListener() {
@@ -112,5 +134,5 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
     	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
-	/* --- DialogActionListener		(end) --- */
+	/* --- DialogActionListener	(end) --- */
 }
