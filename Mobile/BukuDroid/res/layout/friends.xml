@@ -5,9 +5,10 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
 >
-    <ImageView
+    <FrameLayout
+        android:id="@+id/friends_frame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:src="@drawable/friends"
+        android:layout_margin="@dimen/margin"
     />
 </LinearLayout>

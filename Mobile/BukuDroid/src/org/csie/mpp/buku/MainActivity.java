@@ -1,8 +1,10 @@
 package org.csie.mpp.buku;
 
+import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.DialogAction;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
+import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
@@ -34,7 +36,9 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	
 	protected ViewPageFragment bookshelf, stream, friends;
 	
+	private DBHelper db;
 	private BookshelfManager bookMan;
+	private FriendsManager friendMan;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +59,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
-        bookMan = new BookshelfManager(this);
+        db = new DBHelper(this);
+        bookMan = new BookshelfManager(this, db);
         bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
@@ -85,7 +90,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	stream = new ViewPageFragment(getString(R.string.stream), R.layout.stream);
 		viewpagerAdapter.addItem(stream);
 		
-		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends);
+		friendMan = new FriendsManager(this, db);
+		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends, friendMan);
 		viewpagerAdapter.addItem(friends);
 		
 		viewpagerAdapter.notifyDataSetChanged();

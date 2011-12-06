@@ -4,8 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
 >
-    <TextView
-        android:text="@string/add_book_to_start"
+    <ListView
+        android:id="@+id/inner_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
     />
