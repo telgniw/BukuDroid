@@ -13,6 +13,7 @@ public class ScanActivity extends Activity implements OnClickListener {
 	public static final String ISBN = "isbn";
 	
 	protected EditText isbn;
+	protected Button barcode;
 	protected Button add;
 	
     @Override
@@ -21,9 +22,34 @@ public class ScanActivity extends Activity implements OnClickListener {
         setContentView(R.layout.scan);
         
         isbn = (EditText)findViewById(R.id.isbn);
+        barcode = (Button)findViewById(R.id.barcode);
         add = (Button)findViewById(R.id.add);
         
+        barcode.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				//TODO(ianchou): integrate bar code scanning
+		        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
+		        startActivityForResult(intent, 0);
+			}
+        	
+        });
         add.setOnClickListener(this);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                String contents = intent.getStringExtra("SCAN_RESULT");
+                isbn.setText(contents);
+            } else if (resultCode == RESULT_CANCELED) {
+                //TODO(ianchou): show error message
+            }
+        }
+
     }
 
 	@Override
