@@ -1,10 +1,23 @@
 package org.csie.mpp.buku.view;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.BookActivity;
 import org.csie.mpp.buku.MainActivity;
@@ -13,6 +26,8 @@ import org.csie.mpp.buku.ScanActivity;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.listener.ResultCallback;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -81,10 +96,11 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 				entries = new ArrayList<BookEntry>();
 			entries.add(entry);
 			
+			BookInfo info = queryBookInfo(entry.isbn);
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put(FIELD_ICON, R.drawable.book);
-			item.put(FIELD_TITLE, entry.isbn);
-			item.put(FIELD_AUTHOR, "author");
+			item.put(FIELD_TITLE, info.title);
+			item.put(FIELD_AUTHOR, info.author);
 			list_items.add(item);
 		}
 
@@ -169,5 +185,101 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			vm.initView(view);
 			updateBooklist();
 		}
+	}
+	
+	//TODO(ianchou): move this class to someplace more suitable
+	/*
+	 * a class to store the information of book from http://openlibrary.org
+	 */
+	private class BookInfo {
+		public String isbn;
+		public String title;
+		public String author;
+		BookInfo(){
+			title = "Unknown";
+			author = "Unknown";
+		}
+	}
+
+	/*
+	 * handle the query to http://openlibrary.org, get the information of book, may change to use google book.
+	 */
+	public BookInfo queryBookInfo(String isbn) {
+		// need isbn_10 for http://openlibrary.org
+		if(isbn.length()==13){
+			isbn = convertISBN(isbn);
+		}
+		BookInfo bookInfo = new BookInfo();
+		String key = "";
+		String authorsKey = "";
+
+		try{
+			URL url = new URL("http://openlibrary.org/api/things?query={\"type\":\"\\/type\\/edition\",\"isbn_10\":\""+isbn+"\"}");
+			URLConnection conn = url.openConnection ();
+			JSONObject jsonObject = new JSONObject(connectionToString(conn));
+			System.err.println(jsonObject);
+			key = jsonObject.getJSONArray("result").getString(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try{
+			if(key.isEmpty()){
+				return bookInfo;
+			}
+			URL url = new URL("http://openlibrary.org/api/get?key="+key);
+			URLConnection conn = url.openConnection ();
+			JSONObject jsonObject = new JSONObject(connectionToString(conn));
+			JSONObject result = jsonObject.getJSONObject("result");
+			bookInfo.title = result.getString("title");
+			authorsKey = result.getJSONArray("authors").getJSONObject(0).getString("key");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try{
+			if(authorsKey.isEmpty()){
+				return bookInfo;
+			}
+			URL url = new URL("http://openlibrary.org/api/get?key="+authorsKey);
+			URLConnection conn = url.openConnection ();
+			JSONObject jsonObject = new JSONObject(connectionToString(conn));
+			JSONObject result = jsonObject.getJSONObject("result");
+			bookInfo.author = result.getString("name");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return bookInfo;
+	}
+	
+	public String connectionToString(URLConnection conn) {
+		StringBuilder builder = new StringBuilder();
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return builder.toString();
+	}	
+	
+	public String convertISBN(String isbn) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(isbn.substring(3,12));
+		int sum=0;
+		for(int i=0;i<9;++i){
+			sum += (isbn.charAt(i+3)-'0')*(10-i);
+		}
+		int m = sum % 11;
+		if(m==1)
+			builder.append('X');
+		else if(m==0)
+			builder.append(0);
+		else
+			builder.append(11-m);
+		return builder.toString();
 	}
 }
