@@ -1,6 +1,10 @@
 package org.csie.mpp.buku;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.listener.ResultCallback;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.DialogAction;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
@@ -37,8 +41,6 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	protected ViewPageFragment bookshelf, stream, friends;
 	
 	private DBHelper db;
-	private BookshelfManager bookMan;
-	private FriendsManager friendMan;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,12 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         /* initialize FB */
         SessionStore.restore(App.fb, this);
+        register(new ResultCallback() {
+			@Override
+			public void onResult(int requestCode, int resultCode, Intent data) {
+				App.fb.authorizeCallback(requestCode, resultCode, data);
+			}
+        });
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
@@ -60,8 +68,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
         db = new DBHelper(this);
-        bookMan = new BookshelfManager(this, db);
-        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, bookMan);
+        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, new BookshelfManager(this, db));
         viewpagerAdapter.addItem(bookshelf);
         
         /* initialize ViewPager */
@@ -75,10 +82,18 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         	createSessionView();
     }
     
+    private List<ResultCallback> callbacks;
+    public void register(ResultCallback callback) {
+    	if(callbacks == null)
+    		callbacks = new ArrayList<ResultCallback>();
+    	
+    	callbacks.add(callback);
+    }
+    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	App.fb.authorizeCallback(requestCode, resultCode, data);
-    	bookMan.onResultCallback(requestCode, resultCode, data);
+    	for(ResultCallback callback: callbacks)
+    		callback.onResult(requestCode, resultCode, data);
     }
     
     @Override
@@ -90,8 +105,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	stream = new ViewPageFragment(getString(R.string.stream), R.layout.stream);
 		viewpagerAdapter.addItem(stream);
 		
-		friendMan = new FriendsManager(this, db);
-		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends, friendMan);
+		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends, new FriendsManager(this, db));
 		viewpagerAdapter.addItem(friends);
 		
 		viewpagerAdapter.notifyDataSetChanged();

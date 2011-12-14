@@ -6,21 +6,26 @@ import java.util.List;
 import java.util.Map;
 
 import org.csie.mpp.buku.App;
+import org.csie.mpp.buku.BookActivity;
+import org.csie.mpp.buku.MainActivity;
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.ScanActivity;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.listener.ResultCallback;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class BookshelfManager extends ViewManager {
+public class BookshelfManager extends ViewManager implements ResultCallback {
 	private interface ViewManager {
 		public void initView(View view);
 		public int length();
@@ -29,13 +34,18 @@ public class BookshelfManager extends ViewManager {
 		public void remove(BookEntry entry);
 	};
 	
-	private class ListViewManager implements ViewManager {
+	private class ListViewManager implements ViewManager, OnItemClickListener, ResultCallback {
+		public static final int REQUEST_CODE = 435;
 		private static final String FIELD_ICON = "ICON", FIELD_TITLE = "TITLE", FIELD_AUTHOR = "AUTHOR";
 		
-		private BookEntry[] entries; 
+		private List<BookEntry> entries; 
 		private ListView booklist;
 		private SimpleAdapter booklistAdapter;
 		private List<Map<String, Object>> list_items;
+		
+		public ListViewManager() {
+			((MainActivity)activity).register(this);
+		}
 		
 		@Override
 		public void initView(View view) {
@@ -49,22 +59,28 @@ public class BookshelfManager extends ViewManager {
 				}
 			);
 			booklist.setAdapter(booklistAdapter);
+			booklist.setOnItemClickListener(this);
 		}
 		
 		@Override
 		public int length() {
-			return entries == null? 0 : entries.length;
+			return entries == null? 0 : entries.size();
 		}
 		
 		@Override
 		public void setBooks(BookEntry[] es) {
-			entries = es;
-			for(BookEntry entry: entries)
+			entries = null;
+			list_items.clear();
+			for(BookEntry entry: es)
 				_addBook_(entry);
 			booklistAdapter.notifyDataSetChanged();
 		}
 		
 		private void _addBook_(BookEntry entry) {
+			if(entries == null)
+				entries = new ArrayList<BookEntry>();
+			entries.add(entry);
+			
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put(FIELD_ICON, R.drawable.book);
 			item.put(FIELD_TITLE, entry.isbn);
@@ -80,7 +96,21 @@ public class BookshelfManager extends ViewManager {
 
 		@Override
 		public void remove(BookEntry entry) {
-			
+			// TODO
+		}
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			Intent intent = new Intent(activity, BookActivity.class);
+			intent.putExtra(BookActivity.ISBN, entries.get(position).isbn);
+			activity.startActivityForResult(intent, REQUEST_CODE);
+		}
+
+		@Override
+		public void onResult(int requestCode, int resultCode, Intent data) {
+			if(requestCode == REQUEST_CODE) {
+				// TODO
+			}
 		}
 	};
 	
@@ -90,9 +120,10 @@ public class BookshelfManager extends ViewManager {
 		super(activity, helper);
 		
 		vm = new ListViewManager();
+		((MainActivity)activity).register(this);
 	}
 	
-	public void onResultCallback(int requestCode, int resultCode, Intent data) {
+	public void onResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == ScanActivity.REQUEST_CODE) {
 			if(resultCode == ScanActivity.RESULT_FIRST_USER) {
 				BookEntry entry = new BookEntry();

@@ -23,5 +23,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ScanActivity" android:label="@string/scan"></activity>
+        <activity android:name=".BookActivity" android:label="@string/book_info"></activity>
     </application>
 </manifest>
