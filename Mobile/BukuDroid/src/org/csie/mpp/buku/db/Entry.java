@@ -116,6 +116,10 @@ public abstract class Entry {
 			return db.query(getName(), null, null, null, null, null, null).getCount();
 		}
 		
+		public boolean exists(SQLiteDatabase db, String whereClause) {
+			return db.query(getName(), null, whereClause, null, null, null, null).getCount() > 0;
+		}
+		
 		public Cursor queryAll(SQLiteDatabase db, String orderBy) {
 			return db.query(getName(), columns, null, null, null, null, orderBy);
 		}

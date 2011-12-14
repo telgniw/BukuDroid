@@ -23,6 +23,10 @@ public class BookEntry extends Entry {
 		return SCHEMA.count(db);
 	}
 	
+	public static boolean exists(SQLiteDatabase db, String isbn) {
+		return SCHEMA.exists(db, "isbn = \"" + isbn + "\"");
+	}
+	
 	public static BookEntry[] queryAll(SQLiteDatabase db) {
 		return queryAll(db, null);
 	}

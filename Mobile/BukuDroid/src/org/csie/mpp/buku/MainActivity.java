@@ -99,6 +99,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     @Override
     public void onDestroy() {
     	super.onDestroy();
+    	
+    	db.close();
     }
     
     private void createSessionView() {

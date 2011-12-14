@@ -141,7 +141,10 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 	}
 	
 	private void updateBooklist(BookEntry entry) {
-		vm.addBook(entry);
+		if(vm.length() == 0)
+			updateView();
+		else
+			vm.addBook(entry);
 	}
 
 	@Override
