@@ -112,6 +112,10 @@ public abstract class Entry {
 			return db.insert(getName(), null, values) != -1;
 		}
 		
+		public boolean delete(SQLiteDatabase db, String whereClause) {
+			return db.delete(getName(), whereClause, null) > 0;
+		}
+		
 		public int count(SQLiteDatabase db) {
 			return db.query(getName(), null, null, null, null, null, null).getCount();
 		}

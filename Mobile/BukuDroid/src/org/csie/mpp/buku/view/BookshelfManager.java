@@ -12,11 +12,15 @@ import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.ScanActivity;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.listener.ContextMenuCallback;
 import org.csie.mpp.buku.listener.ResultCallback;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -31,10 +35,10 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 		public int length();
 		public void setBooks(BookEntry[] entries);
 		public void addBook(BookEntry entry);
-		public void remove(BookEntry entry);
+		public void removeBook(int position);
 	};
 	
-	private class ListViewManager implements ViewManager, OnItemClickListener, ResultCallback {
+	private class ListViewManager implements ViewManager, OnItemClickListener, ResultCallback, ContextMenuCallback {
 		public static final int REQUEST_CODE = 435;
 		private static final String FIELD_ICON = "ICON", FIELD_TITLE = "TITLE", FIELD_AUTHOR = "AUTHOR";
 		
@@ -60,6 +64,9 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			);
 			booklist.setAdapter(booklistAdapter);
 			booklist.setOnItemClickListener(this);
+			
+			activity.registerForContextMenu(booklist);
+			((MainActivity)activity).register(booklist, this);
 		}
 		
 		@Override
@@ -93,10 +100,17 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			_addBook_(entry);
 			booklistAdapter.notifyDataSetChanged();
 		}
+		
+		private void _removeBook_(int position) {
+			entries.get(position).delete(rdb);
+			entries.remove(position);
+			list_items.remove(position);
+		}
 
 		@Override
-		public void remove(BookEntry entry) {
-			// TODO
+		public void removeBook(int position) {
+			_removeBook_(position);
+			booklistAdapter.notifyDataSetChanged();
 		}
 
 		@Override
@@ -110,6 +124,31 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 		public void onResult(int requestCode, int resultCode, Intent data) {
 			if(requestCode == REQUEST_CODE) {
 				// TODO
+			}
+		}
+
+		private static final int MENU_DELETE = 0;
+		private String[] menuItems;
+		
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, ContextMenuInfo menuInfo) {
+			int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
+			if(menuItems == null)
+				menuItems = activity.getResources().getStringArray(R.array.list_item_longclick);
+			for(String menuItem: menuItems)
+				menu.add(menuItem);
+			menu.setHeaderTitle(entries.get(position).isbn);
+		}
+
+		@Override
+		public void onSelectContextMenu(MenuItem item) {
+			int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
+			switch(item.getItemId()) {
+				case MENU_DELETE:
+					removeBook(position);
+					break;
+				default:
+					break;
 			}
 		}
 	};

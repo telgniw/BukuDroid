@@ -18,6 +18,10 @@ public class BookEntry extends Entry {
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
 	}
+
+	public boolean delete(SQLiteDatabase db) {
+		return SCHEMA.delete(db, "id =\"" + id + "\"");
+	}
 	
 	public static int count(SQLiteDatabase db) {
 		return SCHEMA.count(db);

@@ -12,4 +12,7 @@
     <string name="link_account">Sync with Other Account</string>
     <string name="add">Add to Bookshelf</string>
     <string name="book_info">Information</string>
+    <string-array name="list_item_longclick">
+        <item>Delete</item>
+    </string-array>
 </resources>

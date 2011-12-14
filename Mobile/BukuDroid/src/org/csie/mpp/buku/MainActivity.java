@@ -1,9 +1,12 @@
 package org.csie.mpp.buku;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.listener.ContextMenuCallback;
 import org.csie.mpp.buku.listener.ResultCallback;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.DialogAction;
@@ -18,9 +21,12 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
@@ -82,18 +88,42 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         	createSessionView();
     }
     
-    private List<ResultCallback> callbacks;
+    private List<ResultCallback> resultCallbacks;
     public void register(ResultCallback callback) {
-    	if(callbacks == null)
-    		callbacks = new ArrayList<ResultCallback>();
+    	if(resultCallbacks == null)
+    		resultCallbacks = new ArrayList<ResultCallback>();
     	
-    	callbacks.add(callback);
+    	resultCallbacks.add(callback);
     }
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	for(ResultCallback callback: callbacks)
+    	for(ResultCallback callback: resultCallbacks)
     		callback.onResult(requestCode, resultCode, data);
+    }
+
+    private Map<View, ContextMenuCallback> menuCallbacks;
+    private ContextMenuCallback menuCallback;
+    public void register(View view, ContextMenuCallback callback) {
+    	if(menuCallbacks == null)
+    		menuCallbacks = new HashMap<View, ContextMenuCallback>();
+    	menuCallbacks.put(view, callback);
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    	menuCallback = menuCallbacks.get(v);
+    	if(menuCallback != null)
+    		menuCallback.onCreateContextMenu(menu, menuInfo);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	if(menuCallback != null) {
+    		menuCallback.onSelectContextMenu(item);
+    		menuCallback = null;
+    	}
+    	return true;
     }
     
     @Override

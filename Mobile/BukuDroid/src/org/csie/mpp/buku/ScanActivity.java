@@ -50,6 +50,7 @@ public class ScanActivity extends Activity implements OnClickListener {
 			}
         	
         });
+        
         add.setOnClickListener(this);
     }
     
