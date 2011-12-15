@@ -18,7 +18,6 @@ import org.csie.mpp.buku.listener.ContextMenuCallback;
 import org.csie.mpp.buku.listener.ResultCallback;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -31,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BookshelfManager extends ViewManager implements ResultCallback {
 	private interface ViewManager {
@@ -186,7 +186,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 				if(!BookEntry.exists(rdb, isbn))
 					updateBooklist(isbn);
 				else {
-					new AlertDialog.Builder(activity).setMessage(R.string.book_already_exists).create().show();
+					Toast.makeText(activity, R.string.book_already_exists, 3000).show();
 				}
 			}
 		}
