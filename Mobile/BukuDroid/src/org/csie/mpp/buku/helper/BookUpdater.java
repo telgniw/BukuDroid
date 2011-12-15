@@ -34,9 +34,7 @@ public class BookUpdater {
 		try {
 			URL url = new URL("http://openlibrary.org/api/things?query={\"type\":\"\\/type\\/edition\",\"isbn_10\":\"" + entry.isbn + "\"}");
 			URLConnection conn = url.openConnection();
-			String json = Util.connectionToString(conn);
-			Log.e(App.TAG, json);
-			JSONObject jsonObject = new JSONObject(json);
+			JSONObject jsonObject = new JSONObject(Util.connectionToString(conn));
 			key = jsonObject.getJSONArray("result").getString(0);
 			
 			url = new URL("http://openlibrary.org/api/get?key=" + key);

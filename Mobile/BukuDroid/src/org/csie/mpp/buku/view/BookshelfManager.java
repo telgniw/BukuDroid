@@ -95,7 +95,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put(FIELD_ICON, R.drawable.book);
-			item.put(FIELD_TITLE, entry.time);
+			item.put(FIELD_TITLE, entry.title);
 			item.put(FIELD_AUTHOR, entry.author);
 			list_items.add(item);
 		}
@@ -108,6 +108,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			updater.setOnUpdateFinishedListener(new OnUpdateFinishedListener() {
 				@Override
 				public void OnUpdateFinished(BookEntry entry) {
+					Log.e(App.TAG, "insert into db");
 					if(!entry.insert(wdb))
 						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
 					_addBook_(entry);

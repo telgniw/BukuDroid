@@ -18,7 +18,7 @@ public class Util {
 		else if(m == 0)
 			builder.append(0);
 		else
-			builder.append(11-m);
+			builder.append(11 - m);
 		return builder.toString();
 	}
 	
