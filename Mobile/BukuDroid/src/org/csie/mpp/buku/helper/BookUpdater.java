@@ -28,20 +28,21 @@ public class BookUpdater {
 	}
 	
 	public void update() {
-		String key = "";
-		String authorsKey = "";
+		String isbn = entry.isbn;
+		if(isbn.length() > 10)
+			isbn = Util.convertISBN(isbn);
 		
 		try {
-			URL url = new URL("http://openlibrary.org/api/things?query={\"type\":\"\\/type\\/edition\",\"isbn_10\":\"" + entry.isbn + "\"}");
+			URL url = new URL("http://openlibrary.org/api/things?query={\"type\":\"\\/type\\/edition\",\"isbn_10\":\"" + isbn + "\"}");
 			URLConnection conn = url.openConnection();
 			JSONObject jsonObject = new JSONObject(Util.connectionToString(conn));
-			key = jsonObject.getJSONArray("result").getString(0);
+			String key = jsonObject.getJSONArray("result").getString(0);
 			
 			url = new URL("http://openlibrary.org/api/get?key=" + key);
 			conn = url.openConnection();
 			jsonObject = new JSONObject(Util.connectionToString(conn));
 			JSONObject result = jsonObject.getJSONObject("result");
-			authorsKey = result.getJSONArray("authors").getJSONObject(0).getString("key");
+			String authorsKey = result.getJSONArray("authors").getJSONObject(0).getString("key");
 			entry.title = result.getString("title");
 			
 			url = new URL("http://openlibrary.org/api/get?key=" + authorsKey);

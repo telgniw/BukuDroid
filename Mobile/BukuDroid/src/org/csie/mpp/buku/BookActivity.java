@@ -2,6 +2,8 @@ package org.csie.mpp.buku;
 
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.helper.BookUpdater;
+import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
 import org.csie.mpp.buku.view.DialogAction;
 
 import com.markupartist.android.widget.ActionBar;
@@ -19,6 +21,7 @@ public class BookActivity extends Activity {
 	protected ActionBar actionbar;
 	
 	private DBHelper db;
+	private BookEntry entry;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,13 +34,27 @@ public class BookActivity extends Activity {
         
         db = new DBHelper(this);
 
-        if(!BookEntry.exists(db.getReadableDatabase(), getIntent().getStringExtra(ISBN))) {
-            actionbar.addAction(new DialogAction(this, 0, R.drawable.star));
-        }
+        entry = BookEntry.get(db.getReadableDatabase(), getIntent().getStringExtra(ISBN));
         
+        if(entry != null)
+        	updateView();
+        else {
+            actionbar.addAction(new DialogAction(this, 0, R.drawable.star));
+            BookUpdater updater = new BookUpdater(entry);
+            updater.setOnUpdateFinishedListener(new OnUpdateFinishedListener() {
+				@Override
+				public void OnUpdateFinished(BookEntry entry) {
+					updateView();
+				}
+            });
+        }
+    }
+    
+    private void updateView() {
         ((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
-        ((TextView)findViewById(R.id.title)).setText("title");
-        ((TextView)findViewById(R.id.author)).setText("author");
+        ((TextView)findViewById(R.id.title)).setText(entry.title);
+        ((TextView)findViewById(R.id.author)).setText(entry.author);
+        
         ((RatingBar)findViewById(R.id.rating)).setRating(3.5f);
     }
     

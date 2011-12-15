@@ -19,8 +19,6 @@ import org.csie.mpp.buku.listener.ResultCallback;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -40,7 +38,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 		public int length();
 		public void setBooks(BookEntry[] entries);
 		public void addBook(String isbn);
-		public void removeBook(int position);
+		public void removeBook(BookEntry entry);
 	};
 	
 	private class ListViewManager implements ViewManager, OnItemClickListener, ResultCallback, ContextMenuCallback {
@@ -108,7 +106,6 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			updater.setOnUpdateFinishedListener(new OnUpdateFinishedListener() {
 				@Override
 				public void OnUpdateFinished(BookEntry entry) {
-					Log.e(App.TAG, "insert into db");
 					if(!entry.insert(wdb))
 						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
 					_addBook_(entry);
@@ -118,15 +115,17 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			updater.update();
 		}
 		
-		private void _removeBook_(int position) {
+		private void _removeBook_(BookEntry entry) {
+			int position = entries.indexOf(entry);
 			entries.remove(position);
 			list_items.remove(position);
 		}
 
 		@Override
-		public void removeBook(int position) {
-			entries.get(position).delete(rdb);
-			_removeBook_(position);
+		public void removeBook(BookEntry entry) {
+			if(entry.delete(rdb) == false)
+				Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
+			_removeBook_(entry);
 			booklistAdapter.notifyDataSetChanged();
 		}
 
@@ -145,6 +144,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 		}
 
 		private static final int MENU_DELETE = 0;
+		private BookEntry clickedEntry;
 		private String[] menuItems;
 		
 		@Override
@@ -154,15 +154,15 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 				menuItems = activity.getResources().getStringArray(R.array.list_item_longclick);
 			for(String menuItem: menuItems)
 				menu.add(menuItem);
-			menu.setHeaderTitle(entries.get(position).isbn);
+			clickedEntry = entries.get(position);
+			menu.setHeaderTitle(clickedEntry.isbn);
 		}
 
 		@Override
 		public void onSelectContextMenu(MenuItem item) {
-			int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
 			switch(item.getItemId()) {
 				case MENU_DELETE:
-					removeBook(position);
+					removeBook(clickedEntry);
 					break;
 				default:
 					break;
@@ -186,18 +186,7 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 				if(!BookEntry.exists(rdb, isbn))
 					updateBooklist(isbn);
 				else {
-					new AlertDialog.Builder(activity).setPositiveButton(android.R.string.ok, new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							updateBooklist(isbn);
-						}
-					}).setNegativeButton(android.R.string.cancel, new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					}).setMessage(R.string.book_already_exists).create().show();
+					new AlertDialog.Builder(activity).setMessage(R.string.book_already_exists).create().show();
 				}
 			}
 		}

@@ -6,10 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class BookEntry extends Entry {
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
 	
-	@Column(name="id", type=Type.INTEGER, primary=true)
-	public int id;
-	
-	@Column(name="isbn", type=Type.TEXT, notNull=true, skip=false)
+	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)
 	public String isbn;
 	
 	@Column(name="time", type=Type.DATE, defaultVal="CURRENT_DATE")
@@ -26,11 +23,21 @@ public class BookEntry extends Entry {
 	}
 
 	public boolean delete(SQLiteDatabase db) {
-		return SCHEMA.delete(db, "id =\"" + id + "\"");
+		return SCHEMA.delete(db, "isbn =\"" + isbn + "\"");
 	}
 	
 	public static int count(SQLiteDatabase db) {
 		return SCHEMA.count(db);
+	}
+	
+	public static BookEntry get(SQLiteDatabase db, String isbn) {
+		Cursor cursor = SCHEMA.get(db, "isbn = \"" + isbn + "\"");
+		BookEntry entry = new BookEntry();
+		if(cursor.moveToNext()) {
+			SCHEMA.extract(cursor, entry);
+			return entry;
+		}
+		return null;
 	}
 	
 	public static boolean exists(SQLiteDatabase db, String isbn) {

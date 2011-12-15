@@ -15,5 +15,5 @@
     <string-array name="list_item_longclick">
         <item>Delete</item>
     </string-array>
-    <string name="book_already_exists">You already have this book in the bookshelf. Still want to add it?</string>
+    <string name="book_already_exists">You already have this book in the bookshelf.</string>
 </resources>

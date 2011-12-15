@@ -120,8 +120,12 @@ public abstract class Entry {
 			return db.query(getName(), null, null, null, null, null, null).getCount();
 		}
 		
+		public Cursor get(SQLiteDatabase db, String whereClause) {
+			return db.query(getName(), null, whereClause, null, null, null, null);
+		}
+		
 		public boolean exists(SQLiteDatabase db, String whereClause) {
-			return db.query(getName(), null, whereClause, null, null, null, null).getCount() > 0;
+			return get(db, whereClause).getCount() > 0;
 		}
 		
 		public Cursor queryAll(SQLiteDatabase db, String orderBy) {
