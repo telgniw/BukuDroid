@@ -15,6 +15,15 @@ public class BookEntry extends Entry {
 	@Column(name="time", type=Type.DATE, defaultVal="CURRENT_DATE")
 	public long time;
 	
+	@Column(name="update_time", type=Type.DATE, defaultVal="0")
+	public long update_time;
+	
+	@Column(name="title", type=Type.TEXT)
+	public String title;
+	
+	@Column(name="author", type=Type.TEXT)
+	public String author;
+	
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
 	}
