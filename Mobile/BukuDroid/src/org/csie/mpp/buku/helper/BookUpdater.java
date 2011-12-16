@@ -29,27 +29,19 @@ public class BookUpdater {
 	
 	public void update() {
 		String isbn = entry.isbn;
-		if(isbn.length() > 10)
-			isbn = Util.convertISBN(isbn);
 		
 		try {
-			URL url = new URL("http://openlibrary.org/api/things?query={\"type\":\"\\/type\\/edition\",\"isbn_10\":\"" + isbn + "\"}");
+			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn" + isbn);
 			URLConnection conn = url.openConnection();
 			JSONObject jsonObject = new JSONObject(Util.connectionToString(conn));
-			String key = jsonObject.getJSONArray("result").getString(0);
+			String id = jsonObject.getJSONArray("items").getJSONObject(0).getString("id");
 			
-			url = new URL("http://openlibrary.org/api/get?key=" + key);
+			url = new URL("http://www.google.com/books/feeds/volumes/" + id + "?alt=json");
 			conn = url.openConnection();
 			jsonObject = new JSONObject(Util.connectionToString(conn));
-			JSONObject result = jsonObject.getJSONObject("result");
-			String authorsKey = result.getJSONArray("authors").getJSONObject(0).getString("key");
-			entry.title = result.getString("title");
-			
-			url = new URL("http://openlibrary.org/api/get?key=" + authorsKey);
-			conn = url.openConnection();
-			jsonObject = new JSONObject(Util.connectionToString(conn));
-			result = jsonObject.getJSONObject("result");
-			entry.author = result.getString("name");
+			entry.title = jsonObject.getJSONObject("entry").getJSONObject("title").getString("$t");
+			//TODO(ianchou): handle multiple author case
+			entry.author = jsonObject.getJSONObject("entry").getJSONArray("dc$creator").getJSONObject(0).getString("$t");
 		}
 		catch(Exception e) {
 			Log.e(App.TAG, e.toString());
