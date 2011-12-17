@@ -23,7 +23,7 @@ public class ScanActivity extends Activity implements OnClickListener {
 	
 	protected EditText isbn;
 	protected Button barcode;
-	protected Button add;
+	protected Button lookup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,26 +32,24 @@ public class ScanActivity extends Activity implements OnClickListener {
 
         isbn = (EditText)findViewById(R.id.isbn);
         barcode = (Button)findViewById(R.id.barcode);
-        add = (Button)findViewById(R.id.add);
+        lookup = (Button)findViewById(R.id.look_up);
 
         barcode.setOnClickListener(new OnClickListener(){
-
 			@Override
 			public void onClick(View arg0) {
 				//TODO(ianchou): integrate bar code scanning
 		        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
+		        intent.putExtra("SCAN_MODE", "TWO_D_MODE");
 		        String targetAppPackage = findTargetAppPackage(intent);
 		        if (targetAppPackage == null) {
-		          showDownloadDialog();
+		          createDialog().show();
 		          return;
 		        }
 		        startActivityForResult(intent, 0);
 			}
-        	
         });
         
-        add.setOnClickListener(this);
+        lookup.setOnClickListener(this);
     }
     
     @Override
@@ -60,7 +58,8 @@ public class ScanActivity extends Activity implements OnClickListener {
             if (resultCode == RESULT_OK) {
                 String contents = intent.getStringExtra("SCAN_RESULT");
                 isbn.setText(contents);
-            } else if (resultCode == RESULT_CANCELED) {
+            }
+            else if (resultCode == RESULT_CANCELED) {
                 //TODO(ianchou): show error message
             }
         }
@@ -73,7 +72,7 @@ public class ScanActivity extends Activity implements OnClickListener {
 		
 		Intent data = new Intent();
 		data.putExtra(ScanActivity.ISBN, input);
-		setResult(RESULT_FIRST_USER, data);
+		setResult(RESULT_OK, data);
 		finish();
 	}
 
@@ -86,14 +85,13 @@ public class ScanActivity extends Activity implements OnClickListener {
 	   return null;
 	}
 
-	private AlertDialog showDownloadDialog() {
+	private AlertDialog createDialog() {
 		AlertDialog.Builder downloadDialog = new AlertDialog.Builder(ScanActivity.this);
 		downloadDialog.setTitle("Install Barcode Scanner");
 		downloadDialog.setMessage("This funcion requires Barcode Scanner. Would you like to install it?");
 		downloadDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
 			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
+			public void onClick(DialogInterface dialog, int i) {
 				Uri uri = Uri.parse("market://details?id=com.google.zxing.client.android");
 				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 				try {
@@ -103,15 +101,15 @@ public class ScanActivity extends Activity implements OnClickListener {
 					Log.w(ScanActivity.class.getSimpleName(), "Android Market is not installed; cannot install Barcode Scanner");
 				}
 			}
-
 		});
+		
 		downloadDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-
 			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {}
-
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
 		});
-		return downloadDialog.show();
+		
+		return downloadDialog.create();
 	}
-
 }

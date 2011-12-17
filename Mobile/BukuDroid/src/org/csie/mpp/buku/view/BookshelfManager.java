@@ -5,54 +5,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.csie.mpp.buku.App;
-import org.csie.mpp.buku.BookActivity;
-import org.csie.mpp.buku.MainActivity;
 import org.csie.mpp.buku.R;
-import org.csie.mpp.buku.ScanActivity;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
-import org.csie.mpp.buku.helper.BookUpdater;
-import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
-import org.csie.mpp.buku.listener.ContextMenuCallback;
-import org.csie.mpp.buku.listener.ResultCallback;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class BookshelfManager extends ViewManager implements ResultCallback {
+public class BookshelfManager extends ViewManager {
+	public static interface ViewListener {
+		public void onListViewCreated(ListView view);
+	}
+	
 	private interface ViewManager {
 		public void initView(View view);
 		public int length();
-		public void setBooks(BookEntry[] entries);
-		public void addBook(String isbn);
-		public void removeBook(BookEntry entry);
-	};
+		public void set(BookEntry[] entries);
+		public BookEntry get(int position);
+		public void add(BookEntry entry);
+		public void remove(BookEntry entry);
+	}
 	
-	private class ListViewManager implements ViewManager, OnItemClickListener, ResultCallback, ContextMenuCallback {
-		public static final int REQUEST_CODE = 435;
+	private class ListViewManager implements ViewManager {
 		private static final String FIELD_ICON = "ICON", FIELD_TITLE = "TITLE", FIELD_AUTHOR = "AUTHOR";
 		
 		private List<BookEntry> entries; 
 		private ListView booklist;
 		private SimpleAdapter booklistAdapter;
 		private List<Map<String, Object>> list_items;
-		
-		public ListViewManager() {
-			((MainActivity)activity).register(this);
-		}
 		
 		@Override
 		public void initView(View view) {
@@ -66,10 +50,9 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 				}
 			);
 			booklist.setAdapter(booklistAdapter);
-			booklist.setOnItemClickListener(this);
 			
-			activity.registerForContextMenu(booklist);
-			((MainActivity)activity).register(booklist, this);
+			if(callback != null)
+				callback.onListViewCreated(booklist);
 		}
 		
 		@Override
@@ -78,11 +61,28 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 		}
 		
 		@Override
-		public void setBooks(BookEntry[] es) {
+		public void set(BookEntry[] es) {
 			entries = null;
 			list_items.clear();
 			for(BookEntry entry: es)
 				_addBook_(entry);
+			booklistAdapter.notifyDataSetChanged();
+		}
+		
+		@Override
+		public BookEntry get(int position) {
+			return entries.get(position);
+		}
+
+		@Override
+		public void add(BookEntry entry) {
+			_addBook_(entry);
+			booklistAdapter.notifyDataSetChanged();
+		}
+
+		@Override
+		public void remove(BookEntry entry) {
+			_removeBook_(entry);
 			booklistAdapter.notifyDataSetChanged();
 		}
 		
@@ -97,134 +97,53 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			item.put(FIELD_AUTHOR, entry.author);
 			list_items.add(item);
 		}
-
-		@Override
-		public void addBook(String isbn) {
-			BookEntry entry = new BookEntry();
-			entry.isbn = isbn;
-			BookUpdater updater = new BookUpdater(entry);
-			updater.setOnUpdateFinishedListener(new OnUpdateFinishedListener() {
-				@Override
-				public void OnUpdateFinished(BookEntry entry) {
-					if(!entry.insert(wdb))
-						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
-					_addBook_(entry);
-					booklistAdapter.notifyDataSetChanged();					
-				}
-			});
-			updater.update();
-		}
 		
 		private void _removeBook_(BookEntry entry) {
 			int position = entries.indexOf(entry);
 			entries.remove(position);
 			list_items.remove(position);
 		}
-
-		@Override
-		public void removeBook(BookEntry entry) {
-			if(entry.delete(rdb) == false)
-				Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
-			_removeBook_(entry);
-			booklistAdapter.notifyDataSetChanged();
-		}
-
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			Intent intent = new Intent(activity, BookActivity.class);
-			intent.putExtra(BookActivity.ISBN, entries.get(position).isbn);
-			activity.startActivityForResult(intent, REQUEST_CODE);
-		}
-
-		@Override
-		public void onResult(int requestCode, int resultCode, Intent data) {
-			if(requestCode == REQUEST_CODE) {
-				// TODO
-			}
-		}
-
-		private static final int MENU_DELETE = 0;
-		private BookEntry clickedEntry;
-		private String[] menuItems;
-		
-		@Override
-		public void onCreateContextMenu(ContextMenu menu, ContextMenuInfo menuInfo) {
-			int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
-			if(menuItems == null)
-				menuItems = activity.getResources().getStringArray(R.array.list_item_longclick);
-			for(String menuItem: menuItems)
-				menu.add(menuItem);
-			clickedEntry = entries.get(position);
-			menu.setHeaderTitle(clickedEntry.isbn);
-		}
-
-		@Override
-		public void onSelectContextMenu(MenuItem item) {
-			switch(item.getItemId()) {
-				case MENU_DELETE:
-					removeBook(clickedEntry);
-					break;
-				default:
-					break;
-			}
-		}
-	};
+	}
 	
-	protected ListViewManager vm;
+	private ListViewManager vm;
 	
 	public BookshelfManager(Activity activity, DBHelper helper) {
 		super(activity, helper);
 		
 		vm = new ListViewManager();
-		((MainActivity)activity).register(this);
 	}
 	
-	public void onResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == ScanActivity.REQUEST_CODE) {
-			if(resultCode == ScanActivity.RESULT_FIRST_USER) {
-				final String isbn = data.getStringExtra(ScanActivity.ISBN);
-				if(!BookEntry.exists(rdb, isbn))
-					updateBooklist(isbn);
-				else {
-					Toast.makeText(activity, R.string.book_already_exists, 3000).show();
-				}
-			}
-		}
+	private ViewListener callback;
+	
+	public BookshelfManager(Activity activity, DBHelper helper, ViewListener callback) {
+		this(activity, helper);
+		
+		this.callback = callback;
+	}
+	
+	public void add(String isbn) {
+		BookEntry entry = BookEntry.get(rdb, isbn);
+		if(vm.length() < 0)
+			createBookView();
+		vm.add(entry);
+	}
+	
+	public BookEntry get(int position) {
+		return vm.get(position);
+	}
+	
+	public void remove(BookEntry entry) {
+		vm.remove(entry);
 	}
 	
 	private void updateBooklist() {
 		BookEntry[] entries = BookEntry.queryAll(rdb);
-		vm.setBooks(entries);
-	}
-	
-	private void updateBooklist(String isbn) {
-		if(vm.length() < 0)
-			createBookView();
-		vm.addBook(isbn);
+		vm.set(entries);
 	}
 
 	@Override
 	protected int getFrameId() {
 		return R.id.bookshelf_frame;
-	}
-	
-	private void createBookView() {
-		FrameLayout frame = getFrame();
-		if(frame.getChildCount() > 0)
-			frame.removeAllViews();
-		View view = activity.getLayoutInflater().inflate(R.layout.list, null);
-		frame.addView(view);
-		vm.initView(view);
-	}
-	
-	private void createNoBookView() {
-		FrameLayout frame = getFrame();
-		if(frame.getChildCount() > 0)
-			frame.removeAllViews();
-		View view = activity.getLayoutInflater().inflate(R.layout.none, null);
-		frame.addView(view);
-		TextView text = (TextView)view.findViewById(R.id.inner_text);
-		text.setText(R.string.add_book_to_start);
 	}
 
 	@Override
@@ -235,5 +154,28 @@ public class BookshelfManager extends ViewManager implements ResultCallback {
 			createBookView();
 			updateBooklist();
 		}
+	}
+	
+	private void createBookView() {
+		FrameLayout frame = getFrame();
+		
+		if(frame.getChildCount() > 0)
+			frame.removeAllViews();
+		
+		View view = activity.getLayoutInflater().inflate(R.layout.list, null);
+		frame.addView(view);
+		vm.initView(view);
+	}
+	
+	private void createNoBookView() {
+		FrameLayout frame = getFrame();
+		
+		if(frame.getChildCount() > 0)
+			frame.removeAllViews();
+		
+		View view = activity.getLayoutInflater().inflate(R.layout.none, null);
+		frame.addView(view);
+		TextView text = (TextView)view.findViewById(R.id.inner_text);
+		text.setText(R.string.add_book_to_start);
 	}
 }

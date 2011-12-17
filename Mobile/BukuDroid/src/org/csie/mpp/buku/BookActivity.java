@@ -4,19 +4,24 @@ import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
 import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
-import org.csie.mpp.buku.view.DialogAction;
 
 import com.markupartist.android.widget.ActionBar;
+import com.markupartist.android.widget.ActionBar.AbstractAction;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class BookActivity extends Activity {
+public class BookActivity extends Activity implements OnUpdateFinishedListener {
+	public static final int REQUEST_CODE = 1437;
 	public static final String ISBN = "isbn";
+	public static final String CHECK_DUPLICATE = "duplicate";
 
 	protected ActionBar actionbar;
 	
@@ -34,28 +39,41 @@ public class BookActivity extends Activity {
         
         db = new DBHelper(this);
 
-        entry = BookEntry.get(db.getReadableDatabase(), getIntent().getStringExtra(ISBN));
+        Intent intent = getIntent();
+        String isbn = intent.getStringExtra(ISBN);
+        entry = BookEntry.get(db.getReadableDatabase(), isbn);
         
-        if(entry != null)
-        	updateView();
-        else {
-            actionbar.addAction(new DialogAction(this, 0, R.drawable.star));
-            BookUpdater updater = new BookUpdater(entry);
-            updater.setOnUpdateFinishedListener(new OnUpdateFinishedListener() {
-				@Override
-				public void OnUpdateFinished(BookEntry entry) {
-					updateView();
-				}
-            });
+        boolean updateAll = false;
+        
+        if(entry != null) {
+        	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
+        		Toast.makeText(this, R.string.book_already_exists, 3000).show();
         }
-    }
-    
-    private void updateView() {
-        ((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
-        ((TextView)findViewById(R.id.title)).setText(entry.title);
-        ((TextView)findViewById(R.id.author)).setText(entry.author);
+        else {
+        	actionbar.addAction(new AbstractAction(R.drawable.star) {
+				@Override
+				public void performAction(View view) {
+					entry.insert(db.getWritableDatabase());
+					
+					Intent data = new Intent();
+					data.putExtra(BookActivity.ISBN, entry.isbn);
+					setResult(RESULT_OK, data);
+					finish();
+				}
+        	});
+        	
+        	entry = new BookEntry();
+        	entry.isbn = isbn;
+        	updateAll = true;
+        }	
+        	
+        BookUpdater updater = new BookUpdater(entry);
+        updater.setOnUpdateFinishedListener(this);
         
-        ((RatingBar)findViewById(R.id.rating)).setRating(3.5f);
+        if(updateAll)
+        	updater.update();
+        else
+        	updater.updateInfo();
     }
     
     @Override
@@ -63,5 +81,25 @@ public class BookActivity extends Activity {
     	super.onDestroy();
     	
     	db.close();
+    }
+
+    /* --- OnUpdateFinishedListener	(start) --- */
+	@Override
+	public void OnUpdateFinished(BookEntry entry) {
+		updateView();
+	}
+
+	@Override
+	public void OnUpdateFailed(BookEntry entry) {
+		// TODO
+	}
+	/* --- OnUpdateFinishedListener	(end) --- */
+    
+    private void updateView() {
+        ((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
+        ((TextView)findViewById(R.id.title)).setText(entry.title);
+        ((TextView)findViewById(R.id.author)).setText(entry.author);
+        
+        ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
     }
 }

@@ -10,10 +10,11 @@
     <string name="login_failed">Login failed!</string>
     <string name="add_book_to_start">Click the button on the upper-right corner to add some books.</string>
     <string name="link_account">Sync with Other Account</string>
-    <string name="add">Add to Bookshelf</string>
+    <string name="look_up">Look up this book.</string>
     <string name="book_info">Information</string>
     <string-array name="list_item_longclick">
         <item>Delete</item>
     </string-array>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>
+    <string name="delete_failed">Failed on deleting the book:</string>
 </resources>

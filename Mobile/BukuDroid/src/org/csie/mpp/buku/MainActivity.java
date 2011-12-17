@@ -1,14 +1,9 @@
 package org.csie.mpp.buku;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
-import org.csie.mpp.buku.listener.ContextMenuCallback;
-import org.csie.mpp.buku.listener.ResultCallback;
 import org.csie.mpp.buku.view.BookshelfManager;
+import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
 import org.csie.mpp.buku.view.DialogAction;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
 import org.csie.mpp.buku.view.FriendsManager;
@@ -21,12 +16,16 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
@@ -37,7 +36,7 @@ import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends FragmentActivity implements DialogActionListener {
+public class MainActivity extends FragmentActivity implements DialogActionListener, ViewListener, OnItemClickListener {
 	protected ActionBar actionbar;
 	
 	protected TitlePageIndicator indicator;
@@ -47,6 +46,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	protected ViewPageFragment bookshelf, stream, friends;
 	
 	private DBHelper db;
+	private BookshelfManager bookMan;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,12 +56,6 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         /* initialize FB */
         SessionStore.restore(App.fb, this);
-        register(new ResultCallback() {
-			@Override
-			public void onResult(int requestCode, int resultCode, Intent data) {
-				App.fb.authorizeCallback(requestCode, resultCode, data);
-			}
-        });
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
@@ -74,7 +68,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
         db = new DBHelper(this);
-        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, new BookshelfManager(this, db));
+        bookMan = new BookshelfManager(this, db, this);
+        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
         /* initialize ViewPager */
@@ -88,42 +83,31 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         	createSessionView();
     }
     
-    private List<ResultCallback> resultCallbacks;
-    public void register(ResultCallback callback) {
-    	if(resultCallbacks == null)
-    		resultCallbacks = new ArrayList<ResultCallback>();
-    	
-    	resultCallbacks.add(callback);
-    }
-    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	for(ResultCallback callback: resultCallbacks)
-    		callback.onResult(requestCode, resultCode, data);
-    }
-
-    private Map<View, ContextMenuCallback> menuCallbacks;
-    private ContextMenuCallback menuCallback;
-    public void register(View view, ContextMenuCallback callback) {
-    	if(menuCallbacks == null)
-    		menuCallbacks = new HashMap<View, ContextMenuCallback>();
-    	menuCallbacks.put(view, callback);
-    }
-    
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-    	menuCallback = menuCallbacks.get(v);
-    	if(menuCallback != null)
-    		menuCallback.onCreateContextMenu(menu, menuInfo);
-    }
-    
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-    	if(menuCallback != null) {
-    		menuCallback.onSelectContextMenu(item);
-    		menuCallback = null;
+    	switch(requestCode) {
+    		case ScanActivity.REQUEST_CODE:
+    			if(resultCode == RESULT_OK) {
+    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				startBookActivity(isbn, true);
+    			}
+    			break;
+    		case BookActivity.REQUEST_CODE:
+    			if(resultCode == RESULT_OK) {
+    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				bookMan.add(isbn);
+    			}
+    			break;
     	}
-    	return true;
+    	
+    	App.fb.authorizeCallback(requestCode, resultCode, data);
+    }
+    
+    public void startBookActivity(String isbn, boolean checkDuplicate) {
+    	Intent intent = new Intent(this, BookActivity.class);
+		intent.putExtra(BookActivity.ISBN, isbn);
+		intent.putExtra(BookActivity.CHECK_DUPLICATE, checkDuplicate);
+		startActivityForResult(intent, BookActivity.REQUEST_CODE);
     }
     
     @Override
@@ -163,6 +147,40 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     }
     /* --- OptionsMenu			(end) --- */
 
+    /* --- ContextMenu			(start) --- */
+	private static final int MENU_DELETE = 0;
+	private String[] menuItems;
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+    	int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
+		if(menuItems == null)
+			menuItems = getResources().getStringArray(R.array.list_item_longclick);
+		for(String menuItem: menuItems)
+			menu.add(menuItem);
+		BookEntry entry = bookMan.get(position);
+		menu.setHeaderTitle(entry.title);
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+			case MENU_DELETE:
+				int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
+				BookEntry entry = bookMan.get(position);
+				if(entry.delete(db.getWritableDatabase()) == false) {
+					Toast.makeText(MainActivity.this, getString(R.string.delete_failed) + entry.title, App.TOAST_TIME).show();
+					Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
+				}
+				bookMan.remove(entry);
+				break;
+			default:
+				break;
+		}
+    	return true;
+    }
+    /* --- ContextMenu			(end) --- */
+
     /* --- DialogActionListener	(start) --- */
 	@Override
 	public void onCreate(final Dialog dialog) {
@@ -188,4 +206,19 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
 	/* --- DialogActionListener	(end) --- */
+
+	/* --- ViewListener			(start) --- */ 
+	@Override
+	public void onListViewCreated(ListView view) {
+		registerForContextMenu(view);
+		view.setOnItemClickListener(this);
+	}
+	/* --- ViewListener			(end) --- */
+
+	/* -- OnItemClickListener	(start) --- */
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		startBookActivity(bookMan.get(position).isbn, false);
+	}
+	/* --- OnItemClickListener	(end) --- */
 }

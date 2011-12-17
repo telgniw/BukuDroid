@@ -6,6 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 public class BookEntry extends Entry {
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
 	
+	public static class Info {
+		public float rating;
+		public int ratingsCount;
+	}
+	
 	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)
 	public String isbn;
 	
@@ -17,6 +22,8 @@ public class BookEntry extends Entry {
 	
 	@Column(name="author", type=Type.TEXT, skip=false)
 	public String author;
+	
+	public Info info = new Info();
 	
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
