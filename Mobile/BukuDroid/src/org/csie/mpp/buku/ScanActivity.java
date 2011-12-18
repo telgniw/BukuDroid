@@ -39,7 +39,7 @@ public class ScanActivity extends Activity implements OnClickListener {
 			public void onClick(View arg0) {
 				//TODO(ianchou): integrate bar code scanning
 		        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-		        intent.putExtra("SCAN_MODE", "TWO_D_MODE");
+		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
 		        String targetAppPackage = findTargetAppPackage(intent);
 		        if (targetAppPackage == null) {
 		          createDialog().show();

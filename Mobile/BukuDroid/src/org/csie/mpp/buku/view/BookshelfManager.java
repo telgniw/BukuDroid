@@ -1,24 +1,50 @@
 package org.csie.mpp.buku.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class BookshelfManager extends ViewManager {
 	public static interface ViewListener {
 		public void onListViewCreated(ListView view);
+	}
+	
+	private static class BookEntryAdapter extends ArrayAdapter<BookEntry> {
+		private LayoutInflater inflater;
+		private int resourceId;
+		private List<BookEntry> entries;
+		
+		public BookEntryAdapter(Activity activity, int resource, List<BookEntry> list) {
+			super(activity, resource, list);
+			
+			inflater = activity.getLayoutInflater();
+			resourceId = resource;
+			entries = list;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			BookEntry entry = entries.get(position);
+			View view = inflater.inflate(resourceId, parent, false);
+			// TODO: using ImageLoader instead
+			((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(entry.cover);
+			((TextView)view.findViewById(R.id.list_title)).setText(entry.title);
+			((TextView)view.findViewById(R.id.list_author)).setText(entry.author);
+			return view;
+		}
 	}
 	
 	private interface ViewManager {
@@ -31,24 +57,16 @@ public class BookshelfManager extends ViewManager {
 	}
 	
 	private class ListViewManager implements ViewManager {
-		private static final String FIELD_ICON = "ICON", FIELD_TITLE = "TITLE", FIELD_AUTHOR = "AUTHOR";
-		
 		private List<BookEntry> entries; 
 		private ListView booklist;
-		private SimpleAdapter booklistAdapter;
-		private List<Map<String, Object>> list_items;
+		private BookEntryAdapter booklistAdapter;
 		
 		@Override
 		public void initView(View view) {
+			entries = new ArrayList<BookEntry>();
 			booklist = (ListView)view.findViewById(R.id.inner_list);
-			list_items = new ArrayList<Map<String, Object>>();
-			booklistAdapter = new SimpleAdapter(
-				activity, list_items, R.layout.list_item_book, new String[] {
-					FIELD_ICON, FIELD_TITLE, FIELD_AUTHOR
-				}, new int[] {
-					R.id.list_image, R.id.list_title, R.id.list_author
-				}
-			);
+			booklistAdapter = new BookEntryAdapter(activity, R.layout.list_item_book, entries);
+			
 			booklist.setAdapter(booklistAdapter);
 			
 			if(callback != null)
@@ -62,8 +80,7 @@ public class BookshelfManager extends ViewManager {
 		
 		@Override
 		public void set(BookEntry[] es) {
-			entries = null;
-			list_items.clear();
+			entries.clear();
 			for(BookEntry entry: es)
 				_addBook_(entry);
 			booklistAdapter.notifyDataSetChanged();
@@ -87,21 +104,12 @@ public class BookshelfManager extends ViewManager {
 		}
 		
 		private void _addBook_(BookEntry entry) {
-			if(entries == null)
-				entries = new ArrayList<BookEntry>();
 			entries.add(entry);
-			
-			Map<String, Object> item = new HashMap<String, Object>();
-			item.put(FIELD_ICON, R.drawable.book);
-			item.put(FIELD_TITLE, entry.title);
-			item.put(FIELD_AUTHOR, entry.author);
-			list_items.add(item);
 		}
 		
 		private void _removeBook_(BookEntry entry) {
 			int position = entries.indexOf(entry);
 			entries.remove(position);
-			list_items.remove(position);
 		}
 	}
 	

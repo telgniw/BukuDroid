@@ -71,9 +71,9 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         updater.setOnUpdateFinishedListener(this);
         
         if(updateAll)
-        	updater.update();
-        else
-        	updater.updateInfo();
+        	updater.updateEntry();
+        
+        updater.updateInfo();
     }
     
     @Override
@@ -91,12 +91,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
 	@Override
 	public void OnUpdateFailed(BookEntry entry) {
-		// TODO
+		updateView();
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
     private void updateView() {
-        ((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
+        ((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
         ((TextView)findViewById(R.id.title)).setText(entry.title);
         ((TextView)findViewById(R.id.author)).setText(entry.author);
         

@@ -1,8 +1,16 @@
 package org.csie.mpp.buku;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.URLConnection;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 
 public class Util {
 	public static String isbn13To10(String isbn13) {
@@ -45,9 +53,10 @@ public class Util {
 		return isbn10To13(isbn9);
 	}
 	
-	public static String connectionToString(URLConnection conn) {
+	public static String urlToString(URL url) {
 		StringBuilder builder = new StringBuilder();
 		try {
+			URLConnection conn = url.openConnection();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -55,8 +64,34 @@ public class Util {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Log.e(App.TAG, e.toString());
 		}
 		return builder.toString();
+	}
+	
+	public static Bitmap urlToImage(URL url) {
+		try {
+			URLConnection conn = url.openConnection();
+			InputStream is = new BufferedInputStream(conn.getInputStream());
+			Bitmap bitmap = BitmapFactory.decodeStream(is);
+			is.close();
+			return bitmap;
+		}
+		catch(Exception e) {
+			Log.e(App.TAG, e.toString());
+		}
+		return null;
+	}
+	
+	public static byte[] toByteArray(Bitmap bitmap) {
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 80, os);
+			return os.toByteArray();
+		}
+		catch(Exception e) {
+			Log.e(App.TAG, e.toString());
+		}
+		return null;
 	}
 }

@@ -8,9 +8,13 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.csie.mpp.buku.Util;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public abstract class Entry {
 	public static enum Type {
@@ -18,7 +22,7 @@ public abstract class Entry {
 		INTEGER,
 		DATE,
 		TEXT,
-		BLOB
+		IMAGE
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -98,10 +102,12 @@ public abstract class Entry {
 						case TEXT:
 							values.put(c.name(), (String)field.get(entry));
 							break;
-						case BLOB:
-							values.put(c.name(), (byte[])field.get(entry));
+						case IMAGE:
+							byte[] bytes = Util.toByteArray((Bitmap)field.get(entry));
+							values.put(c.name(), bytes);
 							break;
 						default:
+							values.put(c.name(), (byte[])field.get(entry));
 							break;
 					}
 				}
@@ -149,10 +155,17 @@ public abstract class Entry {
 						case TEXT:
 							fields[i].set(entry, cursor.isNull(i)? null : cursor.getString(i));
 							break;
-						case BLOB:
-							fields[i].set(entry, cursor.isNull(i)? null : cursor.getBlob(i));
+						case IMAGE:
+							if(cursor.isNull(i))
+								fields[i].set(entry, null);
+							else {
+								byte[] bytes = cursor.getBlob(i);
+								Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+								fields[i].set(entry, bitmap);
+							}
 							break;
 						default:
+							fields[i].set(entry, cursor.isNull(i)? null : cursor.getBlob(i));
 							break;
 					}
 				}

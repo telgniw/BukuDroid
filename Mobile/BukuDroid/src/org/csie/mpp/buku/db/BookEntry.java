@@ -2,6 +2,7 @@ package org.csie.mpp.buku.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
 public class BookEntry extends Entry {
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
@@ -22,6 +23,9 @@ public class BookEntry extends Entry {
 	
 	@Column(name="author", type=Type.TEXT, skip=false)
 	public String author;
+	
+	@Column(name="cover", type=Type.IMAGE, skip=false)
+	public Bitmap cover;
 	
 	public Info info = new Info();
 	
