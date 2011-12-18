@@ -37,14 +37,8 @@ public class ScanActivity extends Activity implements OnClickListener {
         barcode.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-				//TODO(ianchou): integrate bar code scanning
-		        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+		        Intent intent = new Intent("com.google.zxing.client.android.SCANX");
 		        intent.putExtra("SCAN_MODE", "TWO_D_MODE");
-		        String targetAppPackage = findTargetAppPackage(intent);
-		        if (targetAppPackage == null) {
-		          createDialog().show();
-		          return;
-		        }
 		        startActivityForResult(intent, 0);
 			}
         });
@@ -74,42 +68,5 @@ public class ScanActivity extends Activity implements OnClickListener {
 		data.putExtra(ScanActivity.ISBN, input);
 		setResult(RESULT_OK, data);
 		finish();
-	}
-
-	private String findTargetAppPackage(Intent intent) {
-	   PackageManager pm = ScanActivity.this.getPackageManager();
-	   List<ResolveInfo> availableApps = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-	   if (availableApps!=null && !availableApps.isEmpty()) {
-		   return availableApps.get(0).activityInfo.packageName;
-	   }
-	   return null;
-	}
-
-	private AlertDialog createDialog() {
-		AlertDialog.Builder downloadDialog = new AlertDialog.Builder(ScanActivity.this);
-		downloadDialog.setTitle("Install Barcode Scanner");
-		downloadDialog.setMessage("This funcion requires Barcode Scanner. Would you like to install it?");
-		downloadDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int i) {
-				Uri uri = Uri.parse("market://details?id=com.google.zxing.client.android");
-				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-				try {
-					ScanActivity.this.startActivity(intent);
-				} catch (ActivityNotFoundException anfe) {
-					// Hmm, market is not installed
-					Log.w(ScanActivity.class.getSimpleName(), "Android Market is not installed; cannot install Barcode Scanner");
-				}
-			}
-		});
-		
-		downloadDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		
-		return downloadDialog.create();
 	}
 }
