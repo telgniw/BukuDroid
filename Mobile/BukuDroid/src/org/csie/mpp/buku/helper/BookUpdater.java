@@ -48,8 +48,8 @@ public class BookUpdater {
 				protected boolean update(URL url) {
 					try {
 						JSONObject json = new JSONObject(Util.urlToString(url));
+						entry.vid = json.getJSONArray("items").getJSONObject(0).getString("id");
 						json = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo");
-						
 						JSONArray isbns = json.getJSONArray("industryIdentifiers");
 						String isbn10 = null, isbn13 = null;
 						for(int i = 0; i < isbns.length(); i++) {
@@ -101,13 +101,13 @@ public class BookUpdater {
 	
 	public boolean updateInfo() {
 		try {
-			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn" + entry.isbn);
+			URL url = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
 			AsyncUpdater async = new AsyncUpdater() {
 				@Override
 				protected boolean update(URL url) {
 					try {
 						JSONObject json = new JSONObject(Util.urlToString(url));
-						json = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo");
+						json = json.getJSONObject("volumeInfo");
 						
 						updateInfo(json);
 					}
@@ -135,5 +135,6 @@ public class BookUpdater {
 	protected void updateInfo(JSONObject json) throws JSONException {
 		entry.info.rating = (float)json.getDouble("averageRating");
 		entry.info.ratingsCount = json.getInt("ratingsCount");
+		entry.info.description = json.getString("description");
 	}
 }

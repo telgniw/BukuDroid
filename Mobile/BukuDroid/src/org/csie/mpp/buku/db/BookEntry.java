@@ -10,9 +10,13 @@ public class BookEntry extends Entry {
 	public static class Info {
 		public float rating;
 		public int ratingsCount;
+		public String description;
 	}
 	
-	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)
+	@Column(name="vid", type=Type.TEXT, primary=true, notNull=true, skip=false)
+	public String vid;
+	
+	@Column(name="isbn", type=Type.TEXT, skip=false)
 	public String isbn;
 	
 	@Column(name="time", type=Type.DATE, defaultVal="CURRENT_DATE")
@@ -28,7 +32,7 @@ public class BookEntry extends Entry {
 	public Bitmap cover;
 	
 	public Info info = new Info();
-	
+
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
 	}
