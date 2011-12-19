@@ -43,6 +43,7 @@ import android.widget.TextView;
  *
  * @author dswitkin@google.com (Daniel Switkin)
  */
+@SuppressWarnings("deprecation")
 public final class ShareActivity extends Activity {
 
   private static final String TAG = ShareActivity.class.getSimpleName();

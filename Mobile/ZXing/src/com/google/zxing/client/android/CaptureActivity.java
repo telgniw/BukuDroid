@@ -79,6 +79,7 @@ import java.util.Set;
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
+@SuppressWarnings("deprecation")
 public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
@@ -589,7 +590,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         if (ecLevel != null) {
           intent.putExtra(Intents.Scan.RESULT_ERROR_CORRECTION_LEVEL, ecLevel);
         }
-        Iterable<byte[]> byteSegments = (Iterable<byte[]>) metadata.get(ResultMetadataType.BYTE_SEGMENTS);
+        @SuppressWarnings("unchecked")
+		Iterable<byte[]> byteSegments = (Iterable<byte[]>) metadata.get(ResultMetadataType.BYTE_SEGMENTS);
         if (byteSegments != null) {
           int i = 0;
           for (byte[] byteSegment : byteSegments) {

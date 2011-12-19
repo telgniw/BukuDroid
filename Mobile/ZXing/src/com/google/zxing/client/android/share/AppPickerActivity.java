@@ -30,6 +30,7 @@ public final class AppPickerActivity extends ListActivity {
 
   private final List<String[]> labelsPackages = new ArrayList<String[]>();
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);

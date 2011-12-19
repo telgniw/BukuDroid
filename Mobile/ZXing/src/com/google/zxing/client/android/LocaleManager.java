@@ -168,9 +168,4 @@ public final class LocaleManager {
   public static String getTranslatedAssetLanguage() {
     return TRANSLATED_HELP_ASSET_LANGUAGES.contains(LANGUAGE) ? LANGUAGE : DEFAULT_LANGUAGE;
   }
-
-  private static String doGetTLD(Map<String,String> map) {
-    String tld = map.get(COUNTRY);
-    return tld == null ? DEFAULT_TLD : tld;
-  }
 }
