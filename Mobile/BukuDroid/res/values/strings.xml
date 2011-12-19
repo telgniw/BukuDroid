@@ -14,7 +14,7 @@
     <string name="book_info">Information</string>
     <string name="search_label">Search</string>
     <string name="search_result">Search Result</string>
-    <string name="search_hint">Enter Author/Title/ISBN...</string>
+    <string name="search_hint">Author/Title/ISBN...</string>
     <string-array name="list_item_longclick">
         <item>Delete</item>
     </string-array>
