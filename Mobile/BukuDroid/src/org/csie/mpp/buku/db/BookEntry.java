@@ -3,7 +3,6 @@ package org.csie.mpp.buku.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 public class BookEntry extends Entry {
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
@@ -60,7 +59,6 @@ public class BookEntry extends Entry {
 		String query = "title LIKE '%" + keyword + "%' ";
 		query += "OR author LIKE '%" + keyword + "%' ";
 		query += "OR isbn LIKE '%" + keyword + "%' ";
-		Log.d("BuKuDroid", query);
 		Cursor cursor = SCHEMA.get(db, query);
 		BookEntry[] entries = new BookEntry[cursor.getCount()];
 		for(int i = 0; cursor.moveToNext(); i++) {

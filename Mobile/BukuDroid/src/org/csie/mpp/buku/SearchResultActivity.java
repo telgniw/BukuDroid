@@ -21,7 +21,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class SearchResultActivity extends Activity {
@@ -50,12 +49,7 @@ public class SearchResultActivity extends Activity {
         bundle = intent.getExtras();
         
         query = bundle.getString("query");
-        Toast popup = Toast.makeText(this, query, Toast.LENGTH_SHORT);
-    	popup.show();
-    	
-        
-        entries = BookEntry.search(db.getReadableDatabase(), query);//BookEntry.queryAll(db.getReadableDatabase());
-        //entries = BookEntry.queryAll(db.getReadableDatabase());
+        entries = BookEntry.search(db.getReadableDatabase(), query);
         
         books = new ArrayList<BookEntry>();
         for(BookEntry es: entries)

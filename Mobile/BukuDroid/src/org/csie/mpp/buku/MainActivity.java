@@ -84,6 +84,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         if(App.fb.isSessionValid())
         	createSessionView();
         
+        /* get search bar information */
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
           String query = intent.getStringExtra(SearchManager.QUERY);
@@ -233,10 +234,10 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		startBookActivity(bookMan.get(position).isbn, false);
 	}
 	/* --- OnItemClickListener	(end) --- */
+	
+	/* --- Send Search (start) --- */ 
 	 private void doMySearch(String query) {
-/*	    	Toast popup = Toast.makeText(AddressListActivity.this, query, Toast.LENGTH_SHORT);
-	    	popup.show();*/
-	    	
+    	
 	    	Intent intent = new Intent();
 			intent.setClass(MainActivity.this, SearchResultActivity.class);
 			
@@ -249,4 +250,5 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	    	
 	    	return;
 		}
+	 /* --- Send Search (end) --- */
 }
