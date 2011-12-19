@@ -19,7 +19,7 @@
           android:versionName="4.0 alpha 1"
           android:versionCode="77"
           android:installLocation="auto">
-  <uses-sdk android:minSdkVersion="7"
+  <uses-sdk android:minSdkVersion="14"
             android:targetSdkVersion="7"/>
   <!-- Donut-specific flags which allow us to run on any dpi screens. -->
   <supports-screens android:xlargeScreens="true"
