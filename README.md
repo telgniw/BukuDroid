@@ -1,3 +1,8 @@
+Warnings
+========
+
+1. Don't delete `default.properties` in the eclipse project folder.
+
 Tips for Setup the Projects
 ===========================
 
@@ -20,6 +25,9 @@ Eclipse
 ### Import Eclipse Project
 `File` -> `Import` -> `Existing Projects into Workspace` -> Select a Folder
 
+### Clean Eclipse Project
+`Project` -> `Clean` -> `Clean all projects.`
+
 ### Setup Project Dependency
 1. Import all projects under the folder `/Mobile`.
 2. Right-Click on the Projects -> `Preferences` -> `Android`: Ensure `Is Library` is checked.
@@ -28,3 +36,4 @@ Eclipse
   - `ViewPagerIndicator`
   - `ZXing`
 3. `BukuDroid` -> `Preferences` -> `Android`: Add the above Projects to `Library`.
+4. Clean all projects if still having errors.
