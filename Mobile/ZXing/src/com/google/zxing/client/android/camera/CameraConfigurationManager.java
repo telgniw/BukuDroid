@@ -72,7 +72,6 @@ final class CameraConfigurationManager {
 
   void setDesiredCameraParameters(Camera camera) {
     Camera.Parameters parameters = camera.getParameters();
-
     if (parameters == null) {
       Log.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
       return;
@@ -90,10 +89,11 @@ final class CameraConfigurationManager {
 
     parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
     camera.setParameters(parameters);
+    camera.setDisplayOrientation(90);
   }
 
   Point getCameraResolution() {
-    return cameraResolution;
+	return cameraResolution;
   }
 
   Point getScreenResolution() {

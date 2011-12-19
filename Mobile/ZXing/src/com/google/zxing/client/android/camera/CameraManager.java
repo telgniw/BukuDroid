@@ -182,20 +182,20 @@ public final class CameraManager {
         return null;
       }
       Point screenResolution = configManager.getScreenResolution();
-      int width = screenResolution.x * 3 / 4;
+      int width = screenResolution.y * 3 / 4;
       if (width < MIN_FRAME_WIDTH) {
         width = MIN_FRAME_WIDTH;
       } else if (width > MAX_FRAME_WIDTH) {
         width = MAX_FRAME_WIDTH;
       }
-      int height = screenResolution.y * 3 / 4;
+      int height = screenResolution.x * 3 / 4;
       if (height < MIN_FRAME_HEIGHT) {
         height = MIN_FRAME_HEIGHT;
       } else if (height > MAX_FRAME_HEIGHT) {
         height = MAX_FRAME_HEIGHT;
       }
-      int leftOffset = (screenResolution.x - width) / 2;
-      int topOffset = (screenResolution.y - height) / 2;
+      int leftOffset = (screenResolution.y - width) / 2;
+      int topOffset = (screenResolution.x - height) / 2;
       framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
       Log.d(TAG, "Calculated framing rect: " + framingRect);
     }
@@ -226,7 +226,7 @@ public final class CameraManager {
 
   /**
    * Allows third party apps to specify the scanning rectangle dimensions, rather than determine
-   * them automatically based on screen resolution.
+   * them automatically based surfaceResolutionon screen resolution.
    *
    * @param width The width in pixels to scan.
    * @param height The height in pixels to scan.

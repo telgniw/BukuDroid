@@ -28,7 +28,7 @@
         <activity android:name=".BookActivity" android:label="@string/book_info"></activity>
 				<activity 
 				    android:name="com.google.zxing.client.android.CaptureActivity"
-					android:screenOrientation="landscape"
+					android:screenOrientation="portrait"
 					android:configChanges="orientation|keyboardHidden"
 					android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
 					android:windowSoftInputMode="stateAlwaysHidden"
