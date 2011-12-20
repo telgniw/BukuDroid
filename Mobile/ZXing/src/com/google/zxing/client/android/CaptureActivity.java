@@ -26,11 +26,9 @@ import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
 import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
-import com.google.zxing.client.android.share.ShareActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -47,8 +45,6 @@ import android.text.ClipboardManager;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -83,12 +79,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   
   private static final String TAG = CaptureActivity.class.getSimpleName();
 
-  private static final int SHARE_ID = Menu.FIRST;
-  private static final int HISTORY_ID = Menu.FIRST + 1;
-  private static final int SETTINGS_ID = Menu.FIRST + 2;
-  private static final int HELP_ID = Menu.FIRST + 3;
-  private static final int ABOUT_ID = Menu.FIRST + 4;
-
   private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
   private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
 
@@ -117,20 +107,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String returnUrlTemplate;
   private Collection<BarcodeFormat> decodeFormats;
   private String characterSet;
-  private String versionName;
   private HistoryManager historyManager;
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
 
-  private final DialogInterface.OnClickListener aboutListener =
-      new DialogInterface.OnClickListener() {
-    @Override
-    public void onClick(DialogInterface dialogInterface, int i) {
-      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.zxing_url)));
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      startActivity(intent);
-    }
-  };
 
   ViewfinderView getViewfinderView() {
     return viewfinderView;
@@ -297,64 +277,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       return true;
     }
     return super.onKeyDown(keyCode, event);
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    super.onCreateOptionsMenu(menu);
-    menu.add(0, SHARE_ID, 0, R.string.menu_share)
-        .setIcon(android.R.drawable.ic_menu_share);
-    menu.add(0, HISTORY_ID, 0, R.string.menu_history)
-        .setIcon(android.R.drawable.ic_menu_recent_history);
-    menu.add(0, SETTINGS_ID, 0, R.string.menu_settings)
-        .setIcon(android.R.drawable.ic_menu_preferences);
-    menu.add(0, HELP_ID, 0, R.string.menu_help)
-        .setIcon(android.R.drawable.ic_menu_help);
-    menu.add(0, ABOUT_ID, 0, R.string.menu_about)
-        .setIcon(android.R.drawable.ic_menu_info_details);
-    return true;
-  }
-
-  // Don't display the share menu item if the result overlay is showing.
-  @Override
-  public boolean onPrepareOptionsMenu(Menu menu) {
-    super.onPrepareOptionsMenu(menu);
-    menu.findItem(SHARE_ID).setVisible(lastResult == null);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    Intent intent = new Intent(Intent.ACTION_VIEW);
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-    switch (item.getItemId()) {
-      case SHARE_ID:
-        intent.setClassName(this, ShareActivity.class.getName());
-        startActivity(intent);
-        break;
-      case HISTORY_ID:
-        AlertDialog historyAlert = historyManager.buildAlert();
-        historyAlert.show();
-        break;
-      case SETTINGS_ID:
-        intent.setClassName(this, PreferencesActivity.class.getName());
-        startActivity(intent);
-        break;
-      case HELP_ID:
-        intent.setClassName(this, HelpActivity.class.getName());
-        startActivity(intent);
-        break;
-      case ABOUT_ID:
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.title_about) + versionName);
-        builder.setMessage(getString(R.string.msg_about) + "\n\n" + getString(R.string.zxing_url));
-        builder.setIcon(R.drawable.launcher_icon);
-        builder.setPositiveButton(R.string.button_open_browser, aboutListener);
-        builder.setNegativeButton(R.string.button_cancel, null);
-        builder.show();
-        break;
-    }
-    return super.onOptionsItemSelected(item);
   }
 
   @Override

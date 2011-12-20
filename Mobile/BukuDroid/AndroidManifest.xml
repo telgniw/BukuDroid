@@ -47,7 +47,7 @@
 					</intent-filter>
 
 			   		<intent-filter>
-							<action android:name="com.google.zxing.client.android.BUKUSCAN"/>
+							<action android:name="com.google.zxing.client.android.BUKU_SCAN"/>
 							<category android:name="android.intent.category.DEFAULT"/>
 					</intent-filter>
 				</activity>

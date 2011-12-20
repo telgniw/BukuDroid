@@ -45,7 +45,7 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
       <intent-filter>
-        <action android:name="com.google.zxing.client.android.SCAN"/>
+        <action android:name="com.google.zxing.client.android.BUKU_SCAN"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
       <!-- Allow web apps to launch Barcode Scanner by linking to http://zxing.appspot.com/scan. -->
@@ -78,7 +78,7 @@
               android:label="@string/share_name"
               android:stateNotNeeded="true">
       <intent-filter>
-        <action android:name="com.google.zxing.client.android.ENCODE"/>
+        <action android:name="com.google.zxing.client.android.BUKU_ENCODE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
       <!-- This allows us to handle the Share button in Contacts. -->
@@ -100,7 +100,7 @@
               android:screenOrientation="landscape"
               android:configChanges="orientation|keyboardHidden">
       <intent-filter>
-        <action android:name="com.google.zxing.client.android.SEARCH_BOOK_CONTENTS"/>
+        <action android:name="com.google.zxing.client.android.BUKU_SEARCH_BOOK_CONTENTS"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>
@@ -110,7 +110,7 @@
               android:screenOrientation="user"
               android:theme="@android:style/Theme.Light">
       <intent-filter>
-        <action android:name="com.google.zxing.client.android.SHARE"/>
+        <action android:name="com.google.zxing.client.android.BUKU_SHARE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
     </activity>

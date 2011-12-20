@@ -28,7 +28,7 @@ public class ScanActivity extends Activity implements OnClickListener {
         barcode.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View view) {
-		        Intent intent = new Intent("com.google.zxing.client.android.SCANX");
+		        Intent intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
 		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
 		        startActivityForResult(intent, 0);
 			}
