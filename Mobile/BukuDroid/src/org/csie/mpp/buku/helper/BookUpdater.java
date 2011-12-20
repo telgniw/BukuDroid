@@ -49,6 +49,7 @@ public class BookUpdater {
 					try {
 						JSONObject json = new JSONObject(Util.urlToString(url));
 						entry.vid = json.getJSONArray("items").getJSONObject(0).getString("id");
+						
 						json = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo");
 						JSONArray isbns = json.getJSONArray("industryIdentifiers");
 						String isbn10 = null, isbn13 = null;
@@ -59,11 +60,17 @@ public class BookUpdater {
 							else if(isbn.getString("type").equals("ISBN_13"))
 								isbn13 = isbn.getString("identifier");
 						}
+						
+						if(!entry.isbn.equals(isbn13) && !entry.isbn.equals(isbn10)){
+							listener.OnUpdateFailed();
+							return false;
+						}
+							
 						if(isbn13 != null)
 							entry.isbn = isbn13;
 						else if(isbn10 != null)
 							entry.isbn = isbn10;
-						
+				
 						entry.title = json.getString("title");
 						
 						JSONArray authors = json.getJSONArray("authors");
