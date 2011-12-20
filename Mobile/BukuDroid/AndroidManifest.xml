@@ -43,22 +43,19 @@
         </activity>
         <activity
             android:label="@string/isbn"
-            android:name=".ScanActivity$IsbnInputActivity" >
+            android:name=".ScanActivity$IsbnInputActivity"
+            >
         </activity>
         <activity
-            android:configChanges="orientation|keyboardHidden"
             android:name="com.google.zxing.client.android.CaptureActivity"
-            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter >
                 <action android:name="com.google.zxing.client.android.BUKU_SCAN" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

@@ -22,24 +22,29 @@ public class ScanActivity extends TabActivity {
 
         Resources res = getResources();
         TabHost tabhost = getTabHost();
+
+        // [Yi] Notes: ISBN Input should always has smaller index than Barcode Scanner
+        // an unknown bug that cause soft-keyboard can't be set visible
+        
+        // tab: ISBN Input
+        Intent intent = new Intent(this, IsbnInputActivity.class);
+        String title = getString(R.string.tab_isbn);
+        TabHost.TabSpec spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_text)).setContent(intent);
+        tabhost.addTab(spec);
         
         // tab: Barcode Scanner
-        Intent intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
+        intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
         intent.putExtra("SCAN_MODE", "ONE_D_MODE");
-        String title = getString(R.string.tab_barcode);
-        TabHost.TabSpec spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_barcode)).setContent(intent);
+        title = getString(R.string.tab_barcode);
+        spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_barcode)).setContent(intent);
         tabhost.addTab(spec);
         
-        intent = new Intent(this, IsbnInputActivity.class);
-        title = getString(R.string.tab_isbn);
-        spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_text)).setContent(intent);
-        tabhost.addTab(spec);
-        
-        tabhost.setCurrentTab(0);
+        tabhost.setCurrentTab(1);
     }
     
     public static abstract class AbstractTabContentActivity extends Activity {
     	// [Yi] Notes: a work-around for TabActivity
+    	// a problems that cause resultCode being RESULT_CANCEL
     	protected void setResultForTabActivity(int resultCode, Intent data) {
     		Activity parent = getParent();
         	if(parent == null)
