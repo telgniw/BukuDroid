@@ -23,20 +23,16 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	public static final int REQUEST_CODE = 1437;
 	public static final String ISBN = "isbn";
 	public static final String CHECK_DUPLICATE = "duplicate";
-
-	protected ActionBar actionbar;
 	
 	private DBHelper db;
 	private BookEntry entry;
+	private Boolean bookAddAble = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        /* initialize ActionBar */
-        //actionbar = (ActionBar)findViewById(R.id.actionbar);
         
         db = new DBHelper(this);
 
@@ -55,15 +51,18 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         	entry = new BookEntry();
         	entry.isbn = isbn;
         	updateAll = true;
+        	bookAddAble = true;
         }	
         	
         BookUpdater updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
         
-        if(updateAll)
-        	updater.updateEntry();
-        
-        updater.updateInfo();
+        if(updateAll) {
+        	if(updater.updateEntry())
+        		updater.updateInfo();
+        } else {
+        	updater.updateInfo();
+        }
     }
     
     @Override
@@ -86,7 +85,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	/* --- OnUpdateFinishedListener	(end) --- */
     
     private void updateView() {
-    	if(BookEntry.get(db.getReadableDatabase(), entry.isbn)==null) {
+    	if(bookAddAble) {
     		((ActionBar)findViewById(R.id.actionbar)).addAction(new AbstractAction(R.drawable.ic_camera) {
     			@Override
     			public void performAction(View view) {
@@ -98,6 +97,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     				finish();
     			}
     		});
+    		bookAddAble = false;
     	}
     	if(entry.cover!=null)
     		((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
