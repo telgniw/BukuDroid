@@ -79,7 +79,8 @@ import java.util.Set;
  */
 @SuppressWarnings("deprecation")
 public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
-
+  public static final int REQUEST_CODE = 8001;
+  
   private static final String TAG = CaptureActivity.class.getSimpleName();
 
   private static final int SHARE_ID = Menu.FIRST;

@@ -34,6 +34,7 @@ import com.facebook.android.SessionEvents;
 import com.facebook.android.SessionEvents.AuthListener;
 import com.facebook.android.SessionStore;
 import com.facebook.android.view.FbLoginButton;
+import com.google.zxing.client.android.CaptureActivity;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -61,7 +62,10 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
-        actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.ic_camera, ScanActivity.REQUEST_CODE));
+        
+        Intent captureIntent = new Intent("com.google.zxing.client.android.BUKUSCAN");
+        captureIntent.putExtra("SCAN_MODE", "ONE_D_MODE");
+        actionbar.addAction(new IntentAction(this, captureIntent, R.drawable.ic_camera, CaptureActivity.REQUEST_CODE));
         
         // TODO: add login/share (add action when !App.fb.isSessionValid() == true)
         if(App.fb.isSessionValid())
@@ -104,11 +108,10 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		
 		Bundle bundle = new Bundle();
 		bundle.putString("query", query);
-				
+		
 		intent.putExtras(bundle);
 		
 		startActivity(intent);
-   	
 		return;
 	}
     

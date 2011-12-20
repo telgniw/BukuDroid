@@ -4,6 +4,4 @@
     android:hint="@string/search_hint" 
     android:searchSuggestAuthority="org.csie.mpp.buku.SuggestionProvider"
     android:searchSuggestSelection=" ?" >
-  
-
 </searchable>
