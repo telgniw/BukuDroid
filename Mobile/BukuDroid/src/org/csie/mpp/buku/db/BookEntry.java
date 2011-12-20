@@ -13,11 +13,11 @@ public class BookEntry extends Entry {
 		public String description;
 	}
 	
-	@Column(name="vid", type=Type.TEXT, primary=true, notNull=true, skip=false)
-	public String vid;
-	
-	@Column(name="isbn", type=Type.TEXT, skip=false)
+	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)
 	public String isbn;
+	
+	@Column(name="vid", type=Type.TEXT, skip=false, notNull=true)
+	public String vid;
 	
 	@Column(name="time", type=Type.DATE, defaultVal="CURRENT_DATE")
 	public long time;
@@ -40,7 +40,7 @@ public class BookEntry extends Entry {
 	public boolean delete(SQLiteDatabase db) {
 		return SCHEMA.delete(db, "isbn =\"" + isbn + "\"");
 	}
-	
+
 	public static int count(SQLiteDatabase db) {
 		return SCHEMA.count(db);
 	}

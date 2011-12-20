@@ -36,7 +36,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         /* initialize ActionBar */
-        actionbar = (ActionBar)findViewById(R.id.actionbar);
+        //actionbar = (ActionBar)findViewById(R.id.actionbar);
         
         db = new DBHelper(this);
 
@@ -49,20 +49,9 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         if(entry != null) {
         	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
         		Toast.makeText(this, R.string.book_already_exists, 3000).show();
+        	updateView();
         }
         else {
-        	actionbar.addAction(new AbstractAction(R.drawable.star) {
-				@Override
-				public void performAction(View view) {
-					entry.insert(db.getWritableDatabase());
-					
-					Intent data = new Intent();
-					data.putExtra(BookActivity.ISBN, entry.isbn);
-					setResult(RESULT_OK, data);
-					finish();
-				}
-        	});
-        	
         	entry = new BookEntry();
         	entry.isbn = isbn;
         	updateAll = true;
@@ -86,23 +75,44 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
     /* --- OnUpdateFinishedListener	(start) --- */
 	@Override
-	public void OnUpdateFinished(BookEntry entry) {
+	public void OnUpdateFinished() {
 		updateView();
 	}
 
 	@Override
-	public void OnUpdateFailed(BookEntry entry) {
-		updateView();
+	public void OnUpdateFailed() {
+		showError();
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
     private void updateView() {
-        ((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
+    	if(BookEntry.get(db.getReadableDatabase(), entry.isbn)==null) {
+    		((ActionBar)findViewById(R.id.actionbar)).addAction(new AbstractAction(R.drawable.star) {
+    			@Override
+    			public void performAction(View view) {
+    				entry.insert(db.getWritableDatabase());
+				
+    				Intent data = new Intent();
+    				data.putExtra(BookActivity.ISBN, entry.isbn);
+    				setResult(RESULT_OK, data);
+    				finish();
+    			}
+    		});
+    	}
+    	if(entry.cover!=null)
+    		((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
+    	else
+    		((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
         ((TextView)findViewById(R.id.title)).setText(entry.title);
         ((TextView)findViewById(R.id.author)).setText(entry.author);
         
         ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
         ((TextView)findViewById(R.id.description)).setText(entry.info.description);
         ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
+    }
+    
+    private void showError() {
+    	((TextView)findViewById(R.id.title)).setText("Book not found!");
+    	Toast.makeText(this, R.string.book_not_found, Toast.LENGTH_LONG).show();
     }
 }

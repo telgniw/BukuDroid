@@ -40,7 +40,10 @@ public class BookshelfManager extends ViewManager {
 			BookEntry entry = entries.get(position);
 			View view = inflater.inflate(resourceId, parent, false);
 			// TODO: using ImageLoader instead
-			((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(entry.cover);
+			if(entry.cover!=null)
+				((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(entry.cover);
+			else 
+				((ImageView)view.findViewById(R.id.list_image)).setImageResource(R.drawable.book);
 			((TextView)view.findViewById(R.id.list_title)).setText(entry.title);
 			((TextView)view.findViewById(R.id.list_author)).setText(entry.author);
 			return view;

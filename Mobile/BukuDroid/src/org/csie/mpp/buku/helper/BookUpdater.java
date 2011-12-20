@@ -15,8 +15,8 @@ import android.util.Log;
 
 public class BookUpdater {
 	public static interface OnUpdateFinishedListener {
-		public void OnUpdateFinished(BookEntry entry);
-		public void OnUpdateFailed(BookEntry entry);
+		public void OnUpdateFinished();
+		public void OnUpdateFailed();
 	}
 	
 	private BookEntry entry;
@@ -75,17 +75,18 @@ public class BookUpdater {
 						}
 						entry.author = builder.toString();
 						
-						URL imageUrl = new URL(json.getJSONObject("imageLinks").getString("thumbnail"));
-						entry.cover = Util.urlToImage(imageUrl);
+						if(json.has("imageLinks"))	{
+							URL imageUrl = new URL(json.getJSONObject("imageLinks").getString("thumbnail"));
+							entry.cover = Util.urlToImage(imageUrl);
+						}
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
-						
-						listener.OnUpdateFailed(entry);
+						listener.OnUpdateFailed();
 						return false;
 					}
-					
-					listener.OnUpdateFinished(entry);
+
+					listener.OnUpdateFinished();
 					return true;
 				}
 			};
@@ -113,12 +114,10 @@ public class BookUpdater {
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
-						
-						listener.OnUpdateFailed(entry);
 						return false;
 					}
 					
-					listener.OnUpdateFinished(entry);
+					listener.OnUpdateFinished();
 					return true;
 				}
 			};
@@ -133,8 +132,11 @@ public class BookUpdater {
 	}
 	
 	protected void updateInfo(JSONObject json) throws JSONException {
-		entry.info.rating = (float)json.getDouble("averageRating");
-		entry.info.ratingsCount = json.getInt("ratingsCount");
-		entry.info.description = json.getString("description");
+		if(json.has("averageRating"))
+			entry.info.rating = (float)json.getDouble("averageRating");
+		if(json.has("ratingsCount"))
+			entry.info.ratingsCount = json.getInt("ratingsCount");
+		if(json.has("description"))
+			entry.info.description = json.getString("description");
 	}
 }
