@@ -96,6 +96,20 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         }
         
     }
+	 
+	private void doMySearch(String query) {
+		Intent intent = new Intent();
+		intent.setClass(MainActivity.this, SearchResultActivity.class);
+		
+		Bundle bundle = new Bundle();
+		bundle.putString("query", query);
+				
+		intent.putExtras(bundle);
+		
+		startActivity(intent);
+   	
+		return;
+	}
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -235,21 +249,4 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 		startBookActivity(bookMan.get(position).isbn, false);
 	}
 	/* --- OnItemClickListener	(end) --- */
-	
-	/* --- Send Search (start) --- */ 
-	 private void doMySearch(String query) {
-    	
-	    	Intent intent = new Intent();
-			intent.setClass(MainActivity.this, SearchResultActivity.class);
-			
-			Bundle bundle = new Bundle();
-			bundle.putString("query", query);
-					
-			intent.putExtras(bundle);
-			
-			startActivity(intent);
-	    	
-	    	return;
-		}
-	 /* --- Send Search (end) --- */
 }
