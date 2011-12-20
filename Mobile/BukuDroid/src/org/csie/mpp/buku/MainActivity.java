@@ -88,11 +88,12 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         /* get search bar information */
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-          String query = intent.getStringExtra(SearchManager.QUERY);
-          SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                  SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
-          suggestions.saveRecentQuery(query, null);
-          doMySearch(query);
+        	String query = intent.getStringExtra(SearchManager.QUERY);
+        	SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
+        		this, SuggestionProvider.AUTHORITY, SuggestionProvider.MODE
+        	);
+        	suggestions.saveRecentQuery(query, null);
+        	doMySearch(query);
         }
         
     }
