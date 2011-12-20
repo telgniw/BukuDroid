@@ -51,7 +51,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         		Toast.makeText(this, R.string.book_already_exists, 3000).show();
         }
         else {
-        	actionbar.addAction(new AbstractAction(R.drawable.star) {
+        	actionbar.addAction(new AbstractAction(R.drawable.ic_bookshelf) {
 				@Override
 				public void performAction(View view) {
 					entry.insert(db.getWritableDatabase());
