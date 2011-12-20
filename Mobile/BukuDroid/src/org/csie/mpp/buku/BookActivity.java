@@ -87,7 +87,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     
     private void updateView() {
     	if(BookEntry.get(db.getReadableDatabase(), entry.isbn)==null) {
-    		((ActionBar)findViewById(R.id.actionbar)).addAction(new AbstractAction(R.drawable.star) {
+    		((ActionBar)findViewById(R.id.actionbar)).addAction(new AbstractAction(R.drawable.ic_camera) {
     			@Override
     			public void performAction(View view) {
     				entry.insert(db.getWritableDatabase());
