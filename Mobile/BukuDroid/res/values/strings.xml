@@ -18,7 +18,8 @@
         <item>Delete</item>
     </string-array>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>
-    <string name="book_not_found">Book not found. May due to invalid input or network problems. </string>
+    <string name="book_not_found">Book not found.</string>
+    <string name="book_not_found_long">Book not found. May due to network problems or invalid input.</string>
     <string name="delete_failed">Failed on deleting the book:</string>
     <string name="isbn">ISBN</string>
     <string name="tab_isbn">ISBN</string>

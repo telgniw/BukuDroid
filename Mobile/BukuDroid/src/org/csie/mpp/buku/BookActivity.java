@@ -112,7 +112,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     }
     
     private void showError() {
-    	((TextView)findViewById(R.id.title)).setText("Book not found!");
-    	Toast.makeText(this, R.string.book_not_found, Toast.LENGTH_LONG).show();
+    	((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
+    	Toast.makeText(this, R.string.book_not_found_long, Toast.LENGTH_LONG).show();
     }
 }

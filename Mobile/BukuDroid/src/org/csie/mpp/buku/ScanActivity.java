@@ -7,11 +7,13 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 
-public class ScanActivity extends TabActivity {
+public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public static final int REQUEST_CODE = 1436;
 	public static final String ISBN = "ISBN";
 
@@ -40,7 +42,18 @@ public class ScanActivity extends TabActivity {
         tabhost.addTab(spec);
         
         tabhost.setCurrentTab(1);
+        tabhost.setOnTabChangedListener(this);
     }
+
+	@Override
+	public void onTabChanged(String tabId) {
+		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner) 
+		if(!tabId.equals(getString(R.string.tab_isbn))) {
+			InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+			if(imm.isActive())
+				imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+	}
     
     public static abstract class AbstractTabContentActivity extends Activity {
     	// [Yi] Notes: a work-around for TabActivity
