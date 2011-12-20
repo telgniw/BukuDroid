@@ -177,6 +177,7 @@ public final class CameraManager {
    * @return The rectangle to draw on screen in window coordinates.
    */
   public Rect getFramingRect() {
+    // [Yi] Notes: modify the return value to change the position and size of scanned rectangle.
     if (framingRect == null) {
       if (camera == null) {
         return null;
@@ -195,7 +196,7 @@ public final class CameraManager {
         height = MAX_FRAME_HEIGHT;
       }
       int leftOffset = (screenResolution.y - width) / 2;
-      int topOffset = (screenResolution.x - height) / 2;
+      int topOffset = (screenResolution.x - height) / 3;
       framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
       Log.d(TAG, "Calculated framing rect: " + framingRect);
     }

@@ -92,7 +92,12 @@ public final class CaptureActivityHandler extends Handler {
       cameraManager.requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
     } else if (message.what == R.id.return_scan_result) {
       Log.d(TAG, "Got return scan result message");
-      activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
+      // [Yi] Notes: the following 5 lines are work-around for TabActivity
+      Activity parent = activity.getParent();
+      if(parent == null)
+        activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
+      else
+        parent.setResult(Activity.RESULT_OK, (Intent) message.obj);
       activity.finish();
     } else if (message.what == R.id.launch_product_query) {
       Log.d(TAG, "Got product query message");

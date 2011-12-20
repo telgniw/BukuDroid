@@ -1,63 +1,73 @@
 package org.csie.mpp.buku;
 
 import android.app.Activity;
+import android.app.TabActivity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TabHost;
 
-public class ScanActivity extends Activity implements OnClickListener {
+public class ScanActivity extends TabActivity {
 	public static final int REQUEST_CODE = 1436;
-	public static final String ISBN = "isbn";
-	
-	protected EditText isbn;
-	protected Button barcode;
-	protected Button lookup;
+	public static final String ISBN = "ISBN";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan);
 
-        isbn = (EditText)findViewById(R.id.isbn);
-        barcode = (Button)findViewById(R.id.barcode);
-        lookup = (Button)findViewById(R.id.look_up);
-
-        barcode.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View view) {
-		        Intent intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
-		        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
-		        startActivityForResult(intent, 0);
-			}
-        });
+        Resources res = getResources();
+        TabHost tabhost = getTabHost();
         
-        lookup.setOnClickListener(this);
+        // tab: Barcode Scanner
+        Intent intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
+        intent.putExtra("SCAN_MODE", "ONE_D_MODE");
+        String title = getString(R.string.tab_barcode);
+        TabHost.TabSpec spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_barcode)).setContent(intent);
+        tabhost.addTab(spec);
+        
+        intent = new Intent(this, IsbnInputActivity.class);
+        title = getString(R.string.tab_isbn);
+        spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_text)).setContent(intent);
+        tabhost.addTab(spec);
+        
+        tabhost.setCurrentTab(0);
     }
     
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
-            if (resultCode == RESULT_OK) {
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                isbn.setText(contents);
-            }
-            else if (resultCode == RESULT_CANCELED) {
-                //TODO(ianchou): show error message
-            }
-        }
-
+    public static abstract class AbstractTabContentActivity extends Activity {
+    	// [Yi] Notes: a work-around for TabActivity
+    	protected void setResultForTabActivity(int resultCode, Intent data) {
+    		Activity parent = getParent();
+        	if(parent == null)
+        		setResult(resultCode, data);
+        	else
+        		parent.setResult(resultCode, data);
+    	}
     }
+    
+    public static final class IsbnInputActivity extends AbstractTabContentActivity implements OnClickListener {
+    	private EditText input;
+    	
+    	@Override
+    	public void onCreate(Bundle savedInstanceState) {
+    		super.onCreate(savedInstanceState);
+    		setContentView(R.layout.isbn);
+    		
+    		((Button)findViewById(R.id.ok)).setOnClickListener(this);
+    		
+    		input = (EditText)findViewById(R.id.isbn);
+    	}
 
-	@Override
-	public void onClick(View v) {
-		String input = isbn.getText().toString();
-		
-		Intent data = new Intent();
-		data.putExtra(ScanActivity.ISBN, input);
-		setResult(RESULT_OK, data);
-		finish();
-	}
+		@Override
+		public void onClick(View v) {
+        	Intent data = new Intent();
+        	data.putExtra(ISBN, input.getText().toString());
+        	setResultForTabActivity(RESULT_OK, data);
+            finish();
+		}
+    }
 }

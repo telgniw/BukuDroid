@@ -108,7 +108,7 @@ public final class Intents {
      * If the user presses Back, the result code will be
      * RESULT_CANCELED.
      */
-    public static final String RESULT = "SCAN_RESULT";
+    public static final String RESULT = "ISBN";
 
     /**
      * Call intent.getStringExtra(RESULT_FORMAT) to determine which barcode format was found.
