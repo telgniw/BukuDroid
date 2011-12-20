@@ -63,7 +63,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         actionbar = (ActionBar)findViewById(R.id.actionbar);
         actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.ic_camera, ScanActivity.REQUEST_CODE));
         
-        // TODO: add login/share
+        // TODO: add login/share (add action when !App.fb.isSessionValid() == true)
         if(App.fb.isSessionValid())
         	actionbar.addAction(new DialogAction(this, R.layout.login, 0, this), 0);
 
