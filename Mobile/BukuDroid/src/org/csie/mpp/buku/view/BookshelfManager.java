@@ -8,7 +8,6 @@ import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,7 +138,7 @@ public class BookshelfManager extends ViewManager {
 	}
 	
 	public void add(BookEntry entry) {
-		if(vm.length() < 0)
+		if(vm.length() < 1)
 			createBookView();
 		vm.add(entry);
 	}
