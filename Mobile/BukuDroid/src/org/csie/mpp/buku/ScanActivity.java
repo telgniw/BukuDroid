@@ -15,7 +15,6 @@ import android.widget.TabHost.OnTabChangeListener;
 
 public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public static final int REQUEST_CODE = 1436;
-	public static final String ISBN = "ISBN";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +82,7 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 		@Override
 		public void onClick(View v) {
         	Intent data = new Intent();
-        	data.putExtra(ISBN, input.getText().toString());
+        	data.putExtra(App.ISBN, input.getText().toString());
         	setResultForTabActivity(RESULT_OK, data);
             finish();
 		}

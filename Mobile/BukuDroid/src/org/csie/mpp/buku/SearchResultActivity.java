@@ -83,7 +83,7 @@ public class SearchResultActivity extends Activity {
 
     public void startBookActivity(String isbn, boolean checkDuplicate) {
     	Intent intent = new Intent(this, BookActivity.class);
-		intent.putExtra(BookActivity.ISBN, isbn);
+		intent.putExtra(App.ISBN, isbn);
 		intent.putExtra(BookActivity.CHECK_DUPLICATE, checkDuplicate);
 		//startActivityForResult(intent, BookActivity.REQUEST_CODE);
 		startActivity(intent);

@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	public static final int REQUEST_CODE = 1437;
-	public static final String ISBN = "isbn";
 	public static final String CHECK_DUPLICATE = "duplicate";
 	
 	private DBHelper db;
@@ -39,7 +38,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         db = new DBHelper(this);
 
         Intent intent = getIntent();
-        String isbn = intent.getStringExtra(ISBN);
+        String isbn = intent.getStringExtra(App.ISBN);
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
         
         actionBar = ((ActionBar)findViewById(R.id.actionbar));
@@ -54,7 +53,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 				@Override
 				public void performAction(View view) {
 					Intent data = new Intent();
-					data.putExtra(BookActivity.ISBN, entry.isbn);
+					data.putExtra(App.ISBN, entry.isbn);
 					setResult(RESULT_FIRST_USER, data);
 					finish();
 				}
@@ -75,7 +74,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
 					
 					Intent data = new Intent();
-					data.putExtra(BookActivity.ISBN, entry.isbn);
+					data.putExtra(App.ISBN, entry.isbn);
 					setResult(RESULT_OK, data);
 					finish();
 				}

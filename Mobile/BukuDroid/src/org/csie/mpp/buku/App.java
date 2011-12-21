@@ -6,6 +6,8 @@ import com.facebook.android.Facebook;
 public class App {
 	public static final String TAG				= "BUKU";	// error log tag
 	public static final int TOAST_TIME			= 3000;		// toast display time
+
+	public static final String ISBN = "ISBN";
 	
 	// --- Facebook ---
 	public static final String FB_APP_ID 		= "291317434239686";

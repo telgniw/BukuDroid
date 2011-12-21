@@ -116,17 +116,17 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	switch(requestCode) {
     		case ScanActivity.REQUEST_CODE:
     			if(resultCode == RESULT_OK) {
-    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				String isbn = data.getStringExtra(App.ISBN);
     				startBookActivity(isbn, true);
     			}
     			break;
     		case BookActivity.REQUEST_CODE:
     			if(resultCode == RESULT_OK) {
-    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				String isbn = data.getStringExtra(App.ISBN);
     				bookMan.add(isbn);
     			}
     			else if(resultCode == RESULT_FIRST_USER) {
-    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				String isbn = data.getStringExtra(App.ISBN);
     				BookEntry entry = bookMan.get(isbn);
     				bookMan.remove(entry);
 
@@ -141,7 +141,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     
     public void startBookActivity(String isbn, boolean checkDuplicate) {
     	Intent intent = new Intent(this, BookActivity.class);
-		intent.putExtra(BookActivity.ISBN, isbn);
+		intent.putExtra(App.ISBN, isbn);
 		intent.putExtra(BookActivity.CHECK_DUPLICATE, checkDuplicate);
 		startActivityForResult(intent, BookActivity.REQUEST_CODE);
     }

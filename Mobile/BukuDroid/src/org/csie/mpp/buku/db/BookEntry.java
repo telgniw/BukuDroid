@@ -32,6 +32,11 @@ public class BookEntry extends Entry {
 	public Bitmap cover;
 	
 	public Info info = new Info();
+	
+	@Override
+	public boolean equals(Object obj) {
+		return isbn.equals(((BookEntry)obj).isbn);
+	}
 
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
