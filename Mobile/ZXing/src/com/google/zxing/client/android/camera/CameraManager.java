@@ -25,6 +25,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.PreferencesActivity;
 
@@ -196,7 +198,7 @@ public final class CameraManager {
         height = MAX_FRAME_HEIGHT;
       }
       int leftOffset = (screenResolution.y - width) / 2;
-      int topOffset = (screenResolution.x - height) / 3;
+      int topOffset = (screenResolution.x - height - CaptureActivity.TAB_HEIGHT) / 2;
       framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
       Log.d(TAG, "Calculated framing rect: " + framingRect);
     }
@@ -242,7 +244,7 @@ public final class CameraManager {
         height = screenResolution.y;
       }
       int leftOffset = (screenResolution.x - width) / 2;
-      int topOffset = (screenResolution.y - height) / 2;
+      int topOffset = (screenResolution.y - height - CaptureActivity.TAB_HEIGHT) / 2;
       framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
       Log.d(TAG, "Calculated manual framing rect: " + framingRect);
       framingRectInPreview = null;

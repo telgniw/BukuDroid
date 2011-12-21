@@ -26,6 +26,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public final class ViewfinderView extends View {
       paint.setAlpha(CURRENT_POINT_OPACITY);
       canvas.drawBitmap(resultBitmap, null, frame, paint);
     } else {
-
+  	  Log.e("Yi", "draw: top" + frame.top);
       // Draw a two pixel solid black border inside the framing rect
       paint.setColor(frameColor);
       canvas.drawRect(frame.left, frame.top, frame.right + 1, frame.top + 2, paint);

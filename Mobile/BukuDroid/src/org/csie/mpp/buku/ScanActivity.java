@@ -1,5 +1,7 @@
 package org.csie.mpp.buku;
 
+import com.google.zxing.client.android.CaptureActivity;
+
 import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
@@ -13,10 +15,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TabWidget;
 
 public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public static final int REQUEST_CODE = 1436;
 
+	private int tab_height;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +49,16 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         
         tabhost.setCurrentTab(1);
         tabhost.setOnTabChangedListener(this);
+        
+        TabWidget tabwidget = tabhost.getTabWidget();
+        int count = tabwidget.getChildCount();
+        for(int i = 0; i < count; i++) {
+        	int height = tabwidget.getChildAt(i).getLayoutParams().height;
+        	if(height > tab_height)
+        		tab_height = height;
+        }
+        
+        CaptureActivity.TAB_HEIGHT = tab_height;
     }
 
 	@Override

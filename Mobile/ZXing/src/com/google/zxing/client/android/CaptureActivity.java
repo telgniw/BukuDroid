@@ -75,6 +75,9 @@ import java.util.Set;
  */
 @SuppressWarnings("deprecation")
 public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
+  // Yi [Notes]: work-around for tab offset
+  public static int TAB_HEIGHT = 0;
+  
   public static final int REQUEST_CODE = 8001;
   
   private static final String TAG = CaptureActivity.class.getSimpleName();
