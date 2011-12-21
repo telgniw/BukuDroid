@@ -125,6 +125,14 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     				String isbn = data.getStringExtra(ScanActivity.ISBN);
     				bookMan.add(isbn);
     			}
+    			else if(resultCode == RESULT_FIRST_USER) {
+    				String isbn = data.getStringExtra(ScanActivity.ISBN);
+    				BookEntry entry = bookMan.get(isbn);
+    				bookMan.remove(entry);
+
+					if(entry.delete(db.getWritableDatabase()) == false)
+						Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
+    			}
     			break;
     	}
     	

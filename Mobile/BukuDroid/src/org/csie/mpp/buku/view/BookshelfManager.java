@@ -133,18 +133,33 @@ public class BookshelfManager extends ViewManager {
 	}
 	
 	public void add(String isbn) {
-		BookEntry entry = BookEntry.get(rdb, isbn);
+		BookEntry entry = get(isbn);
+		add(entry);
+	}
+	
+	public void add(BookEntry entry) {
 		if(vm.length() < 0)
 			createBookView();
 		vm.add(entry);
+	}
+	
+	public BookEntry get(String isbn) {
+		return BookEntry.get(rdb, isbn);
 	}
 	
 	public BookEntry get(int position) {
 		return vm.get(position);
 	}
 	
+	public void remove(String isbn) {
+		BookEntry entry = get(isbn);
+		remove(entry);
+	}
+	
 	public void remove(BookEntry entry) {
 		vm.remove(entry);
+		if(vm.length() < 1)
+			createNoBookView();
 	}
 	
 	private void updateBooklist() {

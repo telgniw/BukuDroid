@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -26,7 +27,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	
 	private DBHelper db;
 	private BookEntry entry;
-	private Boolean bookAddAble = false;
+	private ActionBar actionBar;
+	private boolean inBookshelf = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,20 +42,46 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         String isbn = intent.getStringExtra(ISBN);
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
         
+        actionBar = ((ActionBar)findViewById(R.id.actionbar));
+        
         boolean updateAll = false;
         
         if(entry != null) {
         	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
         		Toast.makeText(this, R.string.book_already_exists, 3000).show();
+        	
+			actionBar.addAction(new AbstractAction(R.drawable.ic_delete) {
+				@Override
+				public void performAction(View view) {
+					Intent data = new Intent();
+					data.putExtra(BookActivity.ISBN, entry.isbn);
+					setResult(RESULT_FIRST_USER, data);
+					finish();
+				}
+			});
+			
+			inBookshelf = true;
         	updateView();
         }
         else {
         	entry = new BookEntry();
         	entry.isbn = isbn;
         	updateAll = true;
-        	bookAddAble = true;
-        }	
         	
+			actionBar.addAction(new AbstractAction(R.drawable.ic_bookshelf) {
+				@Override
+				public void performAction(View view) {
+					if(entry.insert(db.getWritableDatabase()) == false)
+						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
+					
+					Intent data = new Intent();
+					data.putExtra(BookActivity.ISBN, entry.isbn);
+					setResult(RESULT_OK, data);
+					finish();
+				}
+			});
+        }	
+        
         BookUpdater updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
         
@@ -80,29 +108,18 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
 	@Override
 	public void OnUpdateFailed() {
+		if(!inBookshelf)
+			actionBar.removeViewAt(0);
 		showError();
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
     private void updateView() {
-    	if(bookAddAble) {
-    		((ActionBar)findViewById(R.id.actionbar)).addAction(new AbstractAction(R.drawable.ic_camera) {
-    			@Override
-    			public void performAction(View view) {
-    				entry.insert(db.getWritableDatabase());
-				
-    				Intent data = new Intent();
-    				data.putExtra(BookActivity.ISBN, entry.isbn);
-    				setResult(RESULT_OK, data);
-    				finish();
-    			}
-    		});
-    		bookAddAble = false;
-    	}
     	if(entry.cover!=null)
     		((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
     	else
     		((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
+    	
         ((TextView)findViewById(R.id.title)).setText(entry.title);
         ((TextView)findViewById(R.id.author)).setText(entry.author);
         
