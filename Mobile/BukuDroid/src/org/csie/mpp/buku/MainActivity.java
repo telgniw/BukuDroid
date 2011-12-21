@@ -175,7 +175,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
-    		case R.id.menu_link:
+    		case R.id.menu_search:
     			return true;
     		default:
     			return true;
