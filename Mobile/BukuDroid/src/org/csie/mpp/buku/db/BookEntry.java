@@ -60,19 +60,6 @@ public class BookEntry extends Entry {
 		return null;
 	}
 	
-	public static BookEntry[] search(SQLiteDatabase db, String keyword) {
-		String query = "title LIKE '%" + keyword + "%' ";
-		query += "OR author LIKE '%" + keyword + "%' ";
-		query += "OR isbn LIKE '%" + keyword + "%' ";
-		Cursor cursor = SCHEMA.get(db, query);
-		BookEntry[] entries = new BookEntry[cursor.getCount()];
-		for(int i = 0; cursor.moveToNext(); i++) {
-			entries[i] = new BookEntry();
-			SCHEMA.extract(cursor, entries[i]);
-		}
-		return entries;
-	}
-	
 	public static boolean exists(SQLiteDatabase db, String isbn) {
 		return SCHEMA.exists(db, "isbn = \"" + isbn + "\"");
 	}
@@ -83,6 +70,19 @@ public class BookEntry extends Entry {
 	
 	public static BookEntry[] queryAll(SQLiteDatabase db, String orderBy) {
 		Cursor cursor = SCHEMA.queryAll(db, orderBy);
+		BookEntry[] entries = new BookEntry[cursor.getCount()];
+		for(int i = 0; cursor.moveToNext(); i++) {
+			entries[i] = new BookEntry();
+			SCHEMA.extract(cursor, entries[i]);
+		}
+		return entries;
+	}
+	
+	public static BookEntry[] search(SQLiteDatabase db, String keyword) {
+		String query = "title LIKE '%" + keyword + "%' ";
+		query += "OR author LIKE '%" + keyword + "%' ";
+		query += "OR isbn LIKE '%" + keyword + "%' ";
+		Cursor cursor = SCHEMA.get(db, query);
 		BookEntry[] entries = new BookEntry[cursor.getCount()];
 		for(int i = 0; cursor.moveToNext(); i++) {
 			entries[i] = new BookEntry();

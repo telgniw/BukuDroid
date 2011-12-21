@@ -1,17 +1,24 @@
 package org.csie.mpp.buku;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
+import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
 import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -84,30 +91,37 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         if(App.fb.isSessionValid())
         	createSessionView();
-        
-        /* get search bar information */
-        Intent intent = getIntent();
+    }
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+    	super.onNewIntent(intent);
+
         if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
         	String query = intent.getStringExtra(SearchManager.QUERY);
         	SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
         		this, SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE
         	);
         	suggestions.saveRecentQuery(query, null);
-        	doMySearch(query);
+        	showSearchResult(query);
         }
     }
 	 
-	private void doMySearch(String query) {
-		Intent intent = new Intent();
-		intent.setClass(MainActivity.this, SearchResultActivity.class);
-		
-		Bundle bundle = new Bundle();
-		bundle.putString("query", query);
-		
-		intent.putExtras(bundle);
-		
-		startActivity(intent);
-		return;
+	private void showSearchResult(String query) {
+		final List<BookEntry> entries = new ArrayList<BookEntry>();
+		for(BookEntry entry: BookEntry.search(db.getReadableDatabase(), query))
+			entries.add(entry);
+		BookEntryAdapter adapter = new BookEntryAdapter(this, R.layout.list_item_book, entries);
+		AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(adapter, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int position) {
+				dialog.dismiss();
+				
+				String isbn = entries.get(position).isbn;
+				startBookActivity(isbn, false);
+			}
+		}).create();
+		dialog.show();
 	}
     
     @Override
@@ -132,6 +146,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 					if(entry.delete(db.getWritableDatabase()) == false)
 						Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
     			}
+    			break;
+    		default:
     			break;
     	}
     	

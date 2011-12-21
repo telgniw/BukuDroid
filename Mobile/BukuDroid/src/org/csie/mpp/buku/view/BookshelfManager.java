@@ -22,7 +22,7 @@ public class BookshelfManager extends ViewManager {
 		public void onListViewCreated(ListView view);
 	}
 	
-	private static class BookEntryAdapter extends ArrayAdapter<BookEntry> {
+	public static class BookEntryAdapter extends ArrayAdapter<BookEntry> {
 		private LayoutInflater inflater;
 		private int resourceId;
 		private List<BookEntry> entries;
