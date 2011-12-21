@@ -176,6 +176,9 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
     		case R.id.menu_search:
+    			SearchManager sm = (SearchManager)getSystemService(SEARCH_SERVICE);
+    			if(sm != null)
+    				sm.startSearch(null, false, getComponentName(), null, false); 
     			return true;
     		default:
     			return true;
