@@ -141,10 +141,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     			else if(resultCode == RESULT_FIRST_USER) {
     				String isbn = data.getStringExtra(App.ISBN);
     				BookEntry entry = bookMan.get(isbn);
-    				bookMan.remove(entry);
-
-					if(entry.delete(db.getWritableDatabase()) == false)
-						Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
+    				deleteBookEntry(entry);
     			}
     			break;
     		default:
@@ -154,11 +151,21 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	App.fb.authorizeCallback(requestCode, resultCode, data);
     }
     
-    public void startBookActivity(String isbn, boolean checkDuplicate) {
+    private void startBookActivity(String isbn, boolean checkDuplicate) {
     	Intent intent = new Intent(this, BookActivity.class);
 		intent.putExtra(App.ISBN, isbn);
 		intent.putExtra(BookActivity.CHECK_DUPLICATE, checkDuplicate);
 		startActivityForResult(intent, BookActivity.REQUEST_CODE);
+    }
+    
+    private void deleteBookEntry(BookEntry entry) {
+    	if(entry.delete(db.getWritableDatabase()))
+    		Toast.makeText(MainActivity.this, getString(R.string.deleted), App.TOAST_TIME).show();
+    	else {
+			Toast.makeText(MainActivity.this, getString(R.string.delete_failed) + entry.title, App.TOAST_TIME).show();
+			Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
+		}
+		bookMan.remove(entry);
     }
     
     @Override
@@ -222,11 +229,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 			case MENU_DELETE:
 				int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
 				BookEntry entry = bookMan.get(position);
-				if(entry.delete(db.getWritableDatabase()) == false) {
-					Toast.makeText(MainActivity.this, getString(R.string.delete_failed) + entry.title, App.TOAST_TIME).show();
-					Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
-				}
-				bookMan.remove(entry);
+				deleteBookEntry(entry);
 				break;
 			default:
 				break;

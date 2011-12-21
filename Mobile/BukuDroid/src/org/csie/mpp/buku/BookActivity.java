@@ -7,6 +7,7 @@ import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
 
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
+import com.markupartist.android.widget.ActionBar.Action;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +28,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	private DBHelper db;
 	private BookEntry entry;
 	private ActionBar actionBar;
-	private boolean inBookshelf = false;
+	private Action actionAdd, actionDelete;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
         		Toast.makeText(this, R.string.book_already_exists, 3000).show();
         	
-			actionBar.addAction(new AbstractAction(R.drawable.ic_delete) {
+			actionDelete = new AbstractAction(R.drawable.ic_delete) {
 				@Override
 				public void performAction(View view) {
 					Intent data = new Intent();
@@ -57,9 +58,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 					setResult(RESULT_FIRST_USER, data);
 					finish();
 				}
-			});
-			
-			inBookshelf = true;
+			};
+			actionBar.addAction(actionDelete);
         	updateView();
         }
         else {
@@ -67,7 +67,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         	entry.isbn = isbn;
         	updateAll = true;
         	
-			actionBar.addAction(new AbstractAction(R.drawable.ic_bookshelf) {
+			actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
 				@Override
 				public void performAction(View view) {
 					if(entry.insert(db.getWritableDatabase()) == false)
@@ -76,9 +76,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 					Intent data = new Intent();
 					data.putExtra(App.ISBN, entry.isbn);
 					setResult(RESULT_OK, data);
-					finish();
+
+					Toast.makeText(BookActivity.this, getString(R.string.added), App.TOAST_TIME).show();
+					actionBar.removeAction(this);
 				}
-			});
+			};
+			actionBar.addAction(actionAdd);
         }	
         
         BookUpdater updater = new BookUpdater(entry);
@@ -107,8 +110,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
 	@Override
 	public void OnUpdateFailed() {
-		if(!inBookshelf)
-			actionBar.removeViewAt(0);
+		if(actionAdd != null)
+			actionBar.removeAction(actionAdd);
 		showError();
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
@@ -129,6 +132,6 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     
     private void showError() {
     	((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
-    	Toast.makeText(this, R.string.book_not_found_long, Toast.LENGTH_LONG).show();
+    	Toast.makeText(this, R.string.book_not_found_long, App.TOAST_TIME).show();
     }
 }
