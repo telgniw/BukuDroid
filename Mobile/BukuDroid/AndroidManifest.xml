@@ -61,8 +61,8 @@
         </activity>
 
         <provider
-            android:authorities="org.csie.mpp.buku.SuggestionProvider"
-            android:name=".SuggestionProvider" />
+            android:authorities="org.csie.mpp.buku.helper.SearchSuggestionProvider"
+            android:name=".helper.SearchSuggestionProvider" />
     </application>
 
 </manifest>

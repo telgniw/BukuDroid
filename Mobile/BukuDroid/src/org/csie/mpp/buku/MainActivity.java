@@ -2,9 +2,9 @@ package org.csie.mpp.buku;
 
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
-import org.csie.mpp.buku.view.DialogAction;
 import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
 import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
@@ -63,9 +63,9 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         actionbar = (ActionBar)findViewById(R.id.actionbar);
         actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.ic_camera, ScanActivity.REQUEST_CODE));
         
-        // TODO: add login/share (add action when !App.fb.isSessionValid() == true)
-        if(App.fb.isSessionValid())
-        	actionbar.addAction(new DialogAction(this, R.layout.login, 0, this), 0);
+        // TODO: add login/share
+//        if(!App.fb.isSessionValid())
+//        	actionbar.addAction(new DialogAction(this, R.layout.login, 0, this), 0);
 
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -87,15 +87,14 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         
         /* get search bar information */
         Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
         	String query = intent.getStringExtra(SearchManager.QUERY);
         	SearchRecentSuggestions suggestions = new SearchRecentSuggestions(
-        		this, SuggestionProvider.AUTHORITY, SuggestionProvider.MODE
+        		this, SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE
         	);
         	suggestions.saveRecentQuery(query, null);
         	doMySearch(query);
         }
-        
     }
 	 
 	private void doMySearch(String query) {
