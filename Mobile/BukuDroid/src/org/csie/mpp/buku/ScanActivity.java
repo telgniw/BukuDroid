@@ -3,6 +3,7 @@ package org.csie.mpp.buku;
 import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +21,7 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         Resources res = getResources();
         TabHost tabhost = getTabHost();
