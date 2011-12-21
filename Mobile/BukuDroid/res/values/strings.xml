@@ -15,9 +15,6 @@
     <string name="search">Search</string>
     <string name="search_result">Search Result</string>
     <string name="search_hint">Author, Title, ISBN ...</string>
-    <string-array name="list_item_longclick">
-        <item>Delete</item>
-    </string-array>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>
     <string name="book_not_found">Book not found.</string>
     <string name="book_not_found_long">Book not found. May due to network problems or invalid input.</string>
@@ -27,4 +24,8 @@
     <string name="isbn">ISBN</string>
     <string name="tab_isbn">ISBN</string>
     <string name="tab_barcode">Barcode</string>
+    <string-array name="list_item_longclick">
+        <item>Information</item>
+        <item>Delete</item>
+    </string-array>
 </resources>

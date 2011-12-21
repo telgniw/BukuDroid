@@ -118,7 +118,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 				dialog.dismiss();
 				
 				String isbn = entries.get(position).isbn;
-				startBookActivity(isbn, false);
+				startBookActivity(isbn);
 			}
 		}).create();
 		dialog.show();
@@ -149,6 +149,10 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	}
     	
     	App.fb.authorizeCallback(requestCode, resultCode, data);
+    }
+    
+    private void startBookActivity(String isbn) {
+    	startBookActivity(isbn, false);
     }
     
     private void startBookActivity(String isbn, boolean checkDuplicate) {
@@ -209,7 +213,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     /* --- OptionsMenu			(end) --- */
 
     /* --- ContextMenu			(start) --- */
-	private static final int MENU_DELETE = 0;
+    private static final int MENU_INFO = 0;
+	private static final int MENU_DELETE = 1;
 	private String[] menuItems;
     
     @Override
@@ -225,10 +230,14 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+		int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
+		BookEntry entry = bookMan.get(position);
+		
     	switch(item.getItemId()) {
+    		case MENU_INFO:
+    			startBookActivity(entry.isbn);
+    			break;
 			case MENU_DELETE:
-				int position = ((AdapterView.AdapterContextMenuInfo)item.getMenuInfo()).position;
-				BookEntry entry = bookMan.get(position);
 				deleteBookEntry(entry);
 				break;
 			default:
@@ -275,7 +284,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 	/* -- OnItemClickListener	(start) --- */
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		startBookActivity(bookMan.get(position).isbn, false);
+		startBookActivity(bookMan.get(position).isbn);
 	}
 	/* --- OnItemClickListener	(end) --- */
 }
