@@ -1,8 +1,26 @@
 package org.csie.mpp.buku.helper;
 
+<<<<<<< Updated upstream
 import java.net.MalformedURLException;
+=======
+<<<<<<< Updated upstream
+=======
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 import java.net.URL;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.BookEntry;
@@ -87,6 +105,31 @@ public class BookUpdater {
 		return false;
 	}
 	
+	public boolean updateEntryByBooks() {
+
+	    HttpClient httpclient = new DefaultHttpClient();
+	    HttpGet httpget = new HttpGet("http://search.books.com.tw/exep/prod_search.php?key=" + entry.isbn);
+	    try {
+	    	HttpResponse response = httpclient.execute(httpget);
+	    	int statusCode = response.getStatusLine().getStatusCode();
+	    	if (statusCode != HttpStatus.SC_OK) {
+	    		return false;
+	    		//TODO(ianchou): error handling
+	    	}
+
+	    	HttpEntity entity = response.getEntity();
+	    	String result = EntityUtils.toString(entity, "big5");
+	    	System.err.println(result);
+	    	result = result.substring(result.indexOf("item=")+"item=".length());
+	    	result = result.substring(0, result.indexOf("\""));
+	    	//entry.vid = result;
+	    	System.err.println(result);
+	    } catch(Exception e){
+	    	e.printStackTrace();
+	    }
+	    return true;
+	}
+
 	public boolean updateInfo() {
 		try {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
