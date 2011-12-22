@@ -5,6 +5,7 @@ import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
 import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
 
+import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
 import com.markupartist.android.widget.ActionBar.Action;
@@ -96,6 +97,20 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     }
     
     @Override
+    public void onStart() {
+    	super.onStart();
+
+		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
+    }
+    
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	
+    	FlurryAgent.onEndSession(this);
+    }
+    
+    @Override
     public void onDestroy() {
     	super.onDestroy();
     	
@@ -131,6 +146,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     }
     
     private void showError() {
+    	FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
+    	
     	((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
     	Toast.makeText(this, R.string.book_not_found_long, App.TOAST_TIME).show();
     }

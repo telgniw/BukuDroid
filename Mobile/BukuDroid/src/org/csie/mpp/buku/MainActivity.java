@@ -39,8 +39,8 @@ import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
 import com.facebook.android.SessionEvents.AuthListener;
-import com.facebook.android.SessionStore;
 import com.facebook.android.view.FbLoginButton;
+import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -62,9 +62,9 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        /* initialize FB */
-        SessionStore.restore(App.fb, this);
+		
+        // TODO: initialize FB
+//        SessionStore.restore(App.fb, this);
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
@@ -91,6 +91,20 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
         if(App.fb.isSessionValid())
         	createSessionView();
+    }
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+
+		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
+    }
+    
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	
+    	FlurryAgent.onEndSession(this);
     }
     
     @Override

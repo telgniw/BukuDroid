@@ -1,5 +1,6 @@
 package org.csie.mpp.buku;
 
+import com.flurry.android.FlurryAgent;
 import com.google.zxing.client.android.CaptureActivity;
 
 import android.app.Activity;
@@ -60,6 +61,20 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         
         CaptureActivity.TAB_HEIGHT = tab_height;
     }
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+
+		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
+    }
+    
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	
+    	FlurryAgent.onEndSession(this);
+    }
 
 	@Override
 	public void onTabChanged(String tabId) {
@@ -81,6 +96,20 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         	else
         		parent.setResult(resultCode, data);
     	}
+
+        @Override
+        public void onStart() {
+        	super.onStart();
+
+    		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
+        }
+        
+        @Override
+        public void onStop() {
+        	super.onStop();
+        	
+        	FlurryAgent.onEndSession(this);
+        }
     }
     
     public static final class IsbnInputActivity extends AbstractTabContentActivity implements OnClickListener {
