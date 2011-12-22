@@ -120,7 +120,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 				String isbn = entries.get(position).isbn;
 				startBookActivity(isbn);
 			}
-		}).create();
+		}).setTitle(R.string.search_result).create();
 		dialog.show();
 	}
     
