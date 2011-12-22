@@ -236,8 +236,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
 		if(menuItems == null)
 			menuItems = getResources().getStringArray(R.array.list_item_longclick);
-		for(String menuItem: menuItems)
-			menu.add(menuItem);
+		menu.add(0, MENU_INFO, MENU_INFO, menuItems[0]);
+		menu.add(0, MENU_DELETE, MENU_DELETE, menuItems[1]);
 		BookEntry entry = bookMan.get(position);
 		menu.setHeaderTitle(entry.title);
     }
