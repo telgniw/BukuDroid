@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookshelf">书架</string>
+    <string name="scan">扫描</string>
+    <string name="add_book_to_start">请点选右上角的按钮增加图书</string>
+    <string name="look_up">搜索这本图书</string>
+    <string name="book_info">图书信息</string>
+    <string name="search">搜索</string>
+    <string name="search_result">搜索结果</string>
+    <string name="search_hint">作者书名或ISBN</string>
+    <string name="book_already_exists">这本图书已经在您的书架了</string>
+    <string name="book_not_found">没有找到这本图书</string>
+    <string name="book_not_found_long">没有找到这本图书。请确认网络已且图书信息正确。</string>
+    <string name="added">成功添加到书架</string>
+    <string name="deleted">删除成功</string>
+    <string name="delete_failed">删除失败：</string>
+    <string name="tab_barcode">条码</string>
+    <string-array name="list_item_longclick">
+        <item>图书信息</item>
+        <item>删除</item>
+    </string-array>
+</resources>
