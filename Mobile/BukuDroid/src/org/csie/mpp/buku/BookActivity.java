@@ -87,14 +87,18 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         
         BookUpdater updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
-        
-        updater.updateEntryByBooks();
 
-        if(updateAll) {
-        	if(updater.updateEntry())
-        		updater.updateInfo();
+        //TODO(ianchou): change the flow here, and try to solve the speed problem  
+        String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
+        if(countryCode.equals("957") || countryCode.equals("986")){
+        	updater.updateEntryByBooks();
         } else {
-        	updater.updateInfo();
+        	if(updateAll) {
+        		if(updater.updateEntry())
+        			updater.updateInfo();
+        	} else {
+        		updater.updateInfo();
+        	}
         }
     }
     

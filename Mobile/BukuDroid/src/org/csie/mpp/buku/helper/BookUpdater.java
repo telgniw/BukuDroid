@@ -108,15 +108,36 @@ public class BookUpdater {
 
 	    	HttpEntity entity = response.getEntity();
 	    	String result = EntityUtils.toString(entity, "big5");
-	    	System.err.println(result);
 	    	result = result.substring(result.indexOf("item=")+"item=".length());
 	    	result = result.substring(0, result.indexOf("\""));
-	    	//entry.vid = result;
-	    	System.err.println(result);
-	    } catch(Exception e){
+	    	entry.vid = result;
+
+	    	httpget = new HttpGet("http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid);
+	    	response = httpclient.execute(httpget);
+	    	statusCode = response.getStatusLine().getStatusCode();
+	    	if (statusCode != HttpStatus.SC_OK) {
+	    		return false;
+	    		//TODO(ianchou): error handling
+	    	}
+	    	
+	    	entity = response.getEntity();
+	    	result = EntityUtils.toString(entity, "big5");
+	    	result = result.substring(result.indexOf("<span>圖片預覽</span>") + "<span>圖片預覽</span>".length());
+	    	result = result.substring(result.indexOf("<img src=") + "<img src=".length());
+	    	result = result.substring(result.indexOf("?image=") + "?image=".length());
+	    	URL imageUrl = new URL(result.substring(0, result.indexOf("&")));
+			entry.cover = Util.urlToImage(imageUrl);
+	    	result = result.substring(result.indexOf("<!--product data-->") + "<!--product data-->".length());
+	    	result = result.substring(result.indexOf("<span>") + "<span>".length());
+	    	entry.title = result.substring(0, result.indexOf("<"));
+	    	result = result.substring(result.indexOf("=author\">") + "=author\">".length());
+	    	entry.author = result.substring(0, result.indexOf("<"));
+	    	
+	    }catch(Exception e){
 	    	e.printStackTrace();
 	    }
-	    return true;
+	    listener.OnUpdateFinished();
+		return true;
 	}
 
 	public boolean updateInfo() {
