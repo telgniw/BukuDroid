@@ -1,22 +1,11 @@
 package org.csie.mpp.buku.helper;
 
-<<<<<<< Updated upstream
 import java.net.MalformedURLException;
-=======
-<<<<<<< Updated upstream
-=======
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;

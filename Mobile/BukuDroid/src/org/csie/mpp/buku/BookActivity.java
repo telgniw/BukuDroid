@@ -88,23 +88,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         BookUpdater updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
         
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-        if(updateAll)
-        	updater.update();
-        else
-=======
         updater.updateEntryByBooks();
->>>>>>> Stashed changes
+
         if(updateAll) {
         	if(updater.updateEntry())
         		updater.updateInfo();
         } else {
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
         	updater.updateInfo();
         }
     }
