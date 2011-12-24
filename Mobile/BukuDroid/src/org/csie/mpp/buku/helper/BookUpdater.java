@@ -113,36 +113,23 @@ public class BookUpdater {
 	    	}
 
 	    	HttpEntity entity = response.getEntity();
-	    	String result = EntityUtils.toString(entity, "big5");
+	    	String result = EntityUtils.toString(entity, "UTF-8");
 	    	if(result.indexOf("item=")==-1) {
 	    		listener.OnUpdateFailed(OnUpdateFinishedListener.BOOK_NOT_FOUND);
 	    		return false;
 	    	}
 	    	result = result.substring(result.indexOf("item=")+"item=".length());
-	    	result = result.substring(0, result.indexOf("\""));
-	    	entry.vid = result.trim();
-
-	    	httpget = new HttpGet("http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid);
-	    	response = httpclient.execute(httpget);
-	    	statusCode = response.getStatusLine().getStatusCode();
-	    	if (statusCode != HttpStatus.SC_OK) {
-	    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-	    		return false;
-	    	}
-	    	
-	    	entity = response.getEntity();
-	    	result = EntityUtils.toString(entity, "big5");
-	    	result = result.substring(result.indexOf("<span>圖片預覽</span>") + "<span>圖片預覽</span>".length());
-	    	result = result.substring(result.indexOf("<img src=") + "<img src=".length());
+	    	entry.vid = result.substring(0, result.indexOf("\"")).trim();
+	    	result = result.substring(result.indexOf("title=\"") + "title=\"".length()); 	
+	    	entry.title = result.substring(0, result.indexOf("\"")).trim();
 	    	result = result.substring(result.indexOf("?image=") + "?image=".length());
 	    	URL imageUrl = new URL(result.substring(0, result.indexOf("&")));
-			entry.cover = Util.urlToImage(imageUrl);
-	    	result = result.substring(result.indexOf("<!--product data-->") + "<!--product data-->".length());
-	    	result = result.substring(result.indexOf("<span>") + "<span>".length());
-	    	entry.title = result.substring(0, result.indexOf("<")).trim();
-	    	result = result.substring(result.indexOf("=author\">") + "=author\">".length());
-	    	entry.author = result.substring(0, result.indexOf("<")).trim();
-
+			entry.cover = Util.urlToImage(imageUrl);   	
+			if(result.indexOf("\"go_author\"")!=-1){
+				result = result.substring(result.indexOf("\"go_author\"") + "\"go_author\"".length());
+				result = result.substring(result.indexOf("title=\"") + "title=\"".length());
+		    	entry.author = result.substring(0, result.indexOf("\"")).trim();
+			}
 	    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
 			return true;	
 	    }catch(Exception e){
