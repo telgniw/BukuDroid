@@ -17,7 +17,9 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -128,6 +130,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 			actionBar.addAction(actionAdd);
 			updater.updateInfo();
 		} else if (status == OnUpdateFinishedListener.OK_INFO) {
+			System.err.println(entry.info.reviews.size());
 			updateView();
 		}
 	}
@@ -150,6 +153,11 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
         ((TextView)findViewById(R.id.description)).setText(entry.info.description);
         ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
+        
+        if(entry.info.reviews!=null){
+        	//TODO(ianchou): UI...
+        	((ListView)findViewById(R.id.comments)).setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, entry.info.reviews));
+        }
     }
     
     private void showError(int status) {

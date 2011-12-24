@@ -1,5 +1,7 @@
 package org.csie.mpp.buku.db;
 
+import java.util.ArrayList;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -11,6 +13,7 @@ public class BookEntry extends Entry {
 		public float rating;
 		public int ratingsCount;
 		public String description;
+		public ArrayList<String> reviews;
 	}
 	
 	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)

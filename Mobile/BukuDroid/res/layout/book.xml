@@ -66,15 +66,16 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:textSize="@dimen/fontMedian"
-		        android:maxLines = "10"
+		        android:maxLines = "6"
 		        android:scrollbars = "vertical"
 		    />
 
+		    <ListView
+        		android:id="@+id/comments"
+        		android:layout_width="fill_parent"
+        		android:layout_height="wrap_content"
+    		/>
 		</LinearLayout>
     </FrameLayout>
-    <ListView
-        android:id="@+id/comments"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-    />
+
 </LinearLayout>

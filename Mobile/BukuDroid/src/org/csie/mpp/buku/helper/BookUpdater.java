@@ -2,6 +2,7 @@ package org.csie.mpp.buku.helper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -152,8 +153,24 @@ public class BookUpdater {
 					try {
 						JSONObject json = new JSONObject(Util.urlToString(url));
 						json = json.getJSONObject("volumeInfo");
-						
 						updateInfo(json);
+
+						HttpClient httpclient = new DefaultHttpClient();
+					    HttpGet httpget = new HttpGet("http://books.google.com.tw/books?id=" + entry.vid + "&sitesec=reviews");
+				    	HttpResponse response = httpclient.execute(httpget);
+				    	int statusCode = response.getStatusLine().getStatusCode();
+				    	if (statusCode != HttpStatus.SC_OK) {
+				    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
+				    		return false;
+				    	}
+
+				    	HttpEntity entity = response.getEntity();
+				    	String result = EntityUtils.toString(entity, "UTF-8");
+				    	entry.info.reviews = new ArrayList<String>();
+				    	while(result.indexOf("<p dir=ltr>")!=-1){
+				    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
+				    		entry.info.reviews.add(result.substring(0, result.indexOf("<")));
+				    	}
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
