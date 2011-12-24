@@ -10,7 +10,7 @@
     <string name="search_hint">作者书名或ISBN</string>
     <string name="book_already_exists">这本图书已经在您的书架了</string>
     <string name="book_not_found">没有找到这本图书</string>
-    <string name="book_not_found_long">没有找到这本图书。请确认网络已且图书信息正确。</string>
+    <string name="unexpected_error">未知的错误。请确认网路已连线或连络开发者。</string>
     <string name="added">成功添加到书架</string>
     <string name="deleted">删除成功</string>
     <string name="delete_failed">删除失败：</string>

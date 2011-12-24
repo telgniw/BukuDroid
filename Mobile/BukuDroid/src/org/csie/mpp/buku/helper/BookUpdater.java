@@ -22,8 +22,12 @@ import android.util.Log;
 
 public class BookUpdater {
 	public static interface OnUpdateFinishedListener {
-		public void OnUpdateFinished();
-		public void OnUpdateFailed();
+		final static int OK_ENTRY = 0;
+		final static int OK_INFO = 1;
+		final static int BOOK_NOT_FOUND =2;
+		final static int UNKNOWN = 3;
+		public void OnUpdateFinished(int status);
+		public void OnUpdateFailed(int status);
 	}
 	
 	private BookEntry entry;
@@ -48,6 +52,9 @@ public class BookUpdater {
 	}
 	
 	public boolean updateEntry() {
+		String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
+        if(countryCode.equals("957") || countryCode.equals("986"))
+        	return updateEntryByBooks();
 		try {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn" + entry.isbn);
 			AsyncUpdater async = new AsyncUpdater() {
@@ -76,11 +83,11 @@ public class BookUpdater {
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
-						listener.OnUpdateFailed();
+						listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 						return false;
 					}
 
-					listener.OnUpdateFinished();
+					listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
 					return true;
 				}
 			};
@@ -102,12 +109,16 @@ public class BookUpdater {
 	    	HttpResponse response = httpclient.execute(httpget);
 	    	int statusCode = response.getStatusLine().getStatusCode();
 	    	if (statusCode != HttpStatus.SC_OK) {
+	    		listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
 	    		return false;
-	    		//TODO(ianchou): error handling
 	    	}
 
 	    	HttpEntity entity = response.getEntity();
 	    	String result = EntityUtils.toString(entity, "big5");
+	    	if(result.indexOf("item=")==-1) {
+	    		listener.OnUpdateFinished(OnUpdateFinishedListener.BOOK_NOT_FOUND);
+	    		return false;
+	    	}
 	    	result = result.substring(result.indexOf("item=")+"item=".length());
 	    	result = result.substring(0, result.indexOf("\""));
 	    	entry.vid = result;
@@ -116,8 +127,8 @@ public class BookUpdater {
 	    	response = httpclient.execute(httpget);
 	    	statusCode = response.getStatusLine().getStatusCode();
 	    	if (statusCode != HttpStatus.SC_OK) {
+	    		listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
 	    		return false;
-	    		//TODO(ianchou): error handling
 	    	}
 	    	
 	    	entity = response.getEntity();
@@ -135,12 +146,18 @@ public class BookUpdater {
 	    	
 	    }catch(Exception e){
 	    	e.printStackTrace();
+	    	listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
 	    }
-	    listener.OnUpdateFinished();
+	    listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
 		return true;
 	}
 
 	public boolean updateInfo() {
+		String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
+        if(countryCode.equals("957") || countryCode.equals("986")){
+        	//TODO(ianchou): implement updateInfoByBooks
+        	return true;
+        }
 		try {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
 			AsyncUpdater async = new AsyncUpdater() {
@@ -157,7 +174,7 @@ public class BookUpdater {
 						return false;
 					}
 					
-					listener.OnUpdateFinished();
+					listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
 					return true;
 				}
 			};

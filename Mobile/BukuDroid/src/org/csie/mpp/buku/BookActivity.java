@@ -30,6 +30,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	private BookEntry entry;
 	private ActionBar actionBar;
 	private Action actionAdd, actionDelete;
+	private BookUpdater updater;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,10 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
+        if(isbn.length()!=10 && isbn.length()!=13){
+        	showError(OnUpdateFinishedListener.BOOK_NOT_FOUND);
+        	return;
+        }
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
         
         actionBar = ((ActionBar)findViewById(R.id.actionbar));
@@ -60,8 +65,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 					finish();
 				}
 			};
-			actionBar.addAction(actionDelete);
         	updateView();
+        	actionBar.addAction(actionDelete);
         }
         else {
         	entry = new BookEntry();
@@ -82,24 +87,16 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 					actionBar.removeAction(this);
 				}
 			};
-			actionBar.addAction(actionAdd);
         }	
         
-        BookUpdater updater = new BookUpdater(entry);
+        updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
 
         //TODO(ianchou): change the flow here, and try to solve the speed problem  
-        String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
-        if(countryCode.equals("957") || countryCode.equals("986")){
-        	updater.updateEntryByBooks();
-        } else {
-        	if(updateAll) {
-        		if(updater.updateEntry())
-        			updater.updateInfo();
-        	} else {
-        		updater.updateInfo();
-        	}
-        }
+       	if(updateAll)
+       		updater.updateEntry();
+        else
+        	updater.updateInfo();
     }
     
     @Override
@@ -125,15 +122,19 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 
     /* --- OnUpdateFinishedListener	(start) --- */
 	@Override
-	public void OnUpdateFinished() {
-		updateView();
+	public void OnUpdateFinished(int status) {
+		if(status == OnUpdateFinishedListener.OK_ENTRY) {
+			updateView();
+			actionBar.addAction(actionAdd);
+			updater.updateInfo();
+		} else if (status == OnUpdateFinishedListener.OK_INFO) {
+			updateView();
+		}
 	}
 
 	@Override
-	public void OnUpdateFailed() {
-		if(actionAdd != null)
-			actionBar.removeAction(actionAdd);
-		showError();
+	public void OnUpdateFailed(int status) {		
+		showError(status);
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
@@ -151,10 +152,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
     }
     
-    private void showError() {
-    	FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
-    	
-    	((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
-    	Toast.makeText(this, R.string.book_not_found_long, App.TOAST_TIME).show();
+    private void showError(int status) {
+    	if(status == OnUpdateFinishedListener.BOOK_NOT_FOUND) {
+    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
+    		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
+    	}else{
+    		Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
+    	}
     }
 }

@@ -17,7 +17,7 @@
     <string name="search_hint">Author, Title, ISBN</string>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>
     <string name="book_not_found">Book not found.</string>
-    <string name="book_not_found_long">Book not found. May due to network problems or invalid input.</string>
+    <string name="unexpected_error">Unexpected error! Please check the ,please check the network connection contact the developers</string>
     <string name="added">Successfully added to your bookshelf.</string>
     <string name="deleted">Successfully deleted.</string>
     <string name="delete_failed">Failed on deleting the book:</string>
