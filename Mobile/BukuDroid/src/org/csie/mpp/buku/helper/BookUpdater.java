@@ -156,7 +156,7 @@ public class BookUpdater {
 						updateInfo(json);
 
 						HttpClient httpclient = new DefaultHttpClient();
-					    HttpGet httpget = new HttpGet("http://books.google.com.tw/books?id=" + entry.vid + "&sitesec=reviews");
+					    HttpGet httpget = new HttpGet("http://books.google.com.tw/books?id=" + entry.vid + "&sitesec=reviews&hl=eng");
 				    	HttpResponse response = httpclient.execute(httpget);
 				    	int statusCode = response.getStatusLine().getStatusCode();
 				    	if (statusCode != HttpStatus.SC_OK) {
@@ -166,6 +166,7 @@ public class BookUpdater {
 
 				    	HttpEntity entity = response.getEntity();
 				    	String result = EntityUtils.toString(entity, "UTF-8");
+				    	result = result.substring(result.indexOf(">User reviews<") + ">User reviews<".length());
 				    	entry.info.reviews = new ArrayList<String>();
 				    	while(result.indexOf("<p dir=ltr>")!=-1){
 				    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
