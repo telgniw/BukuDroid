@@ -96,8 +96,7 @@ public class BookUpdater {
 		}
 		catch(MalformedURLException e) {
 			Log.e(App.TAG, e.toString());
-		}
-		
+		}		
 		return false;
 	}
 	
@@ -109,25 +108,25 @@ public class BookUpdater {
 	    	HttpResponse response = httpclient.execute(httpget);
 	    	int statusCode = response.getStatusLine().getStatusCode();
 	    	if (statusCode != HttpStatus.SC_OK) {
-	    		listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
+	    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 	    		return false;
 	    	}
 
 	    	HttpEntity entity = response.getEntity();
 	    	String result = EntityUtils.toString(entity, "big5");
 	    	if(result.indexOf("item=")==-1) {
-	    		listener.OnUpdateFinished(OnUpdateFinishedListener.BOOK_NOT_FOUND);
+	    		listener.OnUpdateFailed(OnUpdateFinishedListener.BOOK_NOT_FOUND);
 	    		return false;
 	    	}
 	    	result = result.substring(result.indexOf("item=")+"item=".length());
 	    	result = result.substring(0, result.indexOf("\""));
-	    	entry.vid = result;
+	    	entry.vid = result.trim();
 
 	    	httpget = new HttpGet("http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid);
 	    	response = httpclient.execute(httpget);
 	    	statusCode = response.getStatusLine().getStatusCode();
 	    	if (statusCode != HttpStatus.SC_OK) {
-	    		listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
+	    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 	    		return false;
 	    	}
 	    	
@@ -140,23 +139,23 @@ public class BookUpdater {
 			entry.cover = Util.urlToImage(imageUrl);
 	    	result = result.substring(result.indexOf("<!--product data-->") + "<!--product data-->".length());
 	    	result = result.substring(result.indexOf("<span>") + "<span>".length());
-	    	entry.title = result.substring(0, result.indexOf("<"));
+	    	entry.title = result.substring(0, result.indexOf("<")).trim();
 	    	result = result.substring(result.indexOf("=author\">") + "=author\">".length());
-	    	entry.author = result.substring(0, result.indexOf("<"));
-	    	
+	    	entry.author = result.substring(0, result.indexOf("<")).trim();
+
+	    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
+			return true;	
 	    }catch(Exception e){
 	    	e.printStackTrace();
-	    	listener.OnUpdateFinished(OnUpdateFinishedListener.UNKNOWN);
+	    	listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 	    }
-	    listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
-		return true;
+	    return false;
 	}
 
-	public boolean updateInfo() {
+	public boolean updateInfo() {		
 		String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
         if(countryCode.equals("957") || countryCode.equals("986")){
-        	//TODO(ianchou): implement updateInfoByBooks
-        	return true;
+        	return updateInfoByBooks();
         }
 		try {
 			URL url = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
@@ -171,6 +170,7 @@ public class BookUpdater {
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
+						listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 						return false;
 					}
 					
@@ -195,5 +195,32 @@ public class BookUpdater {
 			entry.info.ratingsCount = json.getInt("ratingsCount");
 		if(json.has("description"))
 			entry.info.description = json.getString("description");
+	}
+	
+	public boolean updateInfoByBooks() {
+		HttpClient httpclient = new DefaultHttpClient();
+	    HttpGet httpget = new HttpGet("http://m.books.com.tw/product/showmore/" + entry.vid);
+	    try{
+	    	HttpResponse response = httpclient.execute(httpget);
+	    	int statusCode = response.getStatusLine().getStatusCode();
+	    	if (statusCode != HttpStatus.SC_OK) {
+	    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
+	    		return false;
+	    	}
+
+	    	HttpEntity entity = response.getEntity();
+	    	String result = EntityUtils.toString(entity, "big5");
+	    	result = result.substring(result.indexOf("class=\"content_word\"")+"class=\"content_word\"".length());
+	    	result = result.substring(result.indexOf("<BR><BR>")+"<BR><BR>".length());
+	    	result = result.substring(0, result.indexOf("</td>"));
+	    	entry.info.description = result.trim();
+
+	    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
+			return true;
+	    }catch(Exception e){
+	    	e.printStackTrace();
+	    	listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
+	    }
+	    return false;
 	}
 }
