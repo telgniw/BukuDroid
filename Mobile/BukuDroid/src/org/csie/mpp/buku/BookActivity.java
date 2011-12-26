@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -151,14 +152,29 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         ((TextView)findViewById(R.id.author)).setText(entry.author);
         
         ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
-        ((TextView)findViewById(R.id.description)).setText(entry.info.description);
+        if(entry.info.description!=null){
+        	StringBuilder shortContent = new StringBuilder(); 
+        	shortContent.append(entry.info.description.substring(0, Math.min(200, entry.info.description.length())));
+        	if(entry.info.description.length()>200){
+        		shortContent.append("...");
+        	((TextView)findViewById(R.id.description)).setText(shortContent);
+        }
         ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
         
         if(entry.info.reviews!=null){
-        	//TODO(ianchou): UI...
-        	((ListView)findViewById(R.id.comments)).setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, entry.info.reviews));
+        	LinearLayout list = (LinearLayout)findViewById(R.id.reviews);
+        	for (int i=0; i<entry.info.reviews.size(); i++) {
+        		StringBuilder shortContent = new StringBuilder();
+        		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
+        		if(entry.info.reviews.get(i).length()>100)
+        			shortContent.append("...");
+        		System.err.println(shortContent);
+        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
+        		((TextView)view.findViewById(R.id.list_review)).setText(shortContent);
+        		list.addView(view);        	  
+        	}
         }
-    }
+    }        	
     
     private void showError(int status) {
     	if(status == OnUpdateFinishedListener.BOOK_NOT_FOUND) {

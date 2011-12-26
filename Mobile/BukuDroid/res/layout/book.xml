@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" android:layout_height="fill_parent">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res/org.csie.mpp.buku"
     android:layout_width="fill_parent"
@@ -60,22 +62,32 @@
 		        android:layout_height="wrap_content"
 		        android:isIndicator="true"
 		    />
-
+				<TextView
+				    android:text="@string/introduction"
+			      android:layout_width="fill_parent"
+			      android:layout_height="wrap_content"
+			  		android:textSize="@dimen/fontLarge"
+				android:background="@color/lightLineColor" android:textColor="@color/brightTextColor"/>
 		    <TextView
 		        android:id="@+id/description"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:textSize="@dimen/fontMedian"
-		        android:maxLines = "6"
-		        android:scrollbars = "vertical"
 		    />
-
-		    <ListView
-        		android:id="@+id/comments"
-        		android:layout_width="fill_parent"
-        		android:layout_height="wrap_content"
-    		/>
+				<TextView
+				    android:text="@string/review"
+			      android:layout_width="fill_parent"
+			      android:layout_height="wrap_content"
+			  		android:textSize="@dimen/fontLarge"
+				android:background="@color/lightLineColor" android:textColor="@color/brightTextColor" />
+				<LinearLayout
+				    android:id="@+id/reviews"
+			      android:layout_width="fill_parent"
+			      android:layout_height="wrap_content"
+			      android:orientation="vertical"
+			  />
 		</LinearLayout>
     </FrameLayout>
 
 </LinearLayout>
+</ScrollView>

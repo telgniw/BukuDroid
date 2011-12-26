@@ -24,6 +24,8 @@
     <string name="isbn">ISBN</string>
     <string name="tab_isbn">ISBN</string>
     <string name="tab_barcode">Barcode</string>
+    <string name="introduction">Introduction</string>
+    <string name="review">reviews</string>
     <string-array name="list_item_longclick">
         <item>Information</item>
         <item>Delete</item>
