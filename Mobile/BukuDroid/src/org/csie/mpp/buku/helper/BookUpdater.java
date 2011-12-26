@@ -170,7 +170,7 @@ public class BookUpdater {
 				    	entry.info.reviews = new ArrayList<String>();
 				    	while(result.indexOf("<p dir=ltr>")!=-1){
 				    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
-				    		entry.info.reviews.add(result.substring(0, result.indexOf("<")));
+				    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
 				    	}
 					}
 					catch(Exception e) {
@@ -219,6 +219,21 @@ public class BookUpdater {
 	    	result = result.substring(result.indexOf("<BR><BR>")+"<BR><BR>".length());
 	    	result = result.substring(0, result.indexOf("</td>"));
 	    	entry.info.description = result.trim();
+
+	    	httpget = new HttpGet("http://www.books.com.tw/exep/prod/reader_opinion.php?item=" + entry.vid);
+	    	response = httpclient.execute(httpget);
+	    	statusCode = response.getStatusLine().getStatusCode();
+	    	if (statusCode != HttpStatus.SC_OK) {
+	    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
+	    		return false;
+	    	}
+	    	entity = response.getEntity();
+	    	result = EntityUtils.toString(entity, "big5");
+	    	entry.info.reviews = new ArrayList<String>();
+	    	while(result.indexOf("<p class=\"des\">")!=-1){
+	    		result = result.substring(result.indexOf("<p class=\"des\">") + "<p class=\"des\">".length());
+	    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
+	    	}
 
 	    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
 			return true;
