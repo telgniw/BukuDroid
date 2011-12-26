@@ -5,10 +5,10 @@
     android:orientation="vertical"
 >
     <TextView
-        android:id="@+id/list_review"
-        android:layout_width="wrap_content"
+        style="@style/Font.Text"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/fontMedian"
+        android:id="@+id/list_review"
     />
     <org.csie.mpp.buku.view.HorizontalLine
         android:layout_width="fill_parent"

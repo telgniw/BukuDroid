@@ -59,16 +59,20 @@
         />
         <TextView
             style="@style/Font.SubTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:text="@string/introduction"
         />
         <TextView
-            android:id="@+id/description"
+            style="@style/Font.Text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/fontMedian"
+            android:id="@+id/description"
         />
         <TextView
-            style="@style/Font.SubTitle"  
+            style="@style/Font.SubTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:text="@string/review"
         />
         <LinearLayout

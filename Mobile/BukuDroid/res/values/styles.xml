@@ -17,10 +17,12 @@
     </style>
     <style name="Font.SubTitle">
         <item name="android:textSize">@dimen/fontLarge</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@color/lightLineColor</item>
         <item name="android:textColor">@color/brightTextColor</item>
+        <item name="android:padding">@dimen/padding</item>
+    </style>
+    <style name="Font.Text">
+        <item name="android:textSize">@dimen/fontMedian</item>
         <item name="android:padding">@dimen/padding</item>
     </style>
     
