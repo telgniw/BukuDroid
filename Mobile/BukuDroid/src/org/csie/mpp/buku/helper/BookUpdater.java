@@ -35,7 +35,7 @@ public abstract class BookUpdater {
 	public static BookUpdater create(BookEntry entry) {
 		String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
         if(countryCode.equals("957") || countryCode.equals("986"))
-        	return new SearchUpdater(entry);
+        	return new ChineseUpdater(entry);
 		return new NormalUpdater(entry);
 	}
 	
@@ -165,8 +165,8 @@ public abstract class BookUpdater {
 		}
 	}
 	
-	public static class SearchUpdater extends BookUpdater {
-		protected SearchUpdater(BookEntry e) {
+	public static class ChineseUpdater extends BookUpdater {
+		protected ChineseUpdater(BookEntry e) {
 			super(e);
 		}
 
