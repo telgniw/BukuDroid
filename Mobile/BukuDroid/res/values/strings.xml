@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BukuDroid</string>
+    <string name="app_fb_fan_page_short">http://on.fb.me/BukuDroid</string>
     <string name="bookshelf">Bookshelf</string>
     <string name="friends">Friends</string>
     <string name="stream">Stream</string>
@@ -13,6 +14,10 @@
     <string name="look_up">Look up this book.</string>
     <string name="book_info">Information</string>
     <string name="search">Search</string>
+    <string name="about">About</string>
+    <string name="about_buku">About BukuDroid</string>
+    <string name="what_is_buku">An app for bookworms!</string>
+    <string name="find_out_more">Find out more on Facebook!</string>
     <string name="search_result">Search Result</string>
     <string name="search_hint">Author, Title, ISBN</string>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>

@@ -21,10 +21,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -35,6 +37,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
@@ -144,7 +147,16 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     		case ScanActivity.REQUEST_CODE:
     			if(resultCode == RESULT_OK) {
     				String isbn = data.getStringExtra(App.ISBN);
-    				startBookActivity(isbn, true);
+    				if(isbn.contains("BukuDroid")) {
+    					FlurryAgent.logEvent(App.FlurryEvent.FAN_PAGE_OPENED.toString());
+    					/* Tricks for our fan page. */
+    					Uri uri = Uri.parse(App.FB_FAN_PAGE);
+    					Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+    					startActivity(intent);
+    				}
+    				else {
+    					startBookActivity(isbn, true);
+    				}
     			}
     			break;
     		case BookActivity.REQUEST_CODE:
@@ -219,16 +231,24 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     			SearchManager sm = (SearchManager)getSystemService(SEARCH_SERVICE);
     			if(sm != null)
     				sm.startSearch(null, false, getComponentName(), null, false); 
-    			return true;
+    			break;
+    		case R.id.menu_about:
+    			View view = getLayoutInflater().inflate(R.layout.about, null);
+    			Linkify.addLinks((TextView)view.findViewById(R.id.link), Linkify.ALL);
+    			new AlertDialog.Builder(this).setTitle(R.string.about_buku).setView(view).create().show();
+    			break;
     		default:
-    			return true;
+    			break;
     	}
+    	return true;
     }
     /* --- OptionsMenu			(end) --- */
 
     /* --- ContextMenu			(start) --- */
     private static final int MENU_INFO = 0;
 	private static final int MENU_DELETE = 1;
+	
+	private int[] menuIds = { MENU_INFO, MENU_DELETE };
 	private String[] menuItems;
     
     @Override
@@ -236,8 +256,8 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
 		if(menuItems == null)
 			menuItems = getResources().getStringArray(R.array.list_item_longclick);
-		menu.add(0, MENU_INFO, MENU_INFO, menuItems[0]);
-		menu.add(0, MENU_DELETE, MENU_DELETE, menuItems[1]);
+		for(int i = 0; i < menuIds.length; i++)
+			menu.add(0, menuIds[i], 0, menuItems[i]);
 		BookEntry entry = bookMan.get(position);
 		menu.setHeaderTitle(entry.title);
     }

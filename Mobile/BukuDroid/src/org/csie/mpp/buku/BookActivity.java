@@ -187,7 +187,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
     
     private void showError(int status) {
     	if(status == OnUpdateFinishedListener.BOOK_NOT_FOUND) {
-    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
+    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString() + "\"" + entry.isbn + "\"");
     		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
     	}
     	else {

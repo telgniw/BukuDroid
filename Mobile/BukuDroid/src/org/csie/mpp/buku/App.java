@@ -16,6 +16,8 @@ public class App {
 	public static final String[] FB_APP_PERMS 	= {
 	};
 	
+	public static final String FB_FAN_PAGE		= "http://www.facebook.com/pages/BukuDroid/316709318351180";
+	
 	public static final Facebook fb;
 	public static final AsyncFacebookRunner fb_runner;
 	
@@ -32,6 +34,7 @@ public class App {
 	}
 	
 	public enum FlurryEvent {
-		BOOK_NOT_FOUND
+		BOOK_NOT_FOUND,
+		FAN_PAGE_OPENED
 	}
 }

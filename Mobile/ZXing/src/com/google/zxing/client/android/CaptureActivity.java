@@ -490,7 +490,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
 
     if (source == IntentSource.NATIVE_APP_INTENT) {
-      
       // Hand back whatever action they requested - this can be changed to Intents.Scan.ACTION when
       // the deprecated intent is retired.
       Intent intent = new Intent(getIntent().getAction());

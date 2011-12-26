@@ -25,6 +25,12 @@
         <item name="android:textSize">@dimen/fontMedian</item>
         <item name="android:padding">@dimen/padding</item>
     </style>
+    <style name="Font.Dialog">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">@dimen/fontMedian</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
     
     <style name="BukuTheme" parent="android:Theme.Light.NoTitleBar">
     </style>
