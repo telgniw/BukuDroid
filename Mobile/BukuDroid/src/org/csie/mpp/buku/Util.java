@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -81,6 +83,11 @@ public class Util {
 			Log.e(App.TAG, e.toString());
 		}
 		return null;
+	}
+	
+	public static String htmlToText(String str) {
+		str = str.replaceAll("<{1}[^>]{1,}>{1}", "");
+		return StringEscapeUtils.unescapeHtml4(str);
 	}
 	
 	public static byte[] toByteArray(Bitmap bitmap) {

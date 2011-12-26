@@ -19,7 +19,7 @@
 		        android:layout_height="wrap_content"
 		        android:text="@string/isbn"
 		        android:textSize="@dimen/fontLarge"
-	            android:paddingRight="@dimen/margin"
+	            android:paddingRight="@dimen/padding"
 		    />
 		    <EditText
 		        android:id="@+id/isbn"

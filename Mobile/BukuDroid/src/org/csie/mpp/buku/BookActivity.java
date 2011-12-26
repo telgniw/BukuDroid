@@ -25,7 +25,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BookActivity extends Activity implements OnUpdateFinishedListener {
+public class BookActivity extends Activity implements OnUpdateFinishedListener, View.OnClickListener {
 	public static final int REQUEST_CODE = 1437;
 	public static final String CHECK_DUPLICATE = "duplicate";
 	
@@ -93,7 +93,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 			};
         }	
         
-        updater = new BookUpdater(entry);
+        updater = BookUpdater.create(entry);
         updater.setOnUpdateFinishedListener(this);
   
        	if(updateAll)
@@ -174,11 +174,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
         		StringBuilder shortContent = new StringBuilder();
         		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-        		if(entry.info.reviews.get(i).length()>100){
+        		if(entry.info.reviews.get(i).length()>100)
         			shortContent.append("...");
-            		((TextView)view.findViewById(R.id.list_review)).setOnClickListener(new ReviewClickListener(i));
-        		}
-        		((TextView)view.findViewById(R.id.list_review)).setText(shortContent);
+        		TextView review = ((TextView)view.findViewById(R.id.list_review));
+            	review.setOnClickListener(this);
+            	review.setId(i);
+        		review.setText(shortContent);
         		list.addView(view);        	  
         	}
         }
@@ -188,23 +189,19 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     	if(status == OnUpdateFinishedListener.BOOK_NOT_FOUND) {
     		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
     		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
-    	}else{
+    	}
+    	else {
     		Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
     	}
     }
 
-    class ReviewClickListener implements View.OnClickListener
-    {
-        private final int index;
-
-        public ReviewClickListener(final int index)
-        {
-            this.index = index;
-        }
-        @Override
-        public void onClick(View v)
-        {
-        	new AlertDialog.Builder(BookActivity.this).setMessage(entry.info.reviews.get(index)).show();
-        }
-    }
+    private AlertDialog dialog;
+    
+	@Override
+	public void onClick(View v) {
+		if(dialog == null)
+			dialog = new AlertDialog.Builder(BookActivity.this).create();
+		dialog.setMessage(entry.info.reviews.get(v.getId()));
+		dialog.show();
+	}
 }

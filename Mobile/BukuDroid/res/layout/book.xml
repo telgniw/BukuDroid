@@ -14,80 +14,69 @@
         app:title="@string/book_info"
         style="@style/ActionBar"
     />
-    <FrameLayout
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="@dimen/margin"
+        android:orientation="vertical"
     >
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
         >
-		    <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		    >
-		        <ImageView
-			        android:id="@+id/image"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:adjustViewBounds="true"
-			        android:maxWidth="@dimen/imageSize"
-			        android:maxHeight="@dimen/imageSize" 
-			    />
-		        <LinearLayout
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:orientation="vertical"
-			    >
-			        <TextView
-			            android:id="@+id/title"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:textSize="@dimen/fontLarge"
-			        />
-			        <TextView
-			            android:id="@+id/author"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:textSize="@dimen/fontMedian"
-			        />
-		        </LinearLayout>
-
-		    </LinearLayout>
-		    <RatingBar
-		        android:id="@+id/rating"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:isIndicator="true"
-		    />
-				<TextView
-				    android:text="@string/introduction"
-			      android:layout_width="fill_parent"
-			      android:layout_height="wrap_content"
-			  		android:textSize="@dimen/fontLarge"
-				android:background="@color/lightLineColor" android:textColor="@color/brightTextColor"/>
-		    <TextView
-		        android:id="@+id/description"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:textSize="@dimen/fontMedian"
-		    />
-				<TextView
-				    android:text="@string/review"
-			      android:layout_width="fill_parent"
-			      android:layout_height="wrap_content"
-			  		android:textSize="@dimen/fontLarge"
-				android:background="@color/lightLineColor" android:textColor="@color/brightTextColor" />
-				<LinearLayout
-				    android:id="@+id/reviews"
-			      android:layout_width="fill_parent"
-			      android:layout_height="wrap_content"
-			      android:orientation="vertical"
-			  />
-		</LinearLayout>
-    </FrameLayout>
-
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:maxWidth="@dimen/imageSize"
+                android:maxHeight="@dimen/imageSize" 
+            />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+            >
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontLarge"
+                />
+                <TextView
+                    android:id="@+id/author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/fontMedian"
+                />
+            </LinearLayout>
+        </LinearLayout>
+        <RatingBar
+            android:id="@+id/rating"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:isIndicator="true"
+        />
+        <TextView
+            style="@style/Font.SubTitle"
+            android:text="@string/introduction"
+        />
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/fontMedian"
+        />
+        <TextView
+            style="@style/Font.SubTitle"  
+            android:text="@string/review"
+        />
+        <LinearLayout
+            android:id="@+id/reviews"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+        />
+    </LinearLayout>
 </LinearLayout>
 </ScrollView>

@@ -6,6 +6,7 @@
     <dimen name="indicatorSize">20dip</dimen>
     <dimen name="indicatorFontSize">12dip</dimen>
     <dimen name="margin">10dip</dimen>
+    <dimen name="padding">5dip</dimen>
     <dimen name="imageSize">80dip</dimen>
     <dimen name="imageCoverSize">160dip</dimen>
     <dimen name="fontLarge">20dip</dimen>
