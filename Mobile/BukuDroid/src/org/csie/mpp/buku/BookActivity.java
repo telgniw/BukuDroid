@@ -1,5 +1,7 @@
 package org.csie.mpp.buku;
 
+import java.util.HashMap;
+
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
@@ -11,12 +13,14 @@ import com.markupartist.android.widget.ActionBar.AbstractAction;
 import com.markupartist.android.widget.ActionBar.Action;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,7 +38,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 	private ActionBar actionBar;
 	private Action actionAdd, actionDelete;
 	private BookUpdater updater;
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +71,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
 					setResult(RESULT_FIRST_USER, data);
 					finish();
 				}
-			};
+			};        	
+
         	updateView();
         	actionBar.addAction(actionDelete);
         }
@@ -94,8 +99,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         
         updater = new BookUpdater(entry);
         updater.setOnUpdateFinishedListener(this);
-
-        //TODO(ianchou): change the flow here, and try to solve the speed problem  
+  
        	if(updateAll)
        		updater.updateEntry();
         else
@@ -157,6 +161,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         	shortContent.append(entry.info.description.substring(0, Math.min(200, entry.info.description.length())));
         	if(entry.info.description.length()>200){
         		shortContent.append("...");
+        		((TextView)findViewById(R.id.description)).setOnClickListener(new OnClickListener() {
+        	        @Override
+        	        public void onClick(View v) {
+        	        	new AlertDialog.Builder(BookActivity.this).setMessage(entry.info.description).show();               
+        	        }
+        	    });
         	}
         	((TextView)findViewById(R.id.description)).setText(shortContent);
         }
@@ -165,12 +175,13 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         if(entry.info.reviews!=null){
         	LinearLayout list = (LinearLayout)findViewById(R.id.reviews);
         	for (int i=0; i<entry.info.reviews.size(); i++) {
+        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
         		StringBuilder shortContent = new StringBuilder();
         		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-        		if(entry.info.reviews.get(i).length()>100)
+        		if(entry.info.reviews.get(i).length()>100){
         			shortContent.append("...");
-        		System.err.println(shortContent);
-        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
+            		((TextView)view.findViewById(R.id.list_review)).setOnClickListener(new ReviewClickListener(i));
+        		}
         		((TextView)view.findViewById(R.id.list_review)).setText(shortContent);
         		list.addView(view);        	  
         	}
@@ -184,5 +195,20 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
     	}else{
     		Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
     	}
+    }
+
+    class ReviewClickListener implements View.OnClickListener
+    {
+        private final int index;
+
+        public ReviewClickListener(final int index)
+        {
+            this.index = index;
+        }
+        @Override
+        public void onClick(View v)
+        {
+        	new AlertDialog.Builder(BookActivity.this).setMessage(entry.info.reviews.get(index)).show();
+        }
     }
 }
