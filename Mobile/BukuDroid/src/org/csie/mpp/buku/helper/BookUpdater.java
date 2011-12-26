@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -170,7 +171,7 @@ public class BookUpdater {
 				    	entry.info.reviews = new ArrayList<String>();
 				    	while(result.indexOf("<p dir=ltr>")!=-1){
 				    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
-				    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
+				    		entry.info.reviews.add(htmlToText(result.substring(0, result.indexOf("</p>"))));
 				    	}
 					}
 					catch(Exception e) {
@@ -218,7 +219,7 @@ public class BookUpdater {
 	    	result = result.substring(result.indexOf("class=\"content_word\"")+"class=\"content_word\"".length());
 	    	result = result.substring(result.indexOf("<BR><BR>")+"<BR><BR>".length());
 	    	result = result.substring(0, result.indexOf("</td>"));
-	    	entry.info.description = result.trim();
+	    	entry.info.description = htmlToText(result.trim());
 
 	    	httpget = new HttpGet("http://www.books.com.tw/exep/prod/reader_opinion.php?item=" + entry.vid);
 	    	response = httpclient.execute(httpget);
@@ -232,7 +233,7 @@ public class BookUpdater {
 	    	entry.info.reviews = new ArrayList<String>();
 	    	while(result.indexOf("<p class=\"des\">")!=-1){
 	    		result = result.substring(result.indexOf("<p class=\"des\">") + "<p class=\"des\">".length());
-	    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
+	    		entry.info.reviews.add(htmlToText(result.substring(0, result.indexOf("</p>"))));
 	    	}
 
 	    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
@@ -242,5 +243,11 @@ public class BookUpdater {
 	    	listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
 	    }
 	    return false;
+	}
+
+	private String htmlToText(String str) {
+		str = str.replaceAll("<{1}[^>]{1,}>{1}", "");
+		return StringEscapeUtils.unescapeHtml4(str);
+		
 	}
 }
