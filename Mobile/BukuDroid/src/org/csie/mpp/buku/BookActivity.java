@@ -157,6 +157,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener {
         	shortContent.append(entry.info.description.substring(0, Math.min(200, entry.info.description.length())));
         	if(entry.info.description.length()>200){
         		shortContent.append("...");
+        	}
         	((TextView)findViewById(R.id.description)).setText(shortContent);
         }
         ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
