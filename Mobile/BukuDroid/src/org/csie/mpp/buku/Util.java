@@ -99,7 +99,7 @@ public class Util {
 			sum += (isbn.charAt(i) - '0') * (((i & 1) == 0)? 1 : 3);
 		}
 		int m = sum % 10;
-		if(m==0)
+		if(m == 0)
 			return "0";
 		else
 			return String.valueOf(10 - sum % 10);
