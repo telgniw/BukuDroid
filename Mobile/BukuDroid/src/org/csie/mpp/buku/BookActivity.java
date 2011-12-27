@@ -46,7 +46,7 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
         if(isbn.length()!=10 && isbn.length()!=13){
-        	showError(OnUpdateFinishedListener.BOOK_NOT_FOUND);
+        	showError(Status.BOOK_NOT_FOUND);
         	return;
         }
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
@@ -125,20 +125,19 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
 
     /* --- OnUpdateFinishedListener	(start) --- */
 	@Override
-	public void OnUpdateFinished(int status) {
-		if(status == OnUpdateFinishedListener.OK_ENTRY) {
+	public void onUpdateFinished(Status status) {
+		if(status == Status.OK_ENTRY) {
 			updateView();
 			actionBar.addAction(actionAdd);
 			updater.updateInfo();
-		} else if (status == OnUpdateFinishedListener.OK_INFO) {
+		}
+		else if (status == Status.OK_INFO) {
 			System.err.println(entry.info.reviews.size());
 			updateView();
 		}
-	}
-
-	@Override
-	public void OnUpdateFailed(int status) {		
-		showError(status);
+		else {
+			showError(status);
+		}
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
@@ -185,8 +184,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
         }
     }        	
     
-    private void showError(int status) {
-    	if(status == OnUpdateFinishedListener.BOOK_NOT_FOUND) {
+    private void showError(Status status) {
+    	if(status == Status.BOOK_NOT_FOUND) {
     		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString() + "\"" + entry.isbn + "\"");
     		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
     	}

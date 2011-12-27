@@ -23,13 +23,14 @@ import android.util.Log;
 
 public abstract class BookUpdater {
 	public static interface OnUpdateFinishedListener {
-		final static int OK_ENTRY = 0;
-		final static int OK_INFO = 1;
-		final static int BOOK_NOT_FOUND = 2;
-		final static int UNKNOWN = 3;
+		public enum Status {
+			OK_ENTRY,
+			OK_INFO,
+			BOOK_NOT_FOUND,
+			UNKNOWN
+		}
 		
-		public void OnUpdateFinished(int status);
-		public void OnUpdateFailed(int status);
+		public void onUpdateFinished(Status status);
 	}
 	
 	public static BookUpdater create(BookEntry entry) {
@@ -50,16 +51,22 @@ public abstract class BookUpdater {
 		listener = l;
 	}
 	
-	public abstract boolean updateEntry();
-	public abstract boolean updateInfo();
+	public abstract void updateEntry();
+	public abstract void updateInfo();
 	
-	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, Boolean> {
+	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, OnUpdateFinishedListener.Status> {
 		@Override
-		protected Boolean doInBackground(URL... urls) {
+		protected OnUpdateFinishedListener.Status doInBackground(URL... urls) {
 			return update(urls);
 		}
 		
-		protected abstract boolean update(URL... urls);
+		@Override
+		protected void onPostExecute(OnUpdateFinishedListener.Status result) {
+			/* this will be run on UI thread */
+			listener.onUpdateFinished(result);
+		}
+		
+		protected abstract OnUpdateFinishedListener.Status update(URL... urls);
 	}
 	
 	public static class NormalUpdater extends BookUpdater {
@@ -68,11 +75,11 @@ public abstract class BookUpdater {
 		}
 		
 		@Override
-		public boolean updateEntry() {
+		public void updateEntry() {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected boolean update(URL... urls) {
+					protected OnUpdateFinishedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							entry.vid = json.getJSONArray("items").getJSONObject(0).getString("id");
@@ -96,30 +103,27 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-							return false;
+							return OnUpdateFinishedListener.Status.UNKNOWN;
 						}
 
-						listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
-						return true;
+						return OnUpdateFinishedListener.Status.OK_ENTRY;
 					}
 				};
 				
 				URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=isbn" + entry.isbn);
-				return async.update(url);
+				async.execute(url);
 			}
 			catch(MalformedURLException e) {
 				Log.e(App.TAG, e.toString());
-			}		
-			return false;
+			}
 		}
 
 		@Override
-		public boolean updateInfo() {
+		public void updateInfo() {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected boolean update(URL... urls) {
+					protected OnUpdateFinishedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							json = json.getJSONObject("volumeInfo");
@@ -130,8 +134,7 @@ public abstract class BookUpdater {
 					    	HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-					    		return false;
+					    		return OnUpdateFinishedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -145,23 +148,20 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-							return false;
+							return OnUpdateFinishedListener.Status.UNKNOWN;
 						}
 						
-						listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
-						return true;
+						return OnUpdateFinishedListener.Status.OK_INFO;
 					}
 				};
 				
 				URL url0 = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
 				URL url1 = new URL("http://books.google.com.tw/books?id=" + entry.vid + "&sitesec=reviews&hl=eng");
-				return async.update(url0, url1);
+				async.execute(url0, url1);
 			}
 			catch(MalformedURLException e) {
 				Log.e(App.TAG, e.toString());
 			}
-			return false;
 		}
 	}
 	
@@ -172,25 +172,23 @@ public abstract class BookUpdater {
 
 
 		@Override
-		public boolean updateEntry() {
+		public void updateEntry() {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected boolean update(URL... urls) {
+					protected OnUpdateFinishedListener.Status update(URL... urls) {
 						try {
 							HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = new DefaultHttpClient().execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-					    		return false;
+					    		return OnUpdateFinishedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
 					    	if(result.indexOf("item=")==-1) {
-					    		listener.OnUpdateFailed(OnUpdateFinishedListener.BOOK_NOT_FOUND);
-					    		return false;
+					    		return OnUpdateFinishedListener.Status.BOOK_NOT_FOUND;
 					    	}
 					    	result = result.substring(result.indexOf("item=")+"item=".length());
 					    	entry.vid = result.substring(0, result.indexOf("\"")).trim();
@@ -205,40 +203,36 @@ public abstract class BookUpdater {
 						    	entry.author = result.substring(0, result.indexOf("\"")).trim();
 							}
 							
-					    	listener.OnUpdateFinished(OnUpdateFinishedListener.OK_ENTRY);
-							return true;
+					    	return OnUpdateFinishedListener.Status.OK_ENTRY;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-							return false;
+							return OnUpdateFinishedListener.Status.UNKNOWN;
 						}
 					}
 				};
 				
 				URL url = new URL("http://search.books.com.tw/exep/prod_search.php?key=" + entry.isbn);
-				return async.update(url);
+				async.execute(url);
 			}
 			catch(MalformedURLException e) {
 				Log.e(App.TAG, e.toString());
 			}
-			return false;
 		}
 		
 		@Override
-		public boolean updateInfo() {
+		public void updateInfo() {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected boolean update(URL... urls) {
+					protected OnUpdateFinishedListener.Status update(URL... urls) {
 						try {
 							HttpClient httpclient = new DefaultHttpClient();
 						    HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-					    		return false;
+					    		return OnUpdateFinishedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -252,8 +246,7 @@ public abstract class BookUpdater {
 					    	response = httpclient.execute(httpget);
 					    	statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-					    		return false;
+					    		return OnUpdateFinishedListener.Status.UNKNOWN;
 					    	}
 					    	entity = response.getEntity();
 					    	result = EntityUtils.toString(entity, "big5");
@@ -265,23 +258,20 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							listener.OnUpdateFailed(OnUpdateFinishedListener.UNKNOWN);
-							return false;
+							return OnUpdateFinishedListener.Status.UNKNOWN;
 						}
 						
-						listener.OnUpdateFinished(OnUpdateFinishedListener.OK_INFO);
-						return true;
+						return OnUpdateFinishedListener.Status.OK_INFO;
 					}
 				};
 				
 				URL url0 = new URL("http://m.books.com.tw/product/showmore/" + entry.vid);
 				URL url1 = new URL("http://www.books.com.tw/exep/prod/reader_opinion.php?item=" + entry.vid);
-				return async.update(url0, url1);
+				async.execute(url0, url1);
 			}
 			catch(MalformedURLException e) {
 				Log.e(App.TAG, e.toString());
 			}
-			return false;
 		}
 	}
 	
