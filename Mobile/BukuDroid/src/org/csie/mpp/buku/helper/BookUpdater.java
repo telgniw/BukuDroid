@@ -15,7 +15,6 @@ import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.BookEntry;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
@@ -31,6 +30,7 @@ public abstract class BookUpdater {
 		}
 
 		public void onUpdateStart();
+		public void onUpdateProgress();
 		public void onUpdateFinish(Status status);
 	}
 	
@@ -64,6 +64,11 @@ public abstract class BookUpdater {
 		@Override
 		protected void onPreExecute() {
 			listener.onUpdateStart();
+		}
+		
+		@Override
+		protected void onProgressUpdate(Integer... progresses) {
+			listener.onUpdateProgress();
 		}
 		
 		@Override
@@ -101,6 +106,7 @@ public abstract class BookUpdater {
 								builder.append(authors.getString(i));
 							}
 							entry.author = builder.toString();
+							publishProgress();
 							
 							if(json.has("imageLinks"))	{
 								URL imageUrl = new URL(json.getJSONObject("imageLinks").getString("thumbnail"));
@@ -133,7 +139,14 @@ public abstract class BookUpdater {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							json = json.getJSONObject("volumeInfo");
-							updateInfo(json);
+							
+							if(json.has("averageRating"))
+								entry.info.rating = (float)json.getDouble("averageRating");
+							if(json.has("ratingsCount"))
+								entry.info.ratingsCount = json.getInt("ratingsCount");
+							if(json.has("description"))
+								entry.info.description = json.getString("description");
+							publishProgress();
 
 							HttpClient httpclient = new DefaultHttpClient();
 						    HttpGet httpget = new HttpGet(urls[1].toURI());
@@ -193,16 +206,21 @@ public abstract class BookUpdater {
 
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
-					    	if(result.indexOf("item=")==-1) {
+					    	if(result.indexOf("item=")<0) {
 					    		return OnUpdatStatusChangedListener.Status.BOOK_NOT_FOUND;
 					    	}
+					    	
 					    	result = result.substring(result.indexOf("item=")+"item=".length());
 					    	entry.vid = result.substring(0, result.indexOf("\"")).trim();
 					    	result = result.substring(result.indexOf("title=\"") + "title=\"".length()); 	
 					    	entry.title = result.substring(0, result.indexOf("\"")).trim();
+					    	publishProgress();
+					    	
 					    	result = result.substring(result.indexOf("?image=") + "?image=".length());
 					    	URL imageUrl = new URL(result.substring(0, result.indexOf("&")));
-							entry.cover = Util.urlToImage(imageUrl);   	
+							entry.cover = Util.urlToImage(imageUrl);
+							publishProgress();
+							
 							if(result.indexOf("\"go_author\"")!=-1){
 								result = result.substring(result.indexOf("\"go_author\"") + "\"go_author\"".length());
 								result = result.substring(result.indexOf("title=\"") + "title=\"".length());
@@ -247,6 +265,7 @@ public abstract class BookUpdater {
 					    	result = result.substring(result.indexOf("<BR><BR>")+"<BR><BR>".length());
 					    	result = result.substring(0, result.indexOf("</td>"));
 					    	entry.info.description = Util.htmlToText(result.trim());
+					    	publishProgress();
 
 					    	httpget = new HttpGet(urls[1].toURI());
 					    	response = httpclient.execute(httpget);
@@ -279,14 +298,5 @@ public abstract class BookUpdater {
 				Log.e(App.TAG, e.toString());
 			}
 		}
-	}
-	
-	protected void updateInfo(JSONObject json) throws JSONException {
-		if(json.has("averageRating"))
-			entry.info.rating = (float)json.getDouble("averageRating");
-		if(json.has("ratingsCount"))
-			entry.info.ratingsCount = json.getInt("ratingsCount");
-		if(json.has("description"))
-			entry.info.description = json.getString("description");
 	}
 }

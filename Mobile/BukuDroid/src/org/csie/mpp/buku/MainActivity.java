@@ -165,7 +165,10 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     				bookMan.add(isbn);
     			}
     			else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
-    				Toast.makeText(MainActivity.this, getString(R.string.invalid_isbn), App.TOAST_TIME).show();
+    				Toast.makeText(this, getString(R.string.invalid_isbn), App.TOAST_TIME).show();
+    			}
+    			else if(resultCode == BookActivity.RESULT_NOT_FOUND) {
+    				Toast.makeText(this, getString(R.string.book_not_found), App.TOAST_TIME).show();
     			}
 				else if(resultCode == BookActivity.RESULT_DELETE) {
 					String isbn = data.getStringExtra(App.ISBN);

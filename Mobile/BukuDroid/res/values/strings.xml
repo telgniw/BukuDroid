@@ -24,6 +24,7 @@
     <string name="book_not_found">Book not found.</string>
     <string name="invalid_isbn">Invalid ISBN.</string>
     <string name="updating">Updating...</string>
+    <string name="no_data">No data.</string>
     <string name="unexpected_error">Unexpected error! Please check the ,please check the network connection contact the developers</string>
     <string name="added">Successfully added to your bookshelf.</string>
     <string name="deleted">Successfully deleted.</string>

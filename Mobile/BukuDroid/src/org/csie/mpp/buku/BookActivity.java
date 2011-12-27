@@ -28,6 +28,7 @@ import android.widget.Toast;
 public class BookActivity extends Activity implements OnUpdatStatusChangedListener, View.OnClickListener {
 	public static final int REQUEST_CODE = 1437;
 	public static final int RESULT_ISBN_INVALID = 633;
+	public static final int RESULT_NOT_FOUND = 634;
 	public static final int RESULT_DELETE = 643;
 	public static final String CHECK_DUPLICATE = "duplicate";
 	
@@ -131,6 +132,12 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
     public void onUpdateStart() {
     	updateView(null);
     }
+    
+    @Override
+    public void onUpdateProgress() {
+    	// TODO: enhance efficiency
+    	updateView(null);
+    }
 	
 	@Override
 	public void onUpdateFinish(Status status) {
@@ -145,7 +152,9 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 				break;
 			case BOOK_NOT_FOUND:
 	    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
-	    		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
+	    		FlurryAgent.logEvent(entry.isbn);
+	    		setResult(RESULT_NOT_FOUND);
+	    		finish();
 	    		break;
 			default:
 				Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
@@ -155,34 +164,51 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	/* --- OnUpdateFinishedListener	(end) --- */
     
     private void updateView(Status status) {
-    	if(entry.cover!=null)
-    		((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
+    	ImageView cover = ((ImageView)findViewById(R.id.image));
+    	if(entry.cover != null)
+    		cover.setImageBitmap(entry.cover);
     	else
-    		((ImageView)findViewById(R.id.image)).setImageResource(R.drawable.book);
+    		cover.setImageResource(R.drawable.book);
     	
-        ((TextView)findViewById(R.id.title)).setText(entry.title);
-        ((TextView)findViewById(R.id.author)).setText(entry.author);
+    	if(entry.title != null) {
+    		((TextView)findViewById(R.id.title)).setText(entry.title);
+    		((TextView)findViewById(R.id.author)).setText(entry.author);
+            ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
+    	}
+    	else {
+        	if(status == null)
+        		((TextView)findViewById(R.id.title)).setText(R.string.updating);
+    	}
         
-        ((RatingBar)findViewById(R.id.rating)).setRating(entry.info.rating);
-        if(entry.info.description!=null){
+        TextView description = ((TextView)findViewById(R.id.description));
+        if(entry.info.description != null) {
         	StringBuilder shortContent = new StringBuilder(); 
         	shortContent.append(entry.info.description.substring(0, Math.min(200, entry.info.description.length())));
         	if(entry.info.description.length()>200){
         		shortContent.append("...");
-        		((TextView)findViewById(R.id.description)).setOnClickListener(new OnClickListener() {
+        		description.setOnClickListener(new OnClickListener() {
         	        @Override
         	        public void onClick(View v) {
         	        	new AlertDialog.Builder(BookActivity.this).setMessage(entry.info.description).show();               
         	        }
         	    });
         	}
-        	((TextView)findViewById(R.id.description)).setText(shortContent);
+        	description.setText(shortContent);
+        	description.setMovementMethod(new ScrollingMovementMethod());
         }
-        ((TextView)findViewById(R.id.description)).setMovementMethod(new ScrollingMovementMethod());
+        else {
+        	if(status == null)
+        		description.setText(R.string.updating);
+        	else if(status == Status.OK_INFO)
+        		description.setText(R.string.no_data);
+        }
         
-        if(entry.info.reviews!=null){
-        	LinearLayout list = (LinearLayout)findViewById(R.id.reviews);
-        	for (int i=0; i<entry.info.reviews.size(); i++) {
+        LinearLayout reviews = (LinearLayout)findViewById(R.id.reviews);
+        if(entry.info.reviews != null) {
+        	int count = reviews.getChildCount(), size = entry.info.reviews.size();
+        	if(count > 0 && count != size)
+        		reviews.removeAllViews();
+        	for (int i=0; i<size; i++) {
         		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
         		StringBuilder shortContent = new StringBuilder();
         		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
@@ -192,8 +218,19 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
             	review.setOnClickListener(this);
             	review.setId(i);
         		review.setText(shortContent);
-        		list.addView(view);        	  
+        		reviews.addView(view);        	  
         	}
+        }
+        else {
+        	if(status == null) {
+        		if(reviews.getChildCount() == 0) {
+        			View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
+        			((TextView)view.findViewById(R.id.list_review)).setText(R.string.updating);
+        			reviews.addView(view);
+        		}
+        	}
+        	else if(status == Status.OK_INFO)
+        		description.setText(R.string.no_data);
         }
     }
 
