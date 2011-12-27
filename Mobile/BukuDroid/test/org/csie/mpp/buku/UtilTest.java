@@ -18,7 +18,7 @@ public class UtilTest {
 		isbn13 = "9780619217648";
 		
 		upc_isbn10 = "0142501158";
-		upc_bar17 = "0514880599550115";
+		upc_bar17 = "05148800599550115";
 	}
 
 	@Test
