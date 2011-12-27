@@ -24,6 +24,7 @@ public class App {
 	// --- aNobii ---
 	public static final String ANOBII_APP_KEY	= "92b7e23adf9ef1931cfd02503cf1c8ca";
 	public static final String ANOBII_APP_SECRET= "kc21j1bje7";
+	public static final String ANOBII_APP_SIG	= "dcad11c39d4c9ac6800715a8746c68c5";
 	
 	// --- Flurry ---
 	public static final String FLURRY_APP_KEY	= "HLE7GZ4AE2TX4XP1LTLE";
