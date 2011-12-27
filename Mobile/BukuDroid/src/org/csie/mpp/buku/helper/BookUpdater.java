@@ -285,6 +285,15 @@ public abstract class BookUpdater {
 					    	}
 					    	entity = response.getEntity();
 					    	result = EntityUtils.toString(entity, "big5");
+					    	
+					    	if(result.indexOf(">讀者書評等級：")!=-1 && result.indexOf("</tt>")!=-1){
+					    		String tmp = result.substring(result.indexOf(">讀者書評等級："), result.indexOf("</tt>"));
+					    		entry.info.rating = 0;
+					    		while(tmp.indexOf("images/m_bul11.gif")!=-1){
+					    			++entry.info.rating;
+					    			tmp = tmp.substring(tmp.indexOf("images/m_bul11.gif") + "images/m_bul11.gif".length());
+					    		}
+					    	}
 					    	entry.info.reviews = new ArrayList<String>();
 					    	while(result.indexOf("<p class=\"des\">")!=-1){
 					    		result = result.substring(result.indexOf("<p class=\"des\">") + "<p class=\"des\">".length());
