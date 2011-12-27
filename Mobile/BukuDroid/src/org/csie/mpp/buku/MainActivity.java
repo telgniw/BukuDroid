@@ -164,11 +164,14 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     				String isbn = data.getStringExtra(App.ISBN);
     				bookMan.add(isbn);
     			}
-    			else if(resultCode == RESULT_FIRST_USER) {
-    				String isbn = data.getStringExtra(App.ISBN);
-    				BookEntry entry = bookMan.get(isbn);
-    				deleteBookEntry(entry);
+    			else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
+    				Toast.makeText(MainActivity.this, getString(R.string.invalid_isbn), App.TOAST_TIME).show();
     			}
+				else if(resultCode == BookActivity.RESULT_DELETE) {
+					String isbn = data.getStringExtra(App.ISBN);
+					BookEntry entry = bookMan.get(isbn);
+					deleteBookEntry(entry);
+				}
     			break;
     		default:
     			break;

@@ -22,6 +22,8 @@
     <string name="search_hint">Author, Title, ISBN</string>
     <string name="book_already_exists">You already have this book in the bookshelf.</string>
     <string name="book_not_found">Book not found.</string>
+    <string name="invalid_isbn">Invalid ISBN.</string>
+    <string name="updating">Updating...</string>
     <string name="unexpected_error">Unexpected error! Please check the ,please check the network connection contact the developers</string>
     <string name="added">Successfully added to your bookshelf.</string>
     <string name="deleted">Successfully deleted.</string>

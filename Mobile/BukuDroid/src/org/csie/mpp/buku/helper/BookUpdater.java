@@ -22,15 +22,16 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public abstract class BookUpdater {
-	public static interface OnUpdateFinishedListener {
+	public static interface OnUpdatStatusChangedListener {
 		public enum Status {
 			OK_ENTRY,
 			OK_INFO,
 			BOOK_NOT_FOUND,
 			UNKNOWN
 		}
-		
-		public void onUpdateFinished(Status status);
+
+		public void onUpdateStart();
+		public void onUpdateFinish(Status status);
 	}
 	
 	public static BookUpdater create(BookEntry entry) {
@@ -40,33 +41,38 @@ public abstract class BookUpdater {
 		return new NormalUpdater(entry);
 	}
 	
-	protected BookEntry entry;
-	protected OnUpdateFinishedListener listener;
+	protected final BookEntry entry;
+	protected OnUpdatStatusChangedListener listener;
 	
 	protected BookUpdater(BookEntry e) {
 		entry = e;
 	}
 	
-	public void setOnUpdateFinishedListener(OnUpdateFinishedListener l) {
+	public void setOnUpdateFinishedListener(OnUpdatStatusChangedListener l) {
 		listener = l;
 	}
 	
 	public abstract void updateEntry();
 	public abstract void updateInfo();
 	
-	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, OnUpdateFinishedListener.Status> {
+	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, OnUpdatStatusChangedListener.Status> {
 		@Override
-		protected OnUpdateFinishedListener.Status doInBackground(URL... urls) {
+		protected OnUpdatStatusChangedListener.Status doInBackground(URL... urls) {
 			return update(urls);
 		}
 		
 		@Override
-		protected void onPostExecute(OnUpdateFinishedListener.Status result) {
-			/* this will be run on UI thread */
-			listener.onUpdateFinished(result);
+		protected void onPreExecute() {
+			listener.onUpdateStart();
 		}
 		
-		protected abstract OnUpdateFinishedListener.Status update(URL... urls);
+		@Override
+		protected void onPostExecute(OnUpdatStatusChangedListener.Status result) {
+			/* this will be run on UI thread */
+			listener.onUpdateFinish(result);
+		}
+		
+		protected abstract OnUpdatStatusChangedListener.Status update(URL... urls);
 	}
 	
 	public static class NormalUpdater extends BookUpdater {
@@ -79,7 +85,7 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdateFinishedListener.Status update(URL... urls) {
+					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							entry.vid = json.getJSONArray("items").getJSONObject(0).getString("id");
@@ -103,10 +109,10 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdateFinishedListener.Status.UNKNOWN;
+							return OnUpdatStatusChangedListener.Status.UNKNOWN;
 						}
 
-						return OnUpdateFinishedListener.Status.OK_ENTRY;
+						return OnUpdatStatusChangedListener.Status.OK_ENTRY;
 					}
 				};
 				
@@ -123,7 +129,7 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdateFinishedListener.Status update(URL... urls) {
+					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							json = json.getJSONObject("volumeInfo");
@@ -134,7 +140,7 @@ public abstract class BookUpdater {
 					    	HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdateFinishedListener.Status.UNKNOWN;
+					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -148,10 +154,10 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdateFinishedListener.Status.UNKNOWN;
+							return OnUpdatStatusChangedListener.Status.UNKNOWN;
 						}
 						
-						return OnUpdateFinishedListener.Status.OK_INFO;
+						return OnUpdatStatusChangedListener.Status.OK_INFO;
 					}
 				};
 				
@@ -176,19 +182,19 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdateFinishedListener.Status update(URL... urls) {
+					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
 						try {
 							HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = new DefaultHttpClient().execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdateFinishedListener.Status.UNKNOWN;
+					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
 					    	if(result.indexOf("item=")==-1) {
-					    		return OnUpdateFinishedListener.Status.BOOK_NOT_FOUND;
+					    		return OnUpdatStatusChangedListener.Status.BOOK_NOT_FOUND;
 					    	}
 					    	result = result.substring(result.indexOf("item=")+"item=".length());
 					    	entry.vid = result.substring(0, result.indexOf("\"")).trim();
@@ -203,11 +209,11 @@ public abstract class BookUpdater {
 						    	entry.author = result.substring(0, result.indexOf("\"")).trim();
 							}
 							
-					    	return OnUpdateFinishedListener.Status.OK_ENTRY;
+					    	return OnUpdatStatusChangedListener.Status.OK_ENTRY;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdateFinishedListener.Status.UNKNOWN;
+							return OnUpdatStatusChangedListener.Status.UNKNOWN;
 						}
 					}
 				};
@@ -225,14 +231,14 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdateFinishedListener.Status update(URL... urls) {
+					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
 						try {
 							HttpClient httpclient = new DefaultHttpClient();
 						    HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdateFinishedListener.Status.UNKNOWN;
+					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -246,7 +252,7 @@ public abstract class BookUpdater {
 					    	response = httpclient.execute(httpget);
 					    	statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdateFinishedListener.Status.UNKNOWN;
+					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
 					    	}
 					    	entity = response.getEntity();
 					    	result = EntityUtils.toString(entity, "big5");
@@ -258,10 +264,10 @@ public abstract class BookUpdater {
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdateFinishedListener.Status.UNKNOWN;
+							return OnUpdatStatusChangedListener.Status.UNKNOWN;
 						}
 						
-						return OnUpdateFinishedListener.Status.OK_INFO;
+						return OnUpdatStatusChangedListener.Status.OK_INFO;
 					}
 				};
 				

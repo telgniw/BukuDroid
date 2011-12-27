@@ -3,7 +3,7 @@ package org.csie.mpp.buku;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
-import org.csie.mpp.buku.helper.BookUpdater.OnUpdateFinishedListener;
+import org.csie.mpp.buku.helper.BookUpdater.OnUpdatStatusChangedListener;
 
 import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
@@ -25,8 +25,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BookActivity extends Activity implements OnUpdateFinishedListener, View.OnClickListener {
+public class BookActivity extends Activity implements OnUpdatStatusChangedListener, View.OnClickListener {
 	public static final int REQUEST_CODE = 1437;
+	public static final int RESULT_ISBN_INVALID = 633;
+	public static final int RESULT_DELETE = 643;
 	public static final String CHECK_DUPLICATE = "duplicate";
 	
 	private DBHelper db;
@@ -45,8 +47,9 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
 
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
-        if(isbn.length()!=10 && isbn.length()!=13){
-        	showError(Status.BOOK_NOT_FOUND);
+        if(Util.checkIsbn(isbn) == false) {
+        	setResult(RESULT_ISBN_INVALID);
+        	finish();
         	return;
         }
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
@@ -64,12 +67,12 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
 				public void performAction(View view) {
 					Intent data = new Intent();
 					data.putExtra(App.ISBN, entry.isbn);
-					setResult(RESULT_FIRST_USER, data);
+					setResult(RESULT_DELETE, data);
 					finish();
 				}
 			};        	
 
-        	updateView();
+        	updateView(null);
         	actionBar.addAction(actionDelete);
         }
         else {
@@ -98,8 +101,8 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
   
        	if(updateAll)
        		updater.updateEntry();
-        else
-        	updater.updateInfo();
+       	else
+       		updater.updateInfo();
     }
     
     @Override
@@ -124,24 +127,34 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
     }
 
     /* --- OnUpdateFinishedListener	(start) --- */
+    @Override
+    public void onUpdateStart() {
+    	updateView(null);
+    }
+	
 	@Override
-	public void onUpdateFinished(Status status) {
-		if(status == Status.OK_ENTRY) {
-			updateView();
-			actionBar.addAction(actionAdd);
-			updater.updateInfo();
-		}
-		else if (status == Status.OK_INFO) {
-			System.err.println(entry.info.reviews.size());
-			updateView();
-		}
-		else {
-			showError(status);
+	public void onUpdateFinish(Status status) {
+		switch(status) {
+			case OK_ENTRY:
+				actionBar.addAction(actionAdd);
+				updater.updateInfo();
+				updateView(status);
+				break;
+			case OK_INFO:
+				updateView(status);
+				break;
+			case BOOK_NOT_FOUND:
+	    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
+	    		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
+	    		break;
+			default:
+				Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
+				break;
 		}
 	}
 	/* --- OnUpdateFinishedListener	(end) --- */
     
-    private void updateView() {
+    private void updateView(Status status) {
     	if(entry.cover!=null)
     		((ImageView)findViewById(R.id.image)).setImageBitmap(entry.cover);
     	else
@@ -182,16 +195,6 @@ public class BookActivity extends Activity implements OnUpdateFinishedListener, 
         		list.addView(view);        	  
         	}
         }
-    }        	
-    
-    private void showError(Status status) {
-    	if(status == Status.BOOK_NOT_FOUND) {
-    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString() + "\"" + entry.isbn + "\"");
-    		((TextView)findViewById(R.id.title)).setText(R.string.book_not_found);
-    	}
-    	else {
-    		Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
-    	}
     }
 
     private AlertDialog dialog;
