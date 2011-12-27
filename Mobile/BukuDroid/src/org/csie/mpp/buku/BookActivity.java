@@ -205,20 +205,22 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         
         LinearLayout reviews = (LinearLayout)findViewById(R.id.reviews);
         if(entry.info.reviews != null) {
-        	int count = reviews.getChildCount(), size = entry.info.reviews.size();
-        	if(count > 0 && count != size)
+        	if(reviews.getChildCount() == 1) {
         		reviews.removeAllViews();
-        	for (int i=0; i<size; i++) {
-        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
-        		StringBuilder shortContent = new StringBuilder();
-        		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-        		if(entry.info.reviews.get(i).length()>100)
-        			shortContent.append("...");
-        		TextView review = ((TextView)view.findViewById(R.id.list_review));
-            	review.setOnClickListener(this);
-            	review.setId(i);
-        		review.setText(shortContent);
-        		reviews.addView(view);        	  
+        		
+        		int size = entry.info.reviews.size();
+	        	for(int i = 0; i < size; i++) {
+	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
+	        		StringBuilder shortContent = new StringBuilder();
+	        		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
+	        		if(entry.info.reviews.get(i).length()>100)
+	        			shortContent.append("...");
+	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
+	            	review.setOnClickListener(this);
+	            	review.setId(i);
+	        		review.setText(shortContent);
+	        		reviews.addView(view);        	  
+	        	}
         	}
         }
         else {

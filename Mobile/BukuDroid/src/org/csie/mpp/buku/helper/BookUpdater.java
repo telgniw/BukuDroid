@@ -35,7 +35,17 @@ public abstract class BookUpdater {
 	}
 	
 	public static BookUpdater create(BookEntry entry) {
-		String countryCode = entry.isbn.substring(entry.isbn.length()-10, entry.isbn.length()-7);
+		switch(entry.isbn.length()) {
+			case 10:
+				entry.isbn = Util.toIsbn13(entry.isbn);
+				break;
+			case 17:
+				entry.isbn = Util.upcToIsbn(entry.isbn);
+				break;
+			default:
+				break;
+		}
+		String countryCode = entry.isbn.substring(3, 6);
         if(countryCode.equals("957") || countryCode.equals("986"))
         	return new ChineseUpdater(entry);
 		return new NormalUpdater(entry);
