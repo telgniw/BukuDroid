@@ -98,7 +98,7 @@ public class Util {
 		for(int i = 0; i < 12; i++) {
 			sum += (isbn.charAt(i) - '0') * (((i & 1) == 0)? 1 : 3);
 		}
-		return String.valueOf(sum / 10 - sum % 10);
+		return String.valueOf(10 - sum % 10);
 	}
 	
 	public static String toIsbn13(String isbn10) {
