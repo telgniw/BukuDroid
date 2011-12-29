@@ -78,10 +78,12 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 
 	@Override
 	public void onTabChanged(String tabId) {
-		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner) 
-		if(!tabId.equals(getString(R.string.tab_isbn))) {
-			InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-			if(imm != null && imm.isActive())
+		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner)
+		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+		if(tabId.equals(getString(R.string.tab_isbn)))
+			imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		else {
+			if(imm != null)
 				imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		}
 	}
