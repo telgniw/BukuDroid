@@ -15,6 +15,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -211,14 +213,24 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         		int size = entry.info.reviews.size();
 	        	for(int i = 0; i < size; i++) {
 	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
-	        		StringBuilder shortContent = new StringBuilder();
-	        		shortContent.append(entry.info.reviews.get(i).substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-	        		if(entry.info.reviews.get(i).length()>100)
-	        			shortContent.append("...");
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
-	            	review.setOnClickListener(this);
-	            	review.setId(i);
-	        		review.setText(shortContent);
+	        		if(entry.info.reviews.get(i).indexOf("<a class=")==-1){
+	        			String text = Html.fromHtml(entry.info.reviews.get(i)).toString();
+	        			if(entry.info.reviews.get(i).length()>100){
+	        				StringBuilder shortContent = new StringBuilder();
+	        				shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
+	        				shortContent.append("...<read full text>");
+	        				review.setOnClickListener(this);
+	        				review.setId(i);
+			            	review.setText(shortContent);
+	        			}else{
+	        				review.setText(text);
+	        			}
+
+	        		}else{
+		        		review.setText(Html.fromHtml(entry.info.reviews.get(i)));
+		        		review.setMovementMethod(LinkMovementMethod.getInstance());
+	        		}
 	        		reviews.addView(view);        	  
 	        	}
         	}
@@ -242,7 +254,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	public void onClick(View v) {
 		if(dialog == null)
 			dialog = new AlertDialog.Builder(BookActivity.this).create();
-		dialog.setMessage(entry.info.reviews.get(v.getId()));
+		dialog.setMessage(Html.fromHtml(entry.info.reviews.get(v.getId())));
 		dialog.show();
 	}
 }
