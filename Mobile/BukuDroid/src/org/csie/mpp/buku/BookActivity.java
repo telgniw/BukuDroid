@@ -68,7 +68,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
     	actionShare = new AbstractAction(R.drawable.ic_share) {
 			@Override
 			public void performAction(View view) {
-				if(App.fb.isSessionValid()) 
+				if(App.fb.isSessionValid())
 					openShareDialog();
 				else {
 					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
@@ -82,10 +82,16 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 			
 			private void openShareDialog() {
 				Bundle params = new Bundle();
-				params.putString("caption", entry.title);
-				params.putString("description", entry.author);
-				params.putString("name", getString(R.string.fb_from_bukudroid));
-				params.putString("link", getString(R.string.app_market_page));
+				if(entry.info.source == null || entry.info.description == null) {
+					params.putString("caption", entry.title);
+					params.putString("description", entry.author);
+				}
+				else {
+					params.putString("name", entry.title);
+					params.putString("link", entry.info.source);
+					params.putString("caption", entry.author);
+					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
+				}
 				if(entry.coverLink != null)
 					params.putString("picture", entry.coverLink);
 				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
@@ -229,11 +235,8 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         
         TextView description = ((TextView)findViewById(R.id.description));
         if(entry.info.description != null) {
-        	String text = entry.info.description.toString();
-        	StringBuilder shortContent = new StringBuilder(); 
-        	shortContent.append(text.substring(0, Math.min(200, entry.info.description.length())));
-        	if(entry.info.description.length()>200){
-        		shortContent.append(getString(R.string.read_full_text));
+        	String shortContent = Util.shortenString(entry.info.description.toString(), 200);
+        	if(entry.info.description.length() > shortContent.length()) {
         		description.setOnClickListener(new OnClickListener() {
         	        @Override
         	        public void onClick(View v) {
@@ -261,10 +264,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
 	        		if(entry.info.reviews.get(i).length()>100){
-	        			String text = entry.info.reviews.get(i).toString();
-	        			StringBuilder shortContent = new StringBuilder();
-	        			shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-	        			shortContent.append(getString(R.string.read_full_text));
+	        			String shortContent = Util.shortenString(entry.info.reviews.get(i).toString(), 100);
 	        			review.setOnClickListener(this);
 	        			review.setId(i);
 			            review.setText(shortContent);
@@ -289,9 +289,9 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         		description.setText(R.string.no_data);
         }
         
-        if(entry.info.sources!=null){
+        if(entry.info.source != null) {
         	TextView sources = ((TextView)findViewById(R.id.sources));
-        	sources.setText(entry.info.sources);
+        	sources.setText(Html.fromHtml("<a href=\"" + entry.info.source + "\">"+ entry.info.sourceName + "</a>"));
         	sources.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }

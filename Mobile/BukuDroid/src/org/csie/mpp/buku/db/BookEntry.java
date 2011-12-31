@@ -15,7 +15,9 @@ public class BookEntry extends Entry {
 		public int ratingsCount;
 		public Spanned description;
 		public ArrayList<Spanned> reviews;
-		public Spanned sources;
+		
+		public String sourceName;
+		public String source;
 	}
 	
 	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true)

@@ -162,4 +162,15 @@ public class Util {
 		}
 		return null;
 	}
+	
+	public static String shortenString(String str, int maxLength) {
+		boolean flag = str.length() > (maxLength + 3);
+		if(!flag)
+			maxLength = str.length();
+		StringBuilder shortContent = new StringBuilder();
+		shortContent.append(str.substring(0, maxLength));
+		if(flag)
+			shortContent.append("...");
+		return shortContent.toString();
+	}
 }

@@ -23,6 +23,9 @@ import android.text.Spanned;
 import android.util.Log;
 
 public abstract class BookUpdater {
+	private static final String SOURCE_GOOGLE = "Google Books";
+	private static final String SOURCE_BOOKS = "博客來";
+	
 	public static interface OnUpdatStatusChangedListener {
 		public enum Status {
 			OK_ENTRY,
@@ -178,7 +181,8 @@ public abstract class BookUpdater {
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
 
-					    	entry.info.sources = Html.fromHtml("<a href=\"http://books.google.com/books?id=" + entry.vid + "\">google books</a>");
+					    	entry.info.sourceName = SOURCE_GOOGLE;
+					    	entry.info.source = "http://books.google.com/books?id=" + entry.vid;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
@@ -305,7 +309,8 @@ public abstract class BookUpdater {
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
 
-					    	entry.info.sources = Html.fromHtml("<a href=\"http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid + "\">博客來</a>");
+					    	entry.info.sourceName = SOURCE_BOOKS;
+					    	entry.info.source = "http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
