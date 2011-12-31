@@ -20,6 +20,8 @@
     <string name="tab_barcode">条码</string>
     <string name="introduction">简介</string>
     <string name="review">书评</string>
+    <string name="sources">资料来源:</string>
+    <string name="read_full_text">...阅读全文</string>
     <string-array name="list_item_longclick">
         <item>图书信息</item>
         <item>删除</item>

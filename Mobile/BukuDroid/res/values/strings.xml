@@ -34,6 +34,8 @@
     <string name="tab_barcode">Barcode</string>
     <string name="introduction">Introduction</string>
     <string name="review">Reviews</string>
+    <string name="sources">Sources:</string>
+    <string name="read_full_text">...read full text</string>
     <string-array name="list_item_longclick">
         <item>Information</item>
         <item>Delete</item>

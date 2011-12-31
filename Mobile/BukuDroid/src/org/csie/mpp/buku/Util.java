@@ -12,6 +12,8 @@ import java.util.Map;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 public class Util {
@@ -145,10 +147,8 @@ public class Util {
 		return null;
 	}
 	
-	public static String htmlToText(String str) {
-		//str = str.replaceAll("<{1}[^>]{1,}>{1}", "");
-		//return StringEscapeUtils.unescapeHtml4(str);
-		return str;
+	public static Spanned htmlToText(String str) {
+		return Html.fromHtml(str);
 	}
 	
 	public static byte[] toByteArray(Bitmap bitmap) {

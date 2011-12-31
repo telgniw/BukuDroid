@@ -20,6 +20,8 @@
     <string name="tab_barcode">條碼</string>
     <string name="introduction">簡介</string>
     <string name="review">書評</string>
+    <string name="sources">資料來源:</string>
+    <string name="read_full_text">...閱讀全文</string>
     <string-array name="list_item_longclick">
         <item>書籍資訊</item>
         <item>刪除</item>

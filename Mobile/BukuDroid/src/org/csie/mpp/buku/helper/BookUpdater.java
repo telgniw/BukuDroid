@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 
 public abstract class BookUpdater {
@@ -155,7 +157,7 @@ public abstract class BookUpdater {
 							if(json.has("ratingsCount"))
 								entry.info.ratingsCount = json.getInt("ratingsCount");
 							if(json.has("description"))
-								entry.info.description = json.getString("description");
+								entry.info.description = Html.fromHtml(json.getString("description"));
 							publishProgress();
 
 							HttpClient httpclient = new DefaultHttpClient();
@@ -169,11 +171,13 @@ public abstract class BookUpdater {
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
 					    	result = result.substring(result.indexOf(">User reviews<") + ">User reviews<".length());
-					    	entry.info.reviews = new ArrayList<String>();
+					    	entry.info.reviews = new ArrayList<Spanned>();
 					    	while(result.indexOf("<p dir=ltr>")!=-1){
 					    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
+
+					    	entry.info.sources = Html.fromHtml("<a href=\"http://books.google.com/books?id=" + entry.vid + "\">google books</a>");
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
@@ -294,11 +298,13 @@ public abstract class BookUpdater {
 					    			tmp = tmp.substring(tmp.indexOf("images/m_bul11.gif") + "images/m_bul11.gif".length());
 					    		}
 					    	}
-					    	entry.info.reviews = new ArrayList<String>();
+					    	entry.info.reviews = new ArrayList<Spanned>();
 					    	while(result.indexOf("<p class=\"des\">")!=-1){
 					    		result = result.substring(result.indexOf("<p class=\"des\">") + "<p class=\"des\">".length());
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
+
+					    	entry.info.sources = Html.fromHtml("<a href=\"http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid + "\">博客來</a>");
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
