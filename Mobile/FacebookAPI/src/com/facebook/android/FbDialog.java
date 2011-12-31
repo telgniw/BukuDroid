@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.facebook.android.view;
+package com.facebook.android;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -36,11 +36,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.facebook.android.DialogError;
-import com.facebook.android.Facebook;
-import com.facebook.android.FacebookError;
-import com.facebook.android.R;
-import com.facebook.android.Util;
 import com.facebook.android.Facebook.DialogListener;
 
 public class FbDialog extends Dialog {

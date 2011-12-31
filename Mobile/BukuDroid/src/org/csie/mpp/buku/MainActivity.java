@@ -42,7 +42,7 @@ import android.widget.Toast;
 
 import com.facebook.android.SessionEvents;
 import com.facebook.android.SessionEvents.AuthListener;
-import com.facebook.android.view.FbLoginButton;
+import com.facebook.android.LoginButton;
 import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
@@ -308,7 +308,7 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
 
 	@Override
 	public void onDisplay(final Dialog dialog) {
-		FbLoginButton loginButton = (FbLoginButton)dialog.findViewById(R.id.login_button);
+		LoginButton loginButton = (LoginButton)dialog.findViewById(R.id.login_button);
     	loginButton.init(this, App.fb, App.FB_APP_PERMS);
 	}
 	/* --- DialogActionListener	(end) --- */
