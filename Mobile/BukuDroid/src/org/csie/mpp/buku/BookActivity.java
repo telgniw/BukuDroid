@@ -5,6 +5,8 @@ import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
 import org.csie.mpp.buku.helper.BookUpdater.OnUpdatStatusChangedListener;
 
+import com.facebook.android.BaseDialogListener;
+import com.facebook.android.SessionStore;
 import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.AbstractAction;
@@ -37,7 +39,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	private DBHelper db;
 	private BookEntry entry;
 	private ActionBar actionBar;
-	private Action actionAdd, actionDelete;
+	private Action actionAdd, actionDelete, actionShare;
 	private BookUpdater updater;
 
     @Override
@@ -45,6 +47,9 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // initialize FB
+        SessionStore.restore(App.fb, this);
         
         db = new DBHelper(this);
 
@@ -58,6 +63,39 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         entry = BookEntry.get(db.getReadableDatabase(), isbn);
         
         actionBar = ((ActionBar)findViewById(R.id.actionbar));
+        
+        // FB share button
+    	actionShare = new AbstractAction(R.drawable.ic_share) {
+			@Override
+			public void performAction(View view) {
+				if(App.fb.isSessionValid()) 
+					openShareDialog();
+				else {
+					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+						@Override
+						public void onComplete(Bundle values) {
+							openShareDialog();
+						}
+					});
+				}
+			}
+			
+			private void openShareDialog() {
+				Bundle params = new Bundle();
+				params.putString("caption", entry.title);
+				params.putString("description", entry.author);
+				params.putString("name", getString(R.string.fb_from_bukudroid));
+				params.putString("link", getString(R.string.app_market_page));
+				if(entry.coverLink != null)
+					params.putString("picture", entry.coverLink);
+				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+					@Override
+					public void onComplete(Bundle values) {
+						Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+					}
+				});
+			}
+    	};
         
         boolean updateAll = false;
         
@@ -73,10 +111,11 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 					setResult(RESULT_DELETE, data);
 					finish();
 				}
-			};        	
+			};
 
         	updateView(null);
         	actionBar.addAction(actionDelete);
+        	actionBar.addAction(actionShare);
         }
         else {
         	entry = new BookEntry();
@@ -106,6 +145,11 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
        		updater.updateEntry();
        	else
        		updater.updateInfo();
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	App.fb.authorizeCallback(requestCode, resultCode, data);
     }
     
     @Override
@@ -146,6 +190,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 		switch(status) {
 			case OK_ENTRY:
 				actionBar.addAction(actionAdd);
+				actionBar.addAction(actionShare);
 				updater.updateInfo();
 				updateView(status);
 				break;
@@ -219,7 +264,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	        			if(entry.info.reviews.get(i).length()>100){
 	        				StringBuilder shortContent = new StringBuilder();
 	        				shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-	        				shortContent.append("...<read full text>");
+	        				shortContent.append("...");
 	        				review.setOnClickListener(this);
 	        				review.setId(i);
 			            	review.setText(shortContent);

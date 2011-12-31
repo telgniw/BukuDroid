@@ -119,7 +119,8 @@ public abstract class BookUpdater {
 							publishProgress();
 							
 							if(json.has("imageLinks"))	{
-								URL imageUrl = new URL(json.getJSONObject("imageLinks").getString("thumbnail"));
+								entry.coverLink = json.getJSONObject("imageLinks").getString("thumbnail");
+								URL imageUrl = new URL(entry.coverLink);
 								entry.cover = Util.urlToImage(imageUrl);
 							}
 						}
@@ -227,8 +228,8 @@ public abstract class BookUpdater {
 					    	publishProgress();
 					    	
 					    	result = result.substring(result.indexOf("?image=") + "?image=".length());
-					    	URL imageUrl = new URL(result.substring(0, result.indexOf("&")));
-							entry.cover = Util.urlToImage(imageUrl);
+					    	entry.coverLink = result.substring(0, result.indexOf("&"));
+							entry.cover = Util.urlToImage(new URL(entry.coverLink));
 							publishProgress();
 							
 							if(result.indexOf("\"go_author\"")!=-1){

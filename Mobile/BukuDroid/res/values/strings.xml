@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BukuDroid</string>
-    <string name="app_fb_fan_page_short">http://on.fb.me/BukuDroid</string>
+    <string name="app_fb_fan_page">http://on.fb.me/BukuDroid</string>
+    <string name="app_market_page">http://market.android.com/details?id=org.csie.mpp.buku</string>
     <string name="bookshelf">Bookshelf</string>
     <string name="friends">Friends</string>
     <string name="stream">Stream</string>
@@ -34,6 +35,8 @@
     <string name="tab_barcode">Barcode</string>
     <string name="introduction">Introduction</string>
     <string name="review">Reviews</string>
+    <string name="fb_from_bukudroid">Update from BukuDroid</string>
+    <string name="fb_message_posted">Posted to your wall.</string>
     <string-array name="list_item_longclick">
         <item>Information</item>
         <item>Delete</item>

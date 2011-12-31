@@ -9,13 +9,11 @@ import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
-import org.csie.mpp.buku.view.DialogAction.DialogActionListener;
 import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -40,15 +38,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.android.SessionEvents;
-import com.facebook.android.SessionEvents.AuthListener;
-import com.facebook.android.LoginButton;
+import com.facebook.android.SessionStore;
 import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends FragmentActivity implements DialogActionListener, ViewListener, OnItemClickListener {
+public class MainActivity extends FragmentActivity implements ViewListener, OnItemClickListener {
 	protected ActionBar actionbar;
 	
 	protected TitlePageIndicator indicator;
@@ -66,16 +62,12 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
         setContentView(R.layout.main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
-        // TODO: initialize FB
-//        SessionStore.restore(App.fb, this);
+        // initialize FB
+        SessionStore.restore(App.fb, this);
 
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
         actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.ic_camera, ScanActivity.REQUEST_CODE));
-        
-        // TODO: add login/share
-//        if(!App.fb.isSessionValid())
-//        	actionbar.addAction(new DialogAction(this, R.layout.login, 0, this), 0);
 
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -286,32 +278,6 @@ public class MainActivity extends FragmentActivity implements DialogActionListen
     	return true;
     }
     /* --- ContextMenu			(end) --- */
-
-    /* --- DialogActionListener	(start) --- */
-	@Override
-	public void onCreate(final Dialog dialog) {
-		SessionEvents.addAuthListener(new AuthListener() {
-			@Override
-			public void onAuthSucceed() {
-				dialog.dismiss();
-				createSessionView();
-				actionbar.removeActionAt(0);
-			}
-
-			@Override
-			public void onAuthFail(String error) {
-				dialog.dismiss();
-				Toast.makeText(MainActivity.this, R.string.login_failed, App.TOAST_TIME).show();
-			}
-		});
-	}
-
-	@Override
-	public void onDisplay(final Dialog dialog) {
-		LoginButton loginButton = (LoginButton)dialog.findViewById(R.id.login_button);
-    	loginButton.init(this, App.fb, App.FB_APP_PERMS);
-	}
-	/* --- DialogActionListener	(end) --- */
 
 	/* --- ViewListener			(start) --- */ 
 	@Override
