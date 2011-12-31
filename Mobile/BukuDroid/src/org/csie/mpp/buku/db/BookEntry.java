@@ -16,23 +16,28 @@ public class BookEntry extends Entry {
 		public ArrayList<String> reviews;
 	}
 	
-	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true, skip=false)
+	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true)
 	public String isbn;
 	
-	@Column(name="vid", type=Type.TEXT, skip=false, notNull=true)
+	// added in version 1: unrecoverable
+	@Column(name="vid", type=Type.TEXT, notNull=true)
 	public String vid;
 	
 	@Column(name="time", type=Type.DATE, defaultVal="CURRENT_DATE")
 	public long time;
 	
-	@Column(name="title", type=Type.TEXT, skip=false)
+	@Column(name="title", type=Type.TEXT)
 	public String title;
 	
-	@Column(name="author", type=Type.TEXT, skip=false)
+	@Column(name="author", type=Type.TEXT)
 	public String author;
 	
-	@Column(name="cover", type=Type.IMAGE, skip=false)
+	@Column(name="cover", type=Type.IMAGE)
 	public Bitmap cover;
+	
+	// added in version 3
+	@Column(name="coverLink", type=Type.TEXT)
+	public String coverLink;
 	
 	public Info info = new Info();
 	
@@ -41,10 +46,12 @@ public class BookEntry extends Entry {
 		return isbn.equals(((BookEntry)obj).isbn);
 	}
 
+	@Override
 	public boolean insert(SQLiteDatabase db) {
 		return SCHEMA.insert(db, this);
 	}
 
+	@Override
 	public boolean delete(SQLiteDatabase db) {
 		return SCHEMA.delete(db, "isbn =\"" + isbn + "\"");
 	}

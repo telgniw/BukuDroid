@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.Util;
 
 import android.content.ContentValues;
@@ -15,6 +16,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 public abstract class Entry {
 	public static enum Type {
@@ -33,10 +35,10 @@ public abstract class Entry {
 		String defaultVal() default "";
 		boolean primary() default false;
 		boolean notNull() default false;
-		boolean skip() default true;
 	}
 	
 	public abstract boolean insert(SQLiteDatabase db);
+	public abstract boolean delete(SQLiteDatabase db);
 	
 	public static class Schema {
 		private Class<? extends Entry> cls;
@@ -79,7 +81,40 @@ public abstract class Entry {
 					stmt.append(" NOT NULL");
 			}
 			stmt.append(")");
+			
+			Log.i(App.TAG, stmt.toString());
 			db.execSQL(stmt.toString());
+		}
+		
+		public void upgrade(SQLiteDatabase db, String[] added) {
+			Log.i(App.TAG, "Begin Upgrade Transaction");
+			db.beginTransaction();
+			db.execSQL("ALTER TABLE " + getName() + " RENAME TO " + getName() + "_old");
+			create(db);
+			
+			StringBuilder oldColumns = new StringBuilder();
+			for(int i = 0; i < fields.length; i++) {
+				Column c = fields[i].getAnnotation(Column.class);
+				boolean flag = true;
+				for(String a: added) {
+					if(a.equals(c.name())) {
+						flag = false;
+						break;
+					}	
+				}
+				if(flag) {
+					if(oldColumns.length() > 0)
+						oldColumns.append(",");
+					oldColumns.append(c.name());
+				}
+			}
+			
+			Log.i(App.TAG, "Old Columns: " + oldColumns);
+			db.execSQL("INSERT INTO " + getName() + "(" + oldColumns + ") SELECT " + oldColumns + " FROM " + getName() + "_old");
+			db.execSQL("DROP TABLE " + getName() + "_old");
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			Log.i(App.TAG, "End Upgrade Transaction");
 		}
 		
 		public boolean insert(SQLiteDatabase db, Entry entry) {
@@ -87,7 +122,7 @@ public abstract class Entry {
 			try {
 				for(Field field: fields) {
 					Column c = field.getAnnotation(Column.class);
-					if(c.skip())
+					if(c.defaultVal().length() > 0)
 						continue;
 					switch(c.type()) {
 						case BOOLEAN:
