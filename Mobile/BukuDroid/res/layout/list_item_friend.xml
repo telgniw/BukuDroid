@@ -19,16 +19,10 @@
         android:orientation="vertical"
     >
         <TextView
-            android:id="@+id/list_title"
+            android:id="@+id/list_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/fontLarge"
-        />
-        <TextView
-            android:id="@+id/list_author"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/fontMedian"
         />
     </LinearLayout>
 

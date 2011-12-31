@@ -9,6 +9,7 @@ import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
+import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -43,7 +45,7 @@ import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends FragmentActivity implements ViewListener, OnItemClickListener {
+public class MainActivity extends FragmentActivity implements OnPageChangeListener, ViewListener, OnItemClickListener {
 	protected ActionBar actionbar;
 	
 	protected TitlePageIndicator indicator;
@@ -82,6 +84,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
 
         viewpager.setAdapter(viewpagerAdapter);
         indicator.setViewPager(viewpager);
+        indicator.setOnPageChangeListener(this);
 
         if(App.fb.isSessionValid())
         	createSessionView();
@@ -203,14 +206,14 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     }
     
     private void createSessionView() {
-//    	stream = new ViewPageFragment(getString(R.string.stream));
-//		viewpagerAdapter.addItem(stream);
+    	stream = new ViewPageFragment(getString(R.string.title_stream));
+		viewpagerAdapter.addItem(stream);
 		
-//		friends = new ViewPageFragment(getString(R.string.friends), new FriendsManager(this, db));
-//		viewpagerAdapter.addItem(friends);
+		friends = new ViewPageFragment(getString(R.string.title_friends), new FriendsManager(this, db));
+		viewpagerAdapter.addItem(friends);
 		
-//		viewpagerAdapter.notifyDataSetChanged();
-//		indicator.setCurrentItem(1);
+		viewpagerAdapter.notifyDataSetChanged();
+		indicator.setCurrentItem(1);
     }
 
     /* --- OptionsMenu			(start) --- */
@@ -277,6 +280,19 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     	return true;
     }
     /* --- ContextMenu			(end) --- */
+
+    /* --- OnPageChageListener	(start) --- */
+	@Override
+	public void onPageScrollStateChanged(int state) {}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+	@Override
+	public void onPageSelected(int position) {
+		
+	}
+	/* --- OnPageChageListener	(end) --- */
 
 	/* --- ViewListener			(start) --- */ 
 	@Override

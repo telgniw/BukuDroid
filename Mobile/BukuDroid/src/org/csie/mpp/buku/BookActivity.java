@@ -74,6 +74,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 						@Override
 						public void onComplete(Bundle values) {
+							SessionStore.save(App.fb, BookActivity.this);
 							openShareDialog();
 						}
 					});
