@@ -73,7 +73,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
         
         db = new DBHelper(this);
         bookMan = new BookshelfManager(this, db, this);
-        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), bookMan);
+        bookshelf = new ViewPageFragment(getString(R.string.title_bookshelf), bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
         /* initialize ViewPager */
@@ -128,7 +128,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
 				String isbn = entries.get(position).isbn;
 				startBookActivity(isbn);
 			}
-		}).setTitle(R.string.search_result).create();
+		}).setTitle(R.string.title_search_result).create();
 		dialog.show();
 	}
     
@@ -156,10 +156,10 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     				bookMan.add(isbn);
     			}
     			else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
-    				Toast.makeText(this, getString(R.string.invalid_isbn), App.TOAST_TIME).show();
+    				Toast.makeText(this, getString(R.string.msg_invalid_isbn), App.TOAST_TIME).show();
     			}
     			else if(resultCode == BookActivity.RESULT_NOT_FOUND) {
-    				Toast.makeText(this, getString(R.string.book_not_found), App.TOAST_TIME).show();
+    				Toast.makeText(this, getString(R.string.msg_book_not_found), App.TOAST_TIME).show();
     			}
 				else if(resultCode == BookActivity.RESULT_DELETE) {
 					String isbn = data.getStringExtra(App.ISBN);
@@ -187,9 +187,9 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     
     private void deleteBookEntry(BookEntry entry) {
     	if(entry.delete(db.getWritableDatabase()))
-    		Toast.makeText(MainActivity.this, getString(R.string.deleted), App.TOAST_TIME).show();
+    		Toast.makeText(MainActivity.this, getString(R.string.msg_deleted), App.TOAST_TIME).show();
     	else {
-			Toast.makeText(MainActivity.this, getString(R.string.delete_failed) + entry.title, App.TOAST_TIME).show();
+			Toast.makeText(MainActivity.this, getString(R.string.msg_delete_failed) + entry.title, App.TOAST_TIME).show();
 			Log.e(App.TAG, "Delete failed \"" + entry.isbn + "\".");
 		}
 		bookMan.remove(entry);
@@ -232,7 +232,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     		case R.id.menu_about:
     			View view = getLayoutInflater().inflate(R.layout.about, null);
     			Linkify.addLinks((TextView)view.findViewById(R.id.link), Linkify.ALL);
-    			new AlertDialog.Builder(this).setTitle(R.string.about_buku).setView(view).create().show();
+    			new AlertDialog.Builder(this).setTitle(R.string.title_about_bukudroid).setView(view).create().show();
     			break;
     		default:
     			break;
@@ -252,7 +252,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     	int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
 		if(menuItems == null)
-			menuItems = getResources().getStringArray(R.array.list_item_longclick);
+			menuItems = getResources().getStringArray(R.array.list_longclick);
 		for(int i = 0; i < menuIds.length; i++)
 			menu.add(0, menuIds[i], 0, menuItems[i]);
 		BookEntry entry = bookMan.get(position);

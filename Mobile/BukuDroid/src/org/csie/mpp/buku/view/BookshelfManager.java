@@ -190,6 +190,6 @@ public class BookshelfManager extends ViewManager {
 		LinearLayout frame = getFrame();
 		
 		TextView text = (TextView)frame.findViewById(R.id.text);
-		text.setText(R.string.add_book_to_start);
+		text.setText(R.string.hint_add_book_to_start);
 	}
 }

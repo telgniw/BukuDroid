@@ -107,7 +107,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         
         if(entry != null) {
         	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
-        		Toast.makeText(this, R.string.book_already_exists, 3000).show();
+        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
         	
 			actionDelete = new AbstractAction(R.drawable.ic_delete) {
 				@Override
@@ -138,7 +138,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 					data.putExtra(App.ISBN, entry.isbn);
 					setResult(RESULT_OK, data);
 
-					Toast.makeText(BookActivity.this, getString(R.string.added), App.TOAST_TIME).show();
+					Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
 					actionBar.removeAction(this);
 				}
 			};
@@ -210,7 +210,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	    		finish();
 	    		break;
 			default:
-				Toast.makeText(this, R.string.unexpected_error, App.TOAST_TIME).show();
+				Toast.makeText(this, R.string.msg_unexpected_error, App.TOAST_TIME).show();
 				break;
 		}
 	}
@@ -230,7 +230,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
     	}
     	else {
         	if(status == null)
-        		((TextView)findViewById(R.id.title)).setText(R.string.updating);
+        		((TextView)findViewById(R.id.title)).setText(R.string.msg_updating);
     	}
         
         TextView description = ((TextView)findViewById(R.id.description));
@@ -249,9 +249,9 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         }
         else {
         	if(status == null)
-        		description.setText(R.string.updating);
+        		description.setText(R.string.msg_updating);
         	else if(status == Status.OK_INFO)
-        		description.setText(R.string.no_data);
+        		description.setText(R.string.text_no_data);
         }
         
         LinearLayout reviews = (LinearLayout)findViewById(R.id.reviews);
@@ -281,12 +281,12 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         	if(status == null) {
         		if(reviews.getChildCount() == 0) {
         			View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
-        			((TextView)view.findViewById(R.id.list_review)).setText(R.string.updating);
+        			((TextView)view.findViewById(R.id.list_review)).setText(R.string.msg_updating);
         			reviews.addView(view);
         		}
         	}
         	else if(status == Status.OK_INFO)
-        		description.setText(R.string.no_data);
+        		description.setText(R.string.text_no_data);
         }
         
         if(entry.info.source != null) {

@@ -2,11 +2,11 @@
     <item
         android:icon="@drawable/ic_menu_search"
         android:id="@+id/menu_search"
-        android:title="@string/search"
+        android:title="@string/menu_search"
     />
     <item
         android:icon="@drawable/ic_menu_more"
         android:id="@+id/menu_about"
-        android:title="@string/about"
+        android:title="@string/menu_about"
     />
 </menu>

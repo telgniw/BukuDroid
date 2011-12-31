@@ -1,28 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bookshelf">书架</string>
-    <string name="scan">扫描</string>
-    <string name="add_book_to_start">请点选右上角的按钮增加图书</string>
-    <string name="look_up">搜索这本图书</string>
-    <string name="book_info">图书信息</string>
-    <string name="search">搜索</string>
-    <string name="about">关于</string>
-    <string name="about_buku">关于BukuDroid</string>
-    <string name="search_result">搜索结果</string>
-    <string name="search_hint">作者书名或ISBN</string>
-    <string name="book_already_exists">这本图书已经在您的书架了</string>
-    <string name="book_not_found">没有找到这本图书</string>
-    <string name="updating">载入中...</string>
-    <string name="unexpected_error">未知的错误。请确认网路已连线或连络开发者。</string>
-    <string name="added">成功添加到书架</string>
-    <string name="deleted">删除成功</string>
-    <string name="delete_failed">删除失败：</string>
-    <string name="tab_barcode">条码</string>
-    <string name="introduction">简介</string>
-    <string name="review">书评</string>
-    <string name="source">资料来源:</string>
-    <string-array name="list_item_longclick">
+    <!-- Global -->
+    <string name="msg_deleted">删除成功</string>
+    <string name="msg_delete_failed">删除失败：</string>
+    
+    <!-- About -->
+    <!--
+    <string name="text_find_out_more">Find out more on Facebook!</string>
+    <string name="text_what_is_bukudroid">An app for bookworms!</string>
+    -->
+    <string name="title_about_bukudroid">关于BukuDroid</string>
+    
+    <!-- Search -->
+    <string name="hint_search">作者书名或ISBN</string>
+    <string name="title_search_result">搜索结果</string>
+    
+    <!-- ViewPager -->
+    <string name="hint_add_book_to_start">请点选右上角的按钮增加图书</string>
+    <string name="menu_about">关于</string>
+    <string name="menu_search">搜索</string>
+    <string name="title_bookshelf">书架</string>
+    <!--
+    <string name="title_friends">Friends</string>
+    <string name="title_stream">Stream</string>
+    -->
+    
+    <string-array name="list_longclick">
         <item>图书信息</item>
         <item>删除</item>
     </string-array>
+    
+    <!-- Book -->
+    <string name="msg_book_added">成功添加到书架</string>
+    <string name="msg_book_already_exists">这本图书已经在您的书架了</string>
+    <string name="msg_book_not_found">没有找到这本图书</string>
+    <string name="msg_invalid_isbn">ISBN无效</string>
+    <string name="msg_unexpected_error">未知的错误。请确认网路已连线或连络开发者。</string>
+    <string name="msg_updating">载入中...</string>
+    <string name="text_no_data">没有资料</string>
+    <string name="text_source">资料来源：</string>
+    <string name="title_book_info">图书信息</string>
+    <string name="title_introduction">简介</string>
+    <string name="title_review">书评</string>
+    
+    <!-- Scan -->
+    <string name="tab_barcode">条码</string>
+    
+    <!-- Facebook -->
+    <string name="fb_message_posted">成功发布在你的时间线</string>
 </resources>

@@ -11,7 +11,7 @@
         android:id="@+id/actionbar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        app:title="@string/book_info"
+        app:title="@string/title_book_info"
         style="@style/ActionBar"
     />
     <LinearLayout
@@ -63,7 +63,7 @@
             style="@style/Font.SubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/introduction"
+            android:text="@string/title_introduction"
         />
         <TextView
             style="@style/Font.Text"
@@ -75,7 +75,7 @@
             style="@style/Font.SubTitle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/review"
+            android:text="@string/title_review"
         />
         <LinearLayout
             android:id="@+id/reviews"
@@ -92,7 +92,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/source"
+                android:text="@string/text_source"
                 android:textColor="@color/dimTextColor"
             />
             <TextView

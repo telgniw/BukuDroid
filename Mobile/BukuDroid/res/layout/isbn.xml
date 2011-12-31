@@ -17,7 +17,7 @@
 		    <TextView
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:text="@string/isbn"
+		        android:text="@string/tag_isbn"
 		        android:textSize="@dimen/fontLarge"
 	            android:paddingRight="@dimen/padding"
 		    />

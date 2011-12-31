@@ -31,15 +31,12 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:label="@string/scan"
             android:name=".ScanActivity" >
         </activity>
         <activity
-            android:label="@string/book_info"
             android:name=".BookActivity" >
         </activity>
         <activity
-            android:label="@string/isbn"
             android:name=".ScanActivity$IsbnInputActivity"
             >
         </activity>
