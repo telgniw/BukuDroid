@@ -97,7 +97,8 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 					@Override
 					public void onComplete(Bundle values) {
-						Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+						if(values.containsKey("post_id"))
+							Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
 					}
 				});
 			}
