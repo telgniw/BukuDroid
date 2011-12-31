@@ -229,10 +229,11 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         
         TextView description = ((TextView)findViewById(R.id.description));
         if(entry.info.description != null) {
+        	String text = entry.info.description.toString();
         	StringBuilder shortContent = new StringBuilder(); 
-        	shortContent.append(entry.info.description.substring(0, Math.min(200, entry.info.description.length())));
+        	shortContent.append(text.substring(0, Math.min(200, entry.info.description.length())));
         	if(entry.info.description.length()>200){
-        		shortContent.append("...");
+        		shortContent.append(getString(R.string.read_full_text));
         		description.setOnClickListener(new OnClickListener() {
         	        @Override
         	        public void onClick(View v) {
@@ -259,21 +260,17 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	        	for(int i = 0; i < size; i++) {
 	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
-	        		if(entry.info.reviews.get(i).indexOf("<a class=")==-1){
-	        			String text = Html.fromHtml(entry.info.reviews.get(i)).toString();
-	        			if(entry.info.reviews.get(i).length()>100){
-	        				StringBuilder shortContent = new StringBuilder();
-	        				shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
-	        				shortContent.append("...");
-	        				review.setOnClickListener(this);
-	        				review.setId(i);
-			            	review.setText(shortContent);
-	        			}else{
-	        				review.setText(text);
-	        			}
-
-	        		}else{
-		        		review.setText(Html.fromHtml(entry.info.reviews.get(i)));
+	        		if(entry.info.reviews.get(i).length()>100){
+	        			String text = entry.info.reviews.get(i).toString();
+	        			StringBuilder shortContent = new StringBuilder();
+	        			shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
+	        			shortContent.append(getString(R.string.read_full_text));
+	        			review.setOnClickListener(this);
+	        			review.setId(i);
+			            review.setText(shortContent);
+	        		}
+                    else {
+		        		review.setText(entry.info.reviews.get(i));
 		        		review.setMovementMethod(LinkMovementMethod.getInstance());
 	        		}
 	        		reviews.addView(view);        	  
@@ -291,6 +288,12 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
         	else if(status == Status.OK_INFO)
         		description.setText(R.string.no_data);
         }
+        
+        if(entry.info.sources!=null){
+        	TextView sources = ((TextView)findViewById(R.id.sources));
+        	sources.setText(entry.info.sources);
+        	sources.setMovementMethod(LinkMovementMethod.getInstance());
+        }
     }
 
     private AlertDialog dialog;
@@ -299,7 +302,8 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	public void onClick(View v) {
 		if(dialog == null)
 			dialog = new AlertDialog.Builder(BookActivity.this).create();
-		dialog.setMessage(Html.fromHtml(entry.info.reviews.get(v.getId())));
+		dialog.setMessage(entry.info.reviews.get(v.getId()));
 		dialog.show();
+		((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 }

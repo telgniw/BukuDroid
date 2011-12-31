@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.text.Spanned;
 
 public class BookEntry extends Entry {
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
@@ -12,8 +13,9 @@ public class BookEntry extends Entry {
 	public static class Info {
 		public float rating;
 		public int ratingsCount;
-		public String description;
-		public ArrayList<String> reviews;
+		public Spanned description;
+		public ArrayList<Spanned> reviews;
+		public Spanned sources;
 	}
 	
 	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true)

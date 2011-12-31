@@ -37,6 +37,8 @@
     <string name="review">Reviews</string>
     <string name="fb_from_bukudroid">Update from BukuDroid</string>
     <string name="fb_message_posted">Posted to your wall.</string>
+    <string name="sources">Sources:</string>
+    <string name="read_full_text">... read full text</string>
     <string-array name="list_item_longclick">
         <item>Information</item>
         <item>Delete</item>
