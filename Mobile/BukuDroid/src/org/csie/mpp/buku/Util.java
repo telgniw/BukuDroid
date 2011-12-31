@@ -10,11 +10,8 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.text.Html;
 import android.util.Log;
 
 public class Util {
