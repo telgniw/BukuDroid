@@ -215,7 +215,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 	        	for(int i = 0; i < size; i++) {
 	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
-	        		if(entry.info.reviews.get(i).length()>200){
+	        		if(entry.info.reviews.get(i).length()>100){
 	        			String text = entry.info.reviews.get(i).toString();
 	        			StringBuilder shortContent = new StringBuilder();
 	        			shortContent.append(text.substring(0, Math.min(100, entry.info.reviews.get(i).length())));
@@ -258,5 +258,6 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 			dialog = new AlertDialog.Builder(BookActivity.this).create();
 		dialog.setMessage(entry.info.reviews.get(v.getId()));
 		dialog.show();
+		((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 }
