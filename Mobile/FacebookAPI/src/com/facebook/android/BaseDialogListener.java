@@ -1,23 +1,17 @@
 package com.facebook.android;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.widget.Toast;
 
 import com.facebook.android.Facebook.DialogListener;
 
-public class BaseDialogListener implements DialogListener {
+public abstract class BaseDialogListener implements DialogListener {
 	private Context context;
 	private int toastTime;
 	
 	public BaseDialogListener(Context context, int toastTime) {
 		this.context = context;
 		this.toastTime = toastTime;
-	}
-	
-	@Override
-	public void onComplete(Bundle values) {
-		Toast.makeText(context, android.R.string.ok, toastTime).show();
 	}
 
 	@Override

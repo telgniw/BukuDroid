@@ -50,7 +50,7 @@ public class BookshelfManager extends ViewManager {
 		}
 	}
 	
-	private interface ViewManager {
+	private interface BookViewManager {
 		public void initView(View view);
 		public int length();
 		public void set(BookEntry[] entries);
@@ -59,7 +59,7 @@ public class BookshelfManager extends ViewManager {
 		public void remove(BookEntry entry);
 	}
 	
-	private class ListViewManager implements ViewManager {
+	private class ListViewManager implements BookViewManager {
 		private List<BookEntry> entries; 
 		private ListView booklist;
 		private BookEntryAdapter booklistAdapter;
