@@ -12,8 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -67,7 +67,7 @@ public class BookshelfManager extends ViewManager {
 		@Override
 		public void initView(View view) {
 			entries = new ArrayList<BookEntry>();
-			booklist = (ListView)view.findViewById(R.id.inner_list);
+			booklist = (ListView)view.findViewById(R.id.list);
 			booklistAdapter = new BookEntryAdapter(activity, R.layout.list_item_book, entries);
 			
 			booklist.setAdapter(booklistAdapter);
@@ -168,11 +168,6 @@ public class BookshelfManager extends ViewManager {
 	}
 
 	@Override
-	protected int getFrameId() {
-		return R.id.bookshelf_frame;
-	}
-
-	@Override
 	protected void updateView() {
 		if(BookEntry.count(rdb) == 0)
 			createNoBookView();
@@ -183,25 +178,18 @@ public class BookshelfManager extends ViewManager {
 	}
 	
 	private void createBookView() {
-		FrameLayout frame = getFrame();
+		LinearLayout frame = getFrame();
 		
-		if(frame.getChildCount() > 0)
-			frame.removeAllViews();
+		TextView text = (TextView)frame.findViewById(R.id.text);
+		text.setText("");
 		
-		View view = activity.getLayoutInflater().inflate(R.layout.list, null);
-		frame.addView(view);
-		vm.initView(view);
+		vm.initView(frame);
 	}
 	
 	private void createNoBookView() {
-		FrameLayout frame = getFrame();
+		LinearLayout frame = getFrame();
 		
-		if(frame.getChildCount() > 0)
-			frame.removeAllViews();
-		
-		View view = activity.getLayoutInflater().inflate(R.layout.none, null);
-		frame.addView(view);
-		TextView text = (TextView)view.findViewById(R.id.inner_text);
+		TextView text = (TextView)frame.findViewById(R.id.text);
 		text.setText(R.string.add_book_to_start);
 	}
 }

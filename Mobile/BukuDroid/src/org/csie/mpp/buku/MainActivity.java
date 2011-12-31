@@ -9,7 +9,6 @@ import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
-import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
@@ -74,7 +73,7 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
         
         db = new DBHelper(this);
         bookMan = new BookshelfManager(this, db, this);
-        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), R.layout.bookshelf, bookMan);
+        bookshelf = new ViewPageFragment(getString(R.string.bookshelf), bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
         /* initialize ViewPager */
@@ -204,14 +203,14 @@ public class MainActivity extends FragmentActivity implements ViewListener, OnIt
     }
     
     private void createSessionView() {
-    	stream = new ViewPageFragment(getString(R.string.stream), R.layout.stream);
-		viewpagerAdapter.addItem(stream);
+//    	stream = new ViewPageFragment(getString(R.string.stream));
+//		viewpagerAdapter.addItem(stream);
 		
-		friends = new ViewPageFragment(getString(R.string.friends), R.layout.friends, new FriendsManager(this, db));
-		viewpagerAdapter.addItem(friends);
+//		friends = new ViewPageFragment(getString(R.string.friends), new FriendsManager(this, db));
+//		viewpagerAdapter.addItem(friends);
 		
-		viewpagerAdapter.notifyDataSetChanged();
-		indicator.setCurrentItem(1);
+//		viewpagerAdapter.notifyDataSetChanged();
+//		indicator.setCurrentItem(1);
     }
 
     /* --- OptionsMenu			(start) --- */

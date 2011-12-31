@@ -1,5 +1,7 @@
 package org.csie.mpp.buku.view;
 
+import org.csie.mpp.buku.R;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,17 +14,15 @@ public class ViewPageFragment extends Fragment {
 	}
 	
 	protected String title;
-	protected int resource;
 	
 	private ViewPageFragmentListener callback;
 	
-	public ViewPageFragment(String title, int resource) {
-		this(title, resource, null);
+	public ViewPageFragment(String title) {
+		this(title, null);
 	}
 
-	public ViewPageFragment(String title, int resource, ViewPageFragmentListener callback) {
+	public ViewPageFragment(String title, ViewPageFragmentListener callback) {
 		this.title = title;
-		this.resource = resource;
 		this.callback = callback;
 	}
 	
@@ -32,7 +32,7 @@ public class ViewPageFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
-		View view = inflater.inflate(resource, container, false);
+		View view = inflater.inflate(R.layout.pager, container, false);
 		
 		if(callback != null)
 			callback.onCreate(view);

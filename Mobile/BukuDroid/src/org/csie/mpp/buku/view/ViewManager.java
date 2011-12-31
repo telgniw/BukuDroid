@@ -1,19 +1,20 @@
 package org.csie.mpp.buku.view;
 
+import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.view.ViewPageFragment.ViewPageFragmentListener;
 
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 public abstract class ViewManager implements ViewPageFragmentListener {
 	protected final Activity activity;
 	protected final DBHelper helper;
 	protected final SQLiteDatabase rdb, wdb;
 	
-	private FrameLayout frame;
+	private LinearLayout frame;
 	
 	public ViewManager(Activity act, DBHelper db) {
 		activity = act;
@@ -23,17 +24,16 @@ public abstract class ViewManager implements ViewPageFragmentListener {
 		wdb = helper.getWritableDatabase();
 	}
 
-	protected abstract int getFrameId();
 	protected abstract void updateView();
 	
-	protected FrameLayout getFrame() {
+	protected LinearLayout getFrame() {
 		return frame;
 	}
 
 	/* --- ViewPageFragmentListener	(start) --- */
 	@Override
 	public void onCreate(View view) {
-		frame = (FrameLayout)view.findViewById(getFrameId());
+		frame = (LinearLayout)view.findViewById(R.id.frame);
 		updateView();
 	}
 	/* --- ViewPageFragmentListener	(end) --- */
