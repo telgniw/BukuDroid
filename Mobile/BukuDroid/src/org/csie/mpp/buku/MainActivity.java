@@ -10,6 +10,7 @@ import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
 import org.csie.mpp.buku.view.FriendsManager;
+import org.csie.mpp.buku.view.StreamManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
@@ -216,7 +217,7 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     }
     
     private void createSessionView() {
-    	stream = new ViewPageFragment(getString(R.string.title_stream));
+    	stream = new ViewPageFragment(getString(R.string.title_stream), new StreamManager(this, db));
 		viewpagerAdapter.addItem(stream);
 		
 		friends = new ViewPageFragment(getString(R.string.title_friends), new FriendsManager(this, db));
