@@ -18,6 +18,8 @@ import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,15 +48,19 @@ import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class MainActivity extends FragmentActivity implements OnPageChangeListener, ViewListener, OnItemClickListener {
-	protected ActionBar actionbar;
-	
-	protected TitlePageIndicator indicator;
-	protected ViewPager viewpager;
-	protected ViewPagerAdapter viewpagerAdapter;
-	
-	protected ViewPageFragment bookshelf, stream, friends;
+	private static final String PREFS_PAGE_IDX = "VIEWPAGER_INDEX";
 	
 	private DBHelper db;
+	private SharedPreferences prefs;
+	
+	private ActionBar actionbar;
+	
+	private TitlePageIndicator indicator;
+	private ViewPager viewpager;
+	private ViewPagerAdapter viewpagerAdapter;
+	
+	private ViewPageFragment bookshelf, stream, friends;
+	
 	private BookshelfManager bookMan;
 	
     @Override
@@ -66,6 +72,9 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         // initialize FB
         SessionStore.restore(App.fb, this);
 
+        db = new DBHelper(this);
+        prefs = getPreferences(MODE_PRIVATE);
+
         /* initialize ActionBar */
         actionbar = (ActionBar)findViewById(R.id.actionbar);
         actionbar.addAction(new IntentAction(this, new Intent(this, ScanActivity.class), R.drawable.ic_camera, ScanActivity.REQUEST_CODE));
@@ -73,7 +82,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
-        db = new DBHelper(this);
         bookMan = new BookshelfManager(this, db, this);
         bookshelf = new ViewPageFragment(getString(R.string.title_bookshelf), bookMan);
         viewpagerAdapter.addItem(bookshelf);
@@ -213,7 +221,7 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		viewpagerAdapter.addItem(friends);
 		
 		viewpagerAdapter.notifyDataSetChanged();
-		indicator.setCurrentItem(1);
+		indicator.setCurrentItem(prefs.getInt(PREFS_PAGE_IDX, 1));
     }
 
     /* --- OptionsMenu			(start) --- */
@@ -290,7 +298,9 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 
 	@Override
 	public void onPageSelected(int position) {
-		
+		Editor editor = prefs.edit();
+		editor.putInt(PREFS_PAGE_IDX, position);
+		editor.commit();
 	}
 	/* --- OnPageChageListener	(end) --- */
 

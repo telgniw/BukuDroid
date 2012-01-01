@@ -18,6 +18,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">请点选右上角的按钮增加图书</string>
     <string name="menu_about">关于</string>
+    <string name="menu_account_sync">链接帐户</string>
     <string name="menu_search">搜索</string>
     <string name="title_bookshelf">书架</string>
     <!--

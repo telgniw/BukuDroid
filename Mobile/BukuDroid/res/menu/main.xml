@@ -5,6 +5,11 @@
         android:title="@string/menu_search"
     />
     <item
+        android:icon="@drawable/ic_menu_none"
+        android:id="@+id/menu_account_sync"
+        android:title="@string/menu_account_sync"
+    />
+    <item
         android:icon="@drawable/ic_menu_more"
         android:id="@+id/menu_about"
         android:title="@string/menu_about"

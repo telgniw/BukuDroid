@@ -18,6 +18,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">請按右上角的按鈕增加書籍</string>
     <string name="menu_about">關於</string>
+    <string name="menu_account_sync">連結帳號</string>
     <string name="menu_search">搜尋</string>
     <string name="title_bookshelf">書櫃</string>
     <!--

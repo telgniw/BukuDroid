@@ -19,6 +19,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">Click the button on the upper-right corner to add some books.</string>
     <string name="menu_about">About</string>
+    <string name="menu_account_sync">Sync Account</string>
     <string name="menu_search">Search</string>
     <string name="title_bookshelf">Bookshelf</string>
     <string name="title_friends">Friends</string>
