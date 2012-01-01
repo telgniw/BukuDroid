@@ -11,6 +11,11 @@
     -->
     <string name="title_about_bukudroid">關於BukuDroid</string>
     
+    <!-- Account -->
+    <string name="msg_login_success">登入成功</string>
+    <string name="msg_logout_success">登出成功</string>
+    <string name="title_account_sync">帳號連結設定</string>
+    
     <!-- Search -->
     <string name="hint_search">作者書名或ISBN</string>
     <string name="title_search_result">搜尋結果</string>
@@ -18,7 +23,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">請按右上角的按鈕增加書籍</string>
     <string name="menu_about">關於</string>
-    <string name="menu_account_sync">連結帳號</string>
+    <string name="menu_account_sync">設定帳號連結</string>
     <string name="menu_search">搜尋</string>
     <string name="title_bookshelf">書櫃</string>
     <!--

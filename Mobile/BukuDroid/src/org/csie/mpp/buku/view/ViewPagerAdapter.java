@@ -21,6 +21,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter implements TitleProvi
 		fragments.add(fragment);
 	}
 	
+	public void removeItem(ViewPageFragment fragment) {
+		fragments.remove(fragment);
+	}
+	
 	@Override
 	public Fragment getItem(int position) {
 		return fragments.get(position);

@@ -17,6 +17,7 @@ import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -41,6 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.android.BaseDialogListener;
 import com.facebook.android.SessionStore;
 import com.flurry.android.FlurryAgent;
 import com.markupartist.android.widget.ActionBar;
@@ -223,6 +225,14 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		viewpagerAdapter.notifyDataSetChanged();
 		indicator.setCurrentItem(prefs.getInt(PREFS_PAGE_IDX, 1));
     }
+    
+    private void removeSessionView() {
+    	viewpagerAdapter.removeItem(stream);
+    	viewpagerAdapter.removeItem(friends);
+    	
+    	viewpagerAdapter.notifyDataSetChanged();
+    	
+    }
 
     /* --- OptionsMenu			(start) --- */
     @Override
@@ -232,6 +242,14 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	return true;
     }
     
+    
+    private static final String PREFS_ACCOUNT_ITEM = "ACCOUNT_SYNC";
+    private static final int ITEM_FB = 0;
+    
+    private int[] itemIds = { ITEM_FB };
+    private String[] accountItems;
+    private boolean[] checked;
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
@@ -239,6 +257,57 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     			SearchManager sm = (SearchManager)getSystemService(SEARCH_SERVICE);
     			if(sm != null)
     				sm.startSearch(null, false, getComponentName(), null, false); 
+    			break;
+    		case R.id.menu_account_sync:
+    			if(accountItems == null) {
+    				accountItems = getResources().getStringArray(R.array.list_account);
+    				checked = new boolean[itemIds.length];
+    				for(int i = 0; i < itemIds.length; i++)
+    					checked[i] = prefs.getBoolean(PREFS_ACCOUNT_ITEM + i, false);
+    			}
+    			new AlertDialog.Builder(this).setTitle(R.string.title_account_sync).setMultiChoiceItems(accountItems, checked, new OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, int which, boolean isChecked) {
+						switch(which) {
+							case ITEM_FB:
+								if(!isChecked) {
+									try {
+										App.fb.logout(MainActivity.this);
+										Toast.makeText(MainActivity.this, R.string.msg_logout_success, App.TOAST_TIME).show();
+										SessionStore.clear(MainActivity.this);
+										removeSessionView();
+									}
+									catch(Exception e) {
+										Log.e(App.TAG, "Logout failed: " + e.toString());
+									}
+								}
+								else {
+									App.fb.authorize(MainActivity.this, App.FB_APP_PERMS, new BaseDialogListener(MainActivity.this, App.TOAST_TIME) {
+										@Override
+										public void onComplete(Bundle values) {
+											Toast.makeText(MainActivity.this, R.string.msg_login_success, App.TOAST_TIME).show();
+											SessionStore.save(App.fb, MainActivity.this);
+											MainActivity.this.runOnUiThread(new Runnable() {
+												@Override
+												public void run() {
+													createSessionView();
+												}
+											});
+										}
+									});
+								}
+								updateStatus(itemIds[which], isChecked);
+								break;
+							default:
+								break;
+						}
+					}
+					private void updateStatus(int id, boolean isChecked) {
+						Editor editor = prefs.edit();
+						editor.putBoolean(PREFS_ACCOUNT_ITEM + id, isChecked);
+						editor.commit();
+					}
+    			}).create().show();
     			break;
     		case R.id.menu_about:
     			View view = getLayoutInflater().inflate(R.layout.about, null);

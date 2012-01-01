@@ -11,6 +11,13 @@
     -->
     <string name="title_about_bukudroid">关于BukuDroid</string>
     
+    <!-- Account -->
+    <!--
+    <string name="msg_login_success">Successfully Logged-in.</string>
+    <string name="msg_logout_success">Successfully Logged-out.</string>
+    -->
+    <string name="title_account_sync">帐户链接设置</string>
+    
     <!-- Search -->
     <string name="hint_search">作者书名或ISBN</string>
     <string name="title_search_result">搜索结果</string>
@@ -18,7 +25,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">请点选右上角的按钮增加图书</string>
     <string name="menu_about">关于</string>
-    <string name="menu_account_sync">链接帐户</string>
+    <string name="menu_account_sync">设置帐户链接</string>
     <string name="menu_search">搜索</string>
     <string name="title_bookshelf">书架</string>
     <!--

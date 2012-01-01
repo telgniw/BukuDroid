@@ -5,12 +5,20 @@
     <string name="app_fb_fan_page">http://on.fb.me/BukuDroid</string>
     <string name="app_market_page">http://market.android.com/details?id=org.csie.mpp.buku</string>
     <string name="msg_deleted">Successfully deleted.</string>
-    <string name="msg_delete_failed">Delete failed:</string>
+    <string name="msg_delete_failed">Delete failed: </string>
     
     <!-- About -->
     <string name="text_find_out_more">Find out more on Facebook!</string>
     <string name="text_what_is_bukudroid">An app for bookworms!</string>
     <string name="title_about_bukudroid">About BukuDroid</string>
+    
+    <!-- Account -->
+    <string name="msg_login_success">Successfully Logged-in.</string>
+    <string name="msg_logout_success">Successfully Logged-out.</string>
+    <string name="title_account_sync">Account Setting</string>
+    <string-array name="list_account">
+        <item>Facebook</item>
+    </string-array>
     
     <!-- Search -->
     <string name="hint_search">Author, Title, ISBN</string>
@@ -19,7 +27,7 @@
     <!-- ViewPager -->
     <string name="hint_add_book_to_start">Click the button on the upper-right corner to add some books.</string>
     <string name="menu_about">About</string>
-    <string name="menu_account_sync">Sync Account</string>
+    <string name="menu_account_sync">Account Setting</string>
     <string name="menu_search">Search</string>
     <string name="title_bookshelf">Bookshelf</string>
     <string name="title_friends">Friends</string>
