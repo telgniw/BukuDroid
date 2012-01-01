@@ -16,6 +16,7 @@ import com.facebook.android.BaseRequestListener;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,8 +79,10 @@ public class FriendsManager extends ViewManager {
 			createView(frame);
 		else {
 			Bundle params = new Bundle();
-			params.putString("fields", "installed,id,name");
-			App.fb_runner.request("me/friends", params, new BaseRequestListener() {
+			//params.putString("fields", "installed,id,name");
+			//App.fb_runner.request("me/friends", params, new BaseRequestListener() {
+			params.putString("q", "SELECT uid,name, is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
+			App.fb_runner.request("fql", params, new BaseRequestListener() {
 				@Override
 				public void onComplete(String response, Object state) {
 					friends = new ArrayList<Friend>();
@@ -88,26 +91,30 @@ public class FriendsManager extends ViewManager {
 						while(response != null) {
 							JSONObject json = new JSONObject(response);
 							JSONArray data = json.getJSONArray("data");
-							
+							Log.d("APP", "Q" + data.toString());
 							for(int i = 0; i < data.length(); i++) {
-								JSONObject p = data.getJSONObject(i);
-								if(p.has("installed")) {
-									Friend friend = new Friend(p.getString("id"), p.getString("name"));
+								JSONObject p = data.getJSONObject(i);		
+								if ( p != JSONObject.NULL )
+								{
+									Friend friend = new Friend(p.getString("uid"), p.getString("name"));
 									friend.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + friend.id + "/picture"));
 									friends.add(friend);
 								}
 							}
-							
-							JSONObject paging = json.getJSONObject("paging");
-							if(!paging.has("next"))
-								response = null;
-							else {
-								URL url = new URL(paging.getString("next"));
-								response = Util.urlToString(url);
+							response = null;
+							if ( json.has("paging") )
+							{
+								JSONObject paging = json.getJSONObject("paging");
+								if(paging.has("next"))
+								{
+									URL url = new URL(paging.getString("next"));
+									response = Util.urlToString(url);
+								}
 							}
 						}
 					}
 					catch(Exception e) {
+						Log.d("APP", "Q" + e.toString());
 						friends.clear();
 					}
 					
