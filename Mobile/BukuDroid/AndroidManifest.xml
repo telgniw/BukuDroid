@@ -41,6 +41,11 @@
             >
         </activity>
         <activity
+            android:name=".ScanActivity$KeywordSearchActivity"
+            >
+        </activity>
+        
+        <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             >

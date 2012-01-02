@@ -64,10 +64,12 @@
     <string name="search_no_result">No result!</string>
     
     <!--  Books Keyword Search -->
-    <string name="keytype_all">All types</string>
-    <string name="keytype_title">Title</string>
-    <string name="keytype_author">Author</string>
-    <string name="keytype_publisher">Publisher</string>
+    <string-array name="keytype">
+	    <item>All types</item>
+	    <item>Title</item>
+	    <item>Author</item>
+	    <item>Publisher</item>
+    </string-array>
     <string name="key_search">Searching</string>
     <string name="key_searching">Please wait a moment...</string>
     

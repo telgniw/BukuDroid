@@ -21,11 +21,14 @@
 		        android:textSize="@dimen/fontLarge"
 	            android:paddingRight="@dimen/padding"
 		    />
+
 		    <EditText
 		        android:id="@+id/isbn"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:layout_weight="1">
+		        android:layout_weight="1"
+		        android:singleLine="true" >
+
 		        <requestFocus />
 		    </EditText>
 		</LinearLayout>

@@ -133,6 +133,11 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		final List<BookEntry> entries = new ArrayList<BookEntry>();
 		for(BookEntry entry: BookEntry.search(db.getReadableDatabase(), query))
 			entries.add(entry);
+		if ( entries.size() == 0 )
+		{
+			Toast.makeText(this, R.string.search_no_result, App.TOAST_TIME).show();
+			return;
+		}
 		BookEntryAdapter adapter = new BookEntryAdapter(this, R.layout.list_item_book, entries);
 		AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(adapter, new OnClickListener() {
 			@Override

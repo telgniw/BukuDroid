@@ -62,11 +62,13 @@
     <string name="search_no_result">找不到書籍!</string>
         
     <!--  Books Keyword Search -->
-    <string name="keytype_all">所有類型</string>
-    <string name="keytype_title">標題</string>
-    <string name="keytype_author">作者</string>
-    <string name="keytype_publisher">出版商</string>
+    <string-array name="keytype">
+	    <item>所有類型</item>
+	    <item>標題</item>
+	    <item>作者</item>
+	    <item>出版商</item>
+    </string-array>
     <string name="key_search">搜尋中</string>
-    <string name="key_searching">請稍候一下</string>
+    <string name="key_searching">請稍候...</string>
         
 </resources>

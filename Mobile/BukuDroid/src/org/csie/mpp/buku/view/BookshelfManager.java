@@ -22,6 +22,30 @@ public class BookshelfManager extends ViewManager {
 		public void onListViewCreated(ListView view);
 	}
 	
+	public static class SearchEntryAdapter extends ArrayAdapter<BookEntry> {
+		private LayoutInflater inflater;
+		private int resourceId;
+		private List<BookEntry> entries;
+		
+		public SearchEntryAdapter(Activity activity, int resource, List<BookEntry> list) {
+			super(activity, resource, list);
+			
+			inflater = activity.getLayoutInflater();
+			resourceId = resource;
+			entries = list;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			BookEntry entry = entries.get(position);
+			View view = inflater.inflate(resourceId, parent, false);
+			// TODO: using ImageLoader instead
+			((TextView)view.findViewById(R.id.list_title)).setText(entry.title);
+			((TextView)view.findViewById(R.id.list_author)).setText(entry.author);
+			return view;
+		}
+	}
+	
 	public static class BookEntryAdapter extends ArrayAdapter<BookEntry> {
 		private LayoutInflater inflater;
 		private int resourceId;

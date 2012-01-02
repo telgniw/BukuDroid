@@ -1,20 +1,37 @@
 package org.csie.mpp.buku;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.csie.mpp.buku.db.BookEntry;
+import org.csie.mpp.buku.view.BookshelfManager.SearchEntryAdapter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.flurry.android.FlurryAgent;
 import com.google.zxing.client.android.CaptureActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.TabActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TabHost;
+import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 
@@ -32,6 +49,8 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         Resources res = getResources();
         TabHost tabhost = getTabHost();
 
+       
+        
         // [Yi] Notes: ISBN Input should always has smaller index than Barcode Scanner
         // an unknown bug that cause soft-keyboard can't be set visible
         
@@ -46,6 +65,12 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         intent.putExtra("SCAN_MODE", "ONE_D_MODE");
         title = getString(R.string.tab_barcode);
         spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_barcode)).setContent(intent);
+        tabhost.addTab(spec);
+        
+         // tab: keyword Input
+        intent = new Intent(this, KeywordSearchActivity.class);
+        title = getString(R.string.tab_search);
+        spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_search)).setContent(intent);
         tabhost.addTab(spec);
         
         tabhost.setCurrentTab(1);
@@ -133,6 +158,191 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         	data.putExtra(App.ISBN, input.getText().toString());
         	setResultForTabActivity(RESULT_OK, data);
             finish();
+		}
+    }
+    public static final class KeywordSearchActivity extends AbstractTabContentActivity implements OnClickListener {
+    	private final static int MAX_RESULT = 10;
+    	private EditText input;
+    	private Spinner spinner;
+    	
+    	@Override
+    	public void onCreate(Bundle savedInstanceState) {
+    		super.onCreate(savedInstanceState);
+    		setContentView(R.layout.keyword);
+    		((Button)findViewById(R.id.search_button)).setOnClickListener(this);
+    		
+    		spinner = (Spinner)findViewById(R.id.keyword_type);
+    		input = (EditText)findViewById(R.id.keyword);
+    	}
+
+		@Override
+		public void onClick(View v) {
+			
+			if( input.getText().toString().equals("") )
+			{
+				Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
+				return;
+			}
+			
+			
+			/*HttpPost  httpP = new HttpPost (urL);
+			
+			List <NameValuePair> params = new ArrayList <NameValuePair>();
+			//params.add(new BasicNameValuePair("q", "inauthor:flowers"));
+			try {
+				
+			    httpP.setEntity(new UrlEncodedFormEntity(params,HTTP.UTF_8));
+			    
+			    HttpResponse httpR = new DefaultHttpClient().execute(httpP);
+			    Log.d("APP", ""+httpR.getStatusLine().getStatusCode());
+			    if (httpR.getStatusLine().getStatusCode() == 200) {
+			    	String ret = EntityUtils.toString(httpR.getEntity());
+			    	Log.d("APP", ret);
+			    }
+			} catch (Exception e) {
+			  e.printStackTrace();
+			}*/
+			
+			final ProgressDialog progressDialog = 
+					ProgressDialog.show(KeywordSearchActivity.this, 
+										getString(R.string.key_search), 
+										getString(R.string.key_searching));
+			final Handler handler = new Handler();
+			
+			Thread thread = new Thread(){
+				
+				URL url;
+				String str;
+				int type = spinner.getSelectedItemPosition();
+				String keyword = input.getText().toString();
+				String prefix;
+				
+				@Override
+				public void run(){
+					
+					try {
+						switch(type)
+						{
+						case 0:
+							prefix = "";
+							break;
+						case 1:
+							prefix = "intitle:";
+							break;
+						case 2:
+							prefix = "inauthor:";
+							break;
+						case 3:
+							prefix = "inpublisher:";
+							break;
+						}
+						String urL = "https://www.googleapis.com/books/v1/volumes?q=" + java.net.URLEncoder.encode(prefix + keyword);
+						url = new URL(urL);
+						Log.d("APP", urL);
+						str = Util.urlToString(url);
+						
+						
+					} catch (MalformedURLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
+					
+					handler.post(new Runnable(){
+						public void run(){					
+							final List<BookEntry> entries = new ArrayList<BookEntry>();
+							/* parse JSON */
+							try{
+								if ( !str.equals("") )
+								{
+									JSONObject json = new JSONObject(str);
+									JSONArray data = json.getJSONArray("items");
+									for ( int i = 0 ; i < data.length() && i < MAX_RESULT ; i++)
+									{
+										JSONObject p = data.getJSONObject(i);	
+										JSONObject vol = p.getJSONObject("volumeInfo");
+										
+										//String imgLink = p.getJSONObject("imageLinks").getString("smallThumbnail");
+										BookEntry book = new BookEntry();
+										if ( vol.has("title") )
+											book.title = vol.getString("title");
+										else
+											continue;
+										
+										if ( vol.has("authors") )
+											book.author = vol.getJSONArray("authors").getString(0);
+										else
+											book.author = "";
+										
+										if ( vol.has("industryIdentifiers") )
+										{	
+											JSONArray ary = vol.getJSONArray("industryIdentifiers");
+											JSONObject ind;
+											for ( int j = 0 ; j < ary.length() ; j++ )
+											{
+												ind = ary.getJSONObject(j);
+												if (ind.getString("type").equals("ISBN_10") || ind.getString("type").equals("ISBN_13"))
+												{
+													book.isbn = ind.getString("identifier");
+													break;
+												}
+											}
+											if ( book.isbn == null )
+												continue;
+											
+										}
+										else
+											continue;
+										entries.add(book);
+										
+									}
+								}
+								
+								if ( entries.size() == 0 )
+								{
+									Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
+									progressDialog.dismiss();
+									return;
+								}
+								SearchEntryAdapter adapter = new SearchEntryAdapter(KeywordSearchActivity.this, R.layout.list_item_keyword, entries);
+
+								AlertDialog dialog = new AlertDialog.Builder(KeywordSearchActivity.this).setAdapter(adapter,  new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(
+											DialogInterface dialog,
+											int position) {
+										dialog.dismiss();
+										String isbn = entries.get(position).isbn;
+										Intent data = new Intent();
+							        	data.putExtra(App.ISBN, isbn);
+							        	setResultForTabActivity(RESULT_OK, data);
+							            finish();
+									}
+								}).setTitle(R.string.title_search_result).create();
+								progressDialog.dismiss();
+								dialog.show();
+								
+							}
+							catch(Exception e){
+								e.printStackTrace();
+							}
+							
+						}
+						
+					});
+				}
+				
+			};
+			thread.start();
+			/*
+			
+			
+			*//*
+        	Intent data = new Intent();
+        	data.putExtra(App.ISBN, input.getText().toString());
+        	setResultForTabActivity(RESULT_OK, data);
+            finish();*/
 		}
     }
 }
