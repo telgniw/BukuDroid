@@ -53,7 +53,20 @@
     <string name="tab_barcode">條碼</string>
     <string name="tab_isbn">ISBN</string>
     <string name="tag_isbn">ISBN</string>
+    <string name="tab_search">搜尋</string>
     
     <!-- Facebook -->
     <string name="fb_message_posted">成功發布到你的塗鴉牆</string>
+    
+    <!-- Search -->
+    <string name="search_no_result">找不到書籍!</string>
+        
+    <!--  Books Keyword Search -->
+    <string name="keytype_all">所有類型</string>
+    <string name="keytype_title">標題</string>
+    <string name="keytype_author">作者</string>
+    <string name="keytype_publisher">出版商</string>
+    <string name="key_search">搜尋中</string>
+    <string name="key_searching">請稍候一下</string>
+        
 </resources>

@@ -53,7 +53,21 @@
     
     <!-- Scan -->
     <string name="tab_barcode">条码</string>
+    <string name="tab_isbn">ISBN</string>
+    <string name="tag_isbn">ISBN</string>
+    <string name="tab_search">搜索</string>
     
     <!-- Facebook -->
     <string name="fb_message_posted">成功发布在你的时间线</string>
+    
+    <!-- Search -->
+    <string name="search_no_result">查无结果!</string>
+        
+    <!--  Books Keyword Search -->
+    <string name="keytype_all">所有类型</string>
+    <string name="keytype_title">标题</string>
+    <string name="keytype_author">作者</string>
+    <string name="keytype_publisher">出版商</string> 
+    <string name="key_search">搜寻中</string>
+    <string name="key_searching">请稍候一下</string>   
 </resources>
