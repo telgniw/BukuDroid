@@ -310,8 +310,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     ResultHandler resultHandler = ResultHandlerFactory.makeResultHandler(this, rawResult);
 
     if (barcode == null) {
-      // This is from history -- no saved barcode
-      handleDecodeInternally(rawResult, resultHandler, null);
+      // should not happen
+      return;
     } else {
       beepManager.playBeepSoundAndVibrate();
       drawResultPoints(barcode, rawResult);
