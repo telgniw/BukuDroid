@@ -235,45 +235,48 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 								if ( !str.equals("") )
 								{
 									JSONObject json = new JSONObject(str);
-									JSONArray data = json.getJSONArray("items");
-									for ( int i = 0 ; i < data.length() && i < MAX_RESULT ; i++)
+									if ( json.getInt("totalItems") != 0 )
 									{
-										JSONObject p = data.getJSONObject(i);	
-										JSONObject vol = p.getJSONObject("volumeInfo");
-										
-										//String imgLink = p.getJSONObject("imageLinks").getString("smallThumbnail");
-										BookEntry book = new BookEntry();
-										if ( vol.has("title") )
-											book.title = vol.getString("title");
-										else
-											continue;
-										
-										if ( vol.has("authors") )
-											book.author = vol.getJSONArray("authors").getString(0);
-										else
-											book.author = "";
-										
-										if ( vol.has("industryIdentifiers") )
-										{	
-											JSONArray ary = vol.getJSONArray("industryIdentifiers");
-											JSONObject ind;
-											for ( int j = 0 ; j < ary.length() ; j++ )
-											{
-												ind = ary.getJSONObject(j);
-												if (ind.getString("type").equals("ISBN_10") || ind.getString("type").equals("ISBN_13"))
-												{
-													book.isbn = ind.getString("identifier");
-													break;
-												}
-											}
-											if ( book.isbn == null )
+										JSONArray data = json.getJSONArray("items");
+										for ( int i = 0 ; i < data.length() && i < MAX_RESULT ; i++)
+										{
+											JSONObject p = data.getJSONObject(i);	
+											JSONObject vol = p.getJSONObject("volumeInfo");
+											
+											//String imgLink = p.getJSONObject("imageLinks").getString("smallThumbnail");
+											BookEntry book = new BookEntry();
+											if ( vol.has("title") )
+												book.title = vol.getString("title");
+											else
 												continue;
 											
+											if ( vol.has("authors") )
+												book.author = vol.getJSONArray("authors").getString(0);
+											else
+												book.author = "";
+											
+											if ( vol.has("industryIdentifiers") )
+											{	
+												JSONArray ary = vol.getJSONArray("industryIdentifiers");
+												JSONObject ind;
+												for ( int j = 0 ; j < ary.length() ; j++ )
+												{
+													ind = ary.getJSONObject(j);
+													if (ind.getString("type").equals("ISBN_10") || ind.getString("type").equals("ISBN_13"))
+													{
+														book.isbn = ind.getString("identifier");
+														break;
+													}
+												}
+												if ( book.isbn == null )
+													continue;
+												
+											}
+											else
+												continue;
+											entries.add(book);
+											
 										}
-										else
-											continue;
-										entries.add(book);
-										
 									}
 								}
 								
