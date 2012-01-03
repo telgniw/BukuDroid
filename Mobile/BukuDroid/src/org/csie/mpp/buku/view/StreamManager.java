@@ -106,39 +106,28 @@ public class StreamManager extends ViewManager {
 					streams = new ArrayList<Stream>();
 					
 					try {
-						//while(response != null) {
-							JSONObject json = new JSONObject(response);
-							JSONArray data = json.getJSONArray("data");
-							for(int i = 0; i < data.length(); i++) {
-								JSONObject p = data.getJSONObject(i);
-								Log.d("APP", "QQ"+p);
-								if(p.has("application")) {
-									if (p.get("application") == JSONObject.NULL)
-										continue;
-											
-									if ( !p.getJSONObject("application").getString("name").equals("BukuDroid"))
-										continue;
-									Stream stream = new Stream(p.getString("id"));
-									if (p.has("name"))
-										stream.book = p.getString("name");
-									stream.message = p.getString("message");
-									stream.pic = Util.urlToImage(new URL(p.getString("picture")));
-									stream.link = p.getString("link");
-									stream.setDate(p.getString("created_time"));
-									streams.add(stream);
-								}
+						JSONObject json = new JSONObject(response);
+						JSONArray data = json.getJSONArray("data");
+						for(int i = 0; i < data.length(); i++) {
+							JSONObject p = data.getJSONObject(i);
+							Log.d("APP", "QQ"+p);
+							if(p.has("application")) {
+								if (p.get("application") == JSONObject.NULL)
+									continue;
+										
+								if ( !p.getJSONObject("application").getString("name").equals("BukuDroid"))
+									continue;
+								Stream stream = new Stream(p.getString("id"));
+								if (p.has("name"))
+									stream.book = p.getString("name");
+								stream.message = p.getString("message");
+								stream.pic = Util.urlToImage(new URL(p.getString("picture")));
+								stream.link = p.getString("link");
+								stream.setDate(p.getString("created_time"));
+								streams.add(stream);
 							}
-							
-							/*JSONObject paging = json.getJSONObject("paging");
-							if(!paging.has("next"))
-								response = null;
-							else {
-								URL url = new URL(paging.getString("next"));
-								response = Util.urlToString(url);
-								
-							}*/
-							
-						//}
+						}
+						// TODO: parse next page
 					}
 					catch(Exception e) {
 						Log.d("exception", e.toString());
