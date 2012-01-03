@@ -10,19 +10,16 @@
         android:layout_margin="@dimen/margin"
         android:orientation="vertical"
     >
-
 	        <Spinner
 	            android:id="@+id/keyword_type"
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
 	            android:entries="@array/keytype" />
-
 		    <EditText
 		        android:id="@+id/keyword"
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
 		        android:singleLine="true" >
-
 		        <requestFocus />
 		    </EditText>
 

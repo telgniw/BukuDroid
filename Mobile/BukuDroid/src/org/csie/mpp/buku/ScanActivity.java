@@ -105,7 +105,7 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public void onTabChanged(String tabId) {
 		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner)
 		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-		if(tabId.equals(getString(R.string.tab_isbn)))
+		if(tabId.equals(getString(R.string.tab_isbn)) || tabId.equals(getString(R.string.tab_search)))
 			imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
 		else {
 			if(imm != null)
@@ -184,33 +184,11 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 				return;
 			}
 			
-			
-			/*HttpPost  httpP = new HttpPost (urL);
-			
-			List <NameValuePair> params = new ArrayList <NameValuePair>();
-			//params.add(new BasicNameValuePair("q", "inauthor:flowers"));
-			try {
-				
-			    httpP.setEntity(new UrlEncodedFormEntity(params,HTTP.UTF_8));
-			    
-			    HttpResponse httpR = new DefaultHttpClient().execute(httpP);
-			    Log.d("APP", ""+httpR.getStatusLine().getStatusCode());
-			    if (httpR.getStatusLine().getStatusCode() == 200) {
-			    	String ret = EntityUtils.toString(httpR.getEntity());
-			    	Log.d("APP", ret);
-			    }
-			} catch (Exception e) {
-			  e.printStackTrace();
-			}*/
-			
-			final ProgressDialog progressDialog = 
-					ProgressDialog.show(KeywordSearchActivity.this, 
-										getString(R.string.key_search), 
-										getString(R.string.key_searching));
+			final ProgressDialog progressDialog = ProgressDialog.show(KeywordSearchActivity.this, getString(R.string.key_search), getString(R.string.key_searching));
 			final Handler handler = new Handler();
 			
+			// TODO: change to AsyncTask
 			Thread thread = new Thread(){
-				
 				URL url;
 				String str;
 				int type = spinner.getSelectedItemPosition();
@@ -335,14 +313,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 				
 			};
 			thread.start();
-			/*
-			
-			
-			*//*
-        	Intent data = new Intent();
-        	data.putExtra(App.ISBN, input.getText().toString());
-        	setResultForTabActivity(RESULT_OK, data);
-            finish();*/
 		}
     }
 }
