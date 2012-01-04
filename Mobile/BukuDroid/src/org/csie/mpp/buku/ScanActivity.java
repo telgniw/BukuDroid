@@ -37,7 +37,12 @@ import android.widget.TabWidget;
 
 public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public static final int REQUEST_CODE = 1436;
+	
+	private String TAB_ISBN;
+	private String TAB_BARCODE;
+	private String TAB_SEARCH;
 
+	private TabHost tabhost;
 	private int tab_height;
 	
     @Override
@@ -46,30 +51,32 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
         setContentView(R.layout.scan);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        TAB_ISBN = getString(R.string.tab_isbn);
+        TAB_BARCODE = getString(R.string.tab_barcode);
+        TAB_SEARCH = getString(R.string.tab_search);
+        
         Resources res = getResources();
-        TabHost tabhost = getTabHost();
-
-       
+        tabhost = getTabHost();
         
         // [Yi] Notes: ISBN Input should always has smaller index than Barcode Scanner
         // an unknown bug that cause soft-keyboard can't be set visible
         
         // tab: ISBN Input
         Intent intent = new Intent(this, IsbnInputActivity.class);
-        String title = getString(R.string.tab_isbn);
+        String title = TAB_ISBN;
         TabHost.TabSpec spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_text)).setContent(intent);
         tabhost.addTab(spec);
         
         // tab: Barcode Scanner
         intent = new Intent("com.google.zxing.client.android.BUKU_SCAN");
         intent.putExtra("SCAN_MODE", "ONE_D_MODE");
-        title = getString(R.string.tab_barcode);
+        title = TAB_BARCODE;
         spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_barcode)).setContent(intent);
         tabhost.addTab(spec);
         
          // tab: keyword Input
         intent = new Intent(this, KeywordSearchActivity.class);
-        title = getString(R.string.tab_search);
+        title = TAB_SEARCH;
         spec = tabhost.newTabSpec(title).setIndicator(title, res.getDrawable(R.drawable.ic_menu_search)).setContent(intent);
         tabhost.addTab(spec);
         
@@ -94,6 +101,23 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
     }
     
+    private String currentTab = TAB_BARCODE;
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	
+    	tabhost.setCurrentTabByTag(currentTab);
+    }
+    
+    @Override
+    public void onPause() {
+    	currentTab = tabhost.getCurrentTabTag();
+    	tabhost.setCurrentTabByTag(TAB_BARCODE);
+    	
+    	super.onPause();
+    }
+    
     @Override
     public void onStop() {
     	super.onStop();
@@ -105,7 +129,7 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public void onTabChanged(String tabId) {
 		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner)
 		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-		if(tabId.equals(getString(R.string.tab_isbn)) || tabId.equals(getString(R.string.tab_search)))
+		if(tabId.equals(TAB_ISBN) || tabId.equals(TAB_SEARCH))
 			imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
 		else {
 			if(imm != null)
