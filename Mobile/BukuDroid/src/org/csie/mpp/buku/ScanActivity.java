@@ -19,7 +19,6 @@ import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -111,9 +110,16 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 	public void onTabChanged(String tabId) {
 		// [Yi] Notes: prevent soft-keyboard to show on other view (such as barcode scanner)
 		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-		if(tabId.equals(TAB_ISBN) || tabId.equals(TAB_SEARCH))
+		if(tabId.equals(TAB_ISBN)) {
+			FlurryAgent.logEvent(TAB_ISBN.toString());
 			imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		}
+		else if(tabId.equals(TAB_SEARCH)) {
+			FlurryAgent.logEvent(App.FlurryEvent.TAB_SEARCH.toString());
+			imm.toggleSoftInput(0, InputMethodManager.SHOW_IMPLICIT);
+		}
 		else {
+			FlurryAgent.logEvent(App.FlurryEvent.TAB_BARCODE.toString());
 			if(imm != null)
 				imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 		}

@@ -36,8 +36,11 @@ public class App {
 	}
 	
 	public enum FlurryEvent {
+		TAB_ISBN,
+		TAB_BARCODE,
+		TAB_SEARCH,
 		BOOK_NOT_FOUND,
-		FAN_PAGE_OPENED,
-		SHARE_ON_FB
+		SHARE_ON_FB,
+		FAN_PAGE_OPENED
 	}
 }
