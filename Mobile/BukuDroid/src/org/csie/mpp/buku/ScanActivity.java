@@ -101,23 +101,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
     }
     
-    private String currentTab = TAB_BARCODE;
-    
-    @Override
-    public void onResume() {
-    	super.onResume();
-    	
-    	tabhost.setCurrentTabByTag(currentTab);
-    }
-    
-    @Override
-    public void onPause() {
-    	currentTab = tabhost.getCurrentTabTag();
-    	tabhost.setCurrentTabByTag(TAB_BARCODE);
-    	
-    	super.onPause();
-    }
-    
     @Override
     public void onStop() {
     	super.onStop();

@@ -242,6 +242,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     inactivityTimer.onPause();
     cameraManager.closeDriver();
+    // Yi: Added to avoid camera being opened before onResume
+    cameraManager = null;
     if (!hasSurface) {
       SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
       SurfaceHolder surfaceHolder = surfaceView.getHolder();
@@ -547,10 +549,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private void initCamera(SurfaceHolder surfaceHolder) {
     try {
-      cameraManager.openDriver(surfaceHolder);
-      // Creating the handler starts the preview, which can also throw a RuntimeException.
-      if (handler == null) {
-        handler = new CaptureActivityHandler(this, decodeFormats, characterSet, cameraManager);
+      // Yi: added to prevent cameraManager not created (onResume haven't called)
+      if(cameraManager != null) {
+    	cameraManager.openDriver(surfaceHolder);
+    	// Creating the handler starts the preview, which can also throw a RuntimeException.
+    	if (handler == null) {
+          handler = new CaptureActivityHandler(this, decodeFormats, characterSet, cameraManager);
+    	}
       }
     } catch (IOException ioe) {
       Log.w(TAG, ioe);
