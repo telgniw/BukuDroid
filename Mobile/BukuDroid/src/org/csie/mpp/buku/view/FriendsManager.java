@@ -79,8 +79,6 @@ public class FriendsManager extends ViewManager {
 			createView(frame);
 		else {
 			Bundle params = new Bundle();
-			//params.putString("fields", "installed,id,name");
-			//App.fb_runner.request("me/friends", params, new BaseRequestListener() {
 			params.putString("q", "SELECT uid,name, is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
 			App.fb_runner.request("fql", params, new BaseRequestListener() {
 				@Override
@@ -91,22 +89,19 @@ public class FriendsManager extends ViewManager {
 						while(response != null) {
 							JSONObject json = new JSONObject(response);
 							JSONArray data = json.getJSONArray("data");
-							Log.d("APP", "Q" + data.toString());
 							for(int i = 0; i < data.length(); i++) {
-								JSONObject p = data.getJSONObject(i);		
-								if ( p != JSONObject.NULL )
-								{
-									Friend friend = new Friend(p.getString("uid"), p.getString("name"));
+								JSONObject item = data.getJSONObject(i);		
+								if (item != JSONObject.NULL) {
+									Friend friend = new Friend(item.getString("uid"), item.getString("name"));
 									friend.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + friend.id + "/picture"));
 									friends.add(friend);
 								}
 							}
 							response = null;
-							if ( json.has("paging") )
-							{
+							
+							if(json.has("paging")) {
 								JSONObject paging = json.getJSONObject("paging");
-								if(paging.has("next"))
-								{
+								if(paging.has("next")) {
 									URL url = new URL(paging.getString("next"));
 									response = Util.urlToString(url);
 								}
@@ -114,7 +109,7 @@ public class FriendsManager extends ViewManager {
 						}
 					}
 					catch(Exception e) {
-						Log.d("APP", "Q" + e.toString());
+						Log.e(App.TAG, e.toString());
 						friends.clear();
 					}
 					

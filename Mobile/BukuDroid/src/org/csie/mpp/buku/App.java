@@ -37,6 +37,7 @@ public class App {
 	
 	public enum FlurryEvent {
 		BOOK_NOT_FOUND,
-		FAN_PAGE_OPENED
+		FAN_PAGE_OPENED,
+		SHARE_ON_FB
 	}
 }

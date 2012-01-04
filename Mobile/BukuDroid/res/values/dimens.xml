@@ -9,6 +9,7 @@
     <dimen name="padding">5dip</dimen>
     <dimen name="maxImageWidth">60dip</dimen>
     <dimen name="fontLarge">20dip</dimen>
+    <dimen name="fontMedianLarge">18dip</dimen>
     <dimen name="fontMedian">16dip</dimen>
     <dimen name="fontSmall">12dip</dimen>
 </resources>

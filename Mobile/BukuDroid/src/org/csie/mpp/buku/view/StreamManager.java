@@ -76,12 +76,13 @@ public class StreamManager extends ViewManager {
 					Stream stream = streams.get(position);
 					LayoutInflater inflater = activity.getLayoutInflater();
 					View view = inflater.inflate(R.layout.list_item_stream, null);
-					((TextView)view.findViewById(R.id.list_stream_message)).setText(stream.message);
-					if ( stream.pic != null)
-						((ImageView)view.findViewById(R.id.list_stream_image)).setImageBitmap(stream.pic);
-					if ( stream.book != null )
-						((TextView)view.findViewById(R.id.list_stream_name)).setText(stream.book);
-					((TextView)view.findViewById(R.id.list_stream_time)).setText(""+stream.time);
+					if(stream.message != null)
+						((TextView)view.findViewById(R.id.list_message)).setText(stream.message);
+					if(stream.pic != null)
+						((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(stream.pic);
+					if(stream.book != null)
+						((TextView)view.findViewById(R.id.list_name)).setText(stream.book);
+					((TextView)view.findViewById(R.id.list_time)).setText(stream.time.toLocaleString());
 					return view;
 				}
 			};
@@ -109,29 +110,32 @@ public class StreamManager extends ViewManager {
 						JSONObject json = new JSONObject(response);
 						JSONArray data = json.getJSONArray("data");
 						for(int i = 0; i < data.length(); i++) {
-							JSONObject p = data.getJSONObject(i);
-							Log.d("APP", "QQ"+p);
-							if(p.has("application")) {
-								if (p.get("application") == JSONObject.NULL)
-									continue;
-										
-								if ( !p.getJSONObject("application").getString("name").equals("BukuDroid"))
-									continue;
-								Stream stream = new Stream(p.getString("id"));
-								if (p.has("name"))
-									stream.book = p.getString("name");
-								stream.message = p.getString("message");
-								stream.pic = Util.urlToImage(new URL(p.getString("picture")));
-								stream.link = p.getString("link");
-								stream.setDate(p.getString("created_time"));
-								streams.add(stream);
+							try {
+								JSONObject item = data.getJSONObject(i);
+								if(item.has("application")) {
+									if(item.get("application") == JSONObject.NULL)
+										continue;
+									if(!item.getJSONObject("application").getString("id").equals(App.FB_APP_ID))
+										continue;
+									Stream stream = new Stream(item.getString("id"));
+									if(item.has("name"))
+										stream.book = item.getString("name");
+									if(item.has("message"))
+										stream.message = item.getString("message");
+									stream.pic = Util.urlToImage(new URL(item.getString("picture")));
+									stream.link = item.getString("link");
+									stream.setDate(item.getString("created_time"));
+									streams.add(stream);
+								}
+							}
+							catch(Exception e) {
+								Log.e(App.TAG, e.toString());
 							}
 						}
 						// TODO: parse next page
 					}
 					catch(Exception e) {
-						Log.d("exception", e.toString());
-						streams.clear();
+						Log.e(App.TAG, e.toString());
 					}
 					
 					activity.runOnUiThread(new Runnable() {

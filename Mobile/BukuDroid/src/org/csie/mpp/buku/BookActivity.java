@@ -71,6 +71,7 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 				if(App.fb.isSessionValid())
 					openShareDialog();
 				else {
+					FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
 					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 						@Override
 						public void onComplete(Bundle values) {

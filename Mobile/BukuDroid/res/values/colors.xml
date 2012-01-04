@@ -3,4 +3,5 @@
     <color name="lightLineColor">#FFCCCC</color>
     <color name="brightTextColor">#CC3333</color>
     <color name="dimTextColor">#CC9999</color>
+    <color name="darkTextColor">#666666</color>
 </resources>

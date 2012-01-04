@@ -99,6 +99,10 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 
         if(App.fb.isSessionValid())
         	createSessionView();
+        else {
+        	if(prefs.getBoolean(PREFS_ACCOUNT_ITEM + ITEM_FB, false))
+        		loginFacebook();
+        }
     }
     
     @Override
@@ -133,8 +137,7 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		final List<BookEntry> entries = new ArrayList<BookEntry>();
 		for(BookEntry entry: BookEntry.search(db.getReadableDatabase(), query))
 			entries.add(entry);
-		if ( entries.size() == 0 )
-		{
+		if(entries.size() == 0) {
 			Toast.makeText(this, R.string.search_no_result, App.TOAST_TIME).show();
 			return;
 		}
@@ -239,6 +242,22 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	viewpagerAdapter.notifyDataSetChanged();
     	
     }
+    
+    private void loginFacebook() {
+		App.fb.authorize(MainActivity.this, App.FB_APP_PERMS, new BaseDialogListener(MainActivity.this, App.TOAST_TIME) {
+			@Override
+			public void onComplete(Bundle values) {
+				Toast.makeText(MainActivity.this, R.string.msg_login_success, App.TOAST_TIME).show();
+				SessionStore.save(App.fb, MainActivity.this);
+				MainActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						createSessionView();
+					}
+				});
+			}
+		});
+    }
 
     /* --- OptionsMenu			(start) --- */
     @Override
@@ -247,7 +266,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	inflater.inflate(R.menu.main, menu);
     	return true;
     }
-    
     
     private static final String PREFS_ACCOUNT_ITEM = "ACCOUNT_SYNC";
     private static final int ITEM_FB = 0;
@@ -276,7 +294,9 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 					public void onClick(final DialogInterface dialog, int which, boolean isChecked) {
 						switch(which) {
 							case ITEM_FB:
-								if(!isChecked) {
+								if(isChecked)
+									loginFacebook();
+								else {
 									try {
 										App.fb.logout(MainActivity.this);
 										Toast.makeText(MainActivity.this, R.string.msg_logout_success, App.TOAST_TIME).show();
@@ -286,21 +306,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 									catch(Exception e) {
 										Log.e(App.TAG, "Logout failed: " + e.toString());
 									}
-								}
-								else {
-									App.fb.authorize(MainActivity.this, App.FB_APP_PERMS, new BaseDialogListener(MainActivity.this, App.TOAST_TIME) {
-										@Override
-										public void onComplete(Bundle values) {
-											Toast.makeText(MainActivity.this, R.string.msg_login_success, App.TOAST_TIME).show();
-											SessionStore.save(App.fb, MainActivity.this);
-											MainActivity.this.runOnUiThread(new Runnable() {
-												@Override
-												public void run() {
-													createSessionView();
-												}
-											});
-										}
-									});
 								}
 								updateStatus(itemIds[which], isChecked);
 								break;
