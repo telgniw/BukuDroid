@@ -221,7 +221,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 						
 						
 					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					

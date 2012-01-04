@@ -51,20 +51,19 @@ public class StreamManager extends ViewManager {
 			dateString = dateString.replace("T", " ");
 			dateString = dateString.replace("+0000", "");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try{
+			try {
 				time = sdf.parse(dateString);
-			}catch(Exception e){
-				e.printStackTrace();
 			}
-			
+			catch(Exception e){
+				Log.e(App.TAG, e.toString());
+			}
 		}
 	}
 
 	private void createView(LinearLayout frame) {
-		Log.d("APP", "QQ" + streams.size());
 		if(streams.size() == 0) {
 			TextView text = (TextView)frame.findViewById(R.id.text);
-			text.setText("You have no streams. QQ");
+			text.setText("You have no streams. QQ"); // TODO: change to strings.xml
 		}
 		else {
 			TextView text = (TextView)frame.findViewById(R.id.text);
@@ -101,6 +100,8 @@ public class StreamManager extends ViewManager {
 		else {
 			Bundle params = new Bundle();
 			params.putString("fields", "id,message,name,picture,link,application,created_time");
+			
+			// TODO: change to AsyncTask
 			App.fb_runner.request("me/feed", params, new BaseRequestListener() {
 				@Override
 				public void onComplete(String response, Object state) {

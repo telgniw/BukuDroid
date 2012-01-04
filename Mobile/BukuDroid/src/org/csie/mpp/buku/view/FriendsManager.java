@@ -48,7 +48,7 @@ public class FriendsManager extends ViewManager {
 	private void createView(LinearLayout frame) {
 		if(friends.size() == 0) {
 			TextView text = (TextView)frame.findViewById(R.id.text);
-			text.setText("You have no friends. QQ");
+			text.setText("You have no friends. QQ"); // TODO: change to strings.xml
 		}
 		else {
 			TextView text = (TextView)frame.findViewById(R.id.text);
@@ -80,6 +80,8 @@ public class FriendsManager extends ViewManager {
 		else {
 			Bundle params = new Bundle();
 			params.putString("q", "SELECT uid,name, is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
+			
+			// TODO: change to AsyncTask
 			App.fb_runner.request("fql", params, new BaseRequestListener() {
 				@Override
 				public void onComplete(String response, Object state) {

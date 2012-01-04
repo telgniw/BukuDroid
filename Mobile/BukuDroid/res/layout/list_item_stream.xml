@@ -21,7 +21,6 @@
 	        android:layout_height="wrap_content"
 	        android:adjustViewBounds="true"
 	        android:maxWidth="@dimen/maxImageWidth"
-	        android:padding="@dimen/padding"
 	    />
         <TextView
             android:id="@+id/list_name"
