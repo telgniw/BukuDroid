@@ -49,8 +49,7 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+ 
         TAB_ISBN = getString(R.string.tab_isbn);
         TAB_BARCODE = getString(R.string.tab_barcode);
         TAB_SEARCH = getString(R.string.tab_search);

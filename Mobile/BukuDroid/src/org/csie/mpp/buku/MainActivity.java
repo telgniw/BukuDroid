@@ -70,7 +70,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
         // initialize FB
         SessionStore.restore(App.fb, this);
