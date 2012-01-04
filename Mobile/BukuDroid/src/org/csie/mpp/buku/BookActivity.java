@@ -46,7 +46,6 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // initialize FB
         SessionStore.restore(App.fb, this);
