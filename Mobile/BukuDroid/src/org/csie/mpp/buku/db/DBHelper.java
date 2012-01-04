@@ -5,10 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
-	public static final int VERSION = 3;
+	public static final int VERSION = 4;
 	public static final String NAME = "BUKU_DB";
 	
-	private static final Entry.Schema[] tables = { BookEntry.SCHEMA };
+	private static final Entry.Schema[] tables = { BookEntry.SCHEMA, FriendEntry.SCHEMA };
 
 	public DBHelper(Context context) {
 		super(context, NAME, null, VERSION);
@@ -23,14 +23,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		switch(oldVersion) {
-			case 1:
-				switch(newVersion) {
-					case 3:
-						BookEntry.SCHEMA.upgrade(db, new String[]{ "coverLink" });
-						break;
-				}
-				break;
+		if(oldVersion == 1 && newVersion == 3) {
+			BookEntry.SCHEMA.upgrade(db, new String[]{ "coverLink" });
+		}
+		else if(oldVersion < 4 && newVersion == 4) {
+			FriendEntry.SCHEMA.create(db);
 		}
 	}
 }

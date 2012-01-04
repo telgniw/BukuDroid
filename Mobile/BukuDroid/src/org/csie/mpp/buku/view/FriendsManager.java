@@ -8,13 +8,12 @@ import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.db.FriendEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.facebook.android.BaseRequestListener;
-
 import android.app.Activity;
-import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,102 +26,153 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class FriendsManager extends ViewManager {
-	private List<Friend> friends;
-	private ArrayAdapter<Friend> adapter;
+	private List<FriendEntry> friends;
+	private FriendEntryAdapter adapter;
+
+	public static class FriendEntryAdapter extends ArrayAdapter<FriendEntry> {
+		private LayoutInflater inflater;
+		private int resourceId;
+		private List<FriendEntry> entries;
+		
+		public FriendEntryAdapter(Activity activity, int resource, List<FriendEntry> list) {
+			super(activity, resource, list);
+			
+			inflater = activity.getLayoutInflater();
+			resourceId = resource;
+			entries = list;
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			FriendEntry friend = entries.get(position);
+			View view = inflater.inflate(resourceId, parent, false);
+			((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(friend.icon);
+			((TextView)view.findViewById(R.id.list_name)).setText(friend.name);
+			return view;
+		}
+	}
+	
+	protected class Updater extends AsyncTask<Integer, Integer, Boolean> {
+		private TextView info;
+		
+		public Updater() {
+			info = (TextView)getFrame().findViewById(R.id.text);
+			info.setBackgroundColor(0xaaffffff);
+			info.setText(R.string.msg_updating);
+		}
+		
+		@Override
+		protected Boolean doInBackground(Integer... args) {
+			Bundle params = new Bundle();
+			params.putString("q", "SELECT uid,name,is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
+			
+			try {
+				String response = App.fb.request("fql", params);
+				
+				int counter = 0;
+				while(response != null) {
+					JSONObject json = new JSONObject(response);
+					JSONArray data = json.getJSONArray("data");
+					for(int i = 0; i < data.length(); i++) {
+						publishProgress(++counter);
+						
+						JSONObject item = data.getJSONObject(i);		
+						if (item != JSONObject.NULL) {
+							String id = item.getString("uid");
+							if(FriendEntry.exists(rdb, id))
+								continue;
+							
+							FriendEntry friend = new FriendEntry();
+							friend.id = id;
+							friend.name = item.getString("name");
+							friend.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + friend.id + "/picture"));
+							friend.insert(rdb);
+						}
+					}
+					response = null;
+					
+					if(json.has("paging")) {
+						JSONObject paging = json.getJSONObject("paging");
+						if(paging.has("next")) {
+							URL url = new URL(paging.getString("next"));
+							response = Util.urlToString(url);
+						}
+					}
+				}
+			}
+			catch(Exception e) {
+				Log.e(App.TAG, e.toString());
+				return false;
+			}
+			
+			return true;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Integer... progresses) {
+			if(progresses[0] % 5 == 0)
+				info.append(".");
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			info.setBackgroundColor(0x00ffffff);
+			info.setText("");
+			
+			if(result) {
+				updateFriendList();
+			}
+		}
+	}
 	
 	public FriendsManager(Activity activity, DBHelper helper) {
 		super(activity, helper);
+		
+		friends = new ArrayList<FriendEntry>();
+		adapter = new FriendEntryAdapter(activity, R.layout.list_item_friend, friends);
+	}
+
+	private void updateFriendList() {
+		friends.clear();
+		
+		FriendEntry[] entries = FriendEntry.queryAll(rdb);
+		for(FriendEntry entry: entries)
+			friends.add(entry);
+		
+		adapter.notifyDataSetChanged();
 	}
 	
-	private static class Friend {
-		private String id;
-		private String name;
-		private Bitmap icon;
-		
-		public Friend(String id, String name) {
-			this.id = id;
-			this.name = name;
-		}
-	}
-
-	private void createView(LinearLayout frame) {
-		if(friends.size() == 0) {
-			TextView text = (TextView)frame.findViewById(R.id.text);
-			text.setText("You have no friends. QQ"); // TODO: change to strings.xml
-		}
-		else {
-			TextView text = (TextView)frame.findViewById(R.id.text);
-			text.setText("");
-			
-			adapter = new ArrayAdapter<Friend>(activity, R.layout.list_item_friend, friends) {
-				@Override
-				public View getView(int position, View convertView, ViewGroup parent) {
-					Friend friend = friends.get(position);
-					LayoutInflater inflater = activity.getLayoutInflater();
-					View view = inflater.inflate(R.layout.list_item_friend, null);
-					((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(friend.icon);
-					((TextView)view.findViewById(R.id.list_name)).setText(friend.name);
-					return view;
-				}
-			};
-			
-			ListView list = (ListView)frame.findViewById(R.id.list);
-			list.setAdapter(adapter);
-		}
-	}
-
+	private Updater updater;
+	
 	@Override
 	protected void updateView() {
-		final LinearLayout frame = getFrame();
-		
-		if(friends != null)
-			createView(frame);
+		if(FriendEntry.count(rdb) == 0)
+			createNoFriendView();
 		else {
-			Bundle params = new Bundle();
-			params.putString("q", "SELECT uid,name, is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
-			
-			// TODO: change to AsyncTask
-			App.fb_runner.request("fql", params, new BaseRequestListener() {
-				@Override
-				public void onComplete(String response, Object state) {
-					friends = new ArrayList<Friend>();
-					
-					try {
-						while(response != null) {
-							JSONObject json = new JSONObject(response);
-							JSONArray data = json.getJSONArray("data");
-							for(int i = 0; i < data.length(); i++) {
-								JSONObject item = data.getJSONObject(i);		
-								if (item != JSONObject.NULL) {
-									Friend friend = new Friend(item.getString("uid"), item.getString("name"));
-									friend.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + friend.id + "/picture"));
-									friends.add(friend);
-								}
-							}
-							response = null;
-							
-							if(json.has("paging")) {
-								JSONObject paging = json.getJSONObject("paging");
-								if(paging.has("next")) {
-									URL url = new URL(paging.getString("next"));
-									response = Util.urlToString(url);
-								}
-							}
-						}
-					}
-					catch(Exception e) {
-						Log.e(App.TAG, e.toString());
-						friends.clear();
-					}
-					
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							createView(frame);
-						}
-					});
-				}
-			});
+			createFriendView();
+			updateFriendList();
 		}
+		
+		if(updater == null) {
+			updater = new Updater();
+			updater.execute(0);
+		}
+	}
+	
+	private void createFriendView() {
+		LinearLayout frame = getFrame();
+		
+		TextView text = (TextView)frame.findViewById(R.id.text);
+		text.setText("");
+		
+		ListView list = (ListView)frame.findViewById(R.id.list);
+		list.setAdapter(adapter);
+	}
+
+	private void createNoFriendView() {
+		LinearLayout frame = getFrame();
+		
+		TextView text = (TextView)frame.findViewById(R.id.text);
+		text.setText("You have no friends. QQ"); // TODO: change to strings.xml
 	}
 }
