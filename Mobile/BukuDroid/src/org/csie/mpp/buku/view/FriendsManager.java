@@ -28,6 +28,8 @@ import android.widget.TextView;
 public class FriendsManager extends ViewManager {
 	private List<FriendEntry> friends;
 	private FriendEntryAdapter adapter;
+	
+	private Updater updater;
 
 	public static class FriendEntryAdapter extends ArrayAdapter<FriendEntry> {
 		private LayoutInflater inflater;
@@ -131,6 +133,10 @@ public class FriendsManager extends ViewManager {
 		friends = new ArrayList<FriendEntry>();
 		adapter = new FriendEntryAdapter(activity, R.layout.list_item_friend, friends);
 	}
+	
+	public void update() {
+		updater.execute(0);
+	}
 
 	private void updateFriendList() {
 		friends.clear();
@@ -141,8 +147,6 @@ public class FriendsManager extends ViewManager {
 		
 		adapter.notifyDataSetChanged();
 	}
-	
-	private Updater updater;
 	
 	@Override
 	protected void updateView() {
@@ -155,7 +159,7 @@ public class FriendsManager extends ViewManager {
 		
 		if(updater == null) {
 			updater = new Updater();
-			updater.execute(0);
+			update();
 		}
 	}
 	
