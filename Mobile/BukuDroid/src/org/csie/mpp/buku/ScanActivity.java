@@ -197,7 +197,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 				
 				@Override
 				public void run(){
-					
 					try {
 						switch(type)
 						{

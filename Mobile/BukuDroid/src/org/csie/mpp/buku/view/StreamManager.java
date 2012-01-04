@@ -40,6 +40,7 @@ public class StreamManager extends ViewManager {
 		private String id;
 		private String message;
 		private String book;
+		private String author;
 		private String link;
 		private Bitmap pic;
 		private Date time;
@@ -79,8 +80,8 @@ public class StreamManager extends ViewManager {
 						((TextView)view.findViewById(R.id.list_message)).setText(stream.message);
 					if(stream.pic != null)
 						((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(stream.pic);
-					if(stream.book != null)
-						((TextView)view.findViewById(R.id.list_name)).setText(stream.book);
+					((TextView)view.findViewById(R.id.list_name)).setText(stream.book);
+					((TextView)view.findViewById(R.id.list_author)).setText(stream.author);
 					((TextView)view.findViewById(R.id.list_time)).setText(stream.time.toLocaleString());
 					return view;
 				}
@@ -99,7 +100,7 @@ public class StreamManager extends ViewManager {
 			createView(frame);
 		else {
 			Bundle params = new Bundle();
-			params.putString("fields", "id,message,name,picture,link,application,created_time");
+			params.putString("fields", "id,message,name,picture,link,caption,description,application,created_time");
 			
 			// TODO: change to AsyncTask
 			App.fb_runner.request("me/feed", params, new BaseRequestListener() {
@@ -119,12 +120,19 @@ public class StreamManager extends ViewManager {
 									if(!item.getJSONObject("application").getString("id").equals(App.FB_APP_ID))
 										continue;
 									Stream stream = new Stream(item.getString("id"));
-									if(item.has("name"))
-										stream.book = item.getString("name");
 									if(item.has("message"))
 										stream.message = item.getString("message");
-									stream.pic = Util.urlToImage(new URL(item.getString("picture")));
-									stream.link = item.getString("link");
+									if(item.has("picture"))
+										stream.pic = Util.urlToImage(new URL(item.getString("picture")));
+									if(item.has("name")) {
+										stream.book = item.getString("name");
+										stream.author = item.getString("caption");
+										stream.link = item.getString("link");
+									}
+									else {
+										stream.book = item.getString("caption");
+										stream.author = item.getString("description");
+									}
 									stream.setDate(item.getString("created_time"));
 									streams.add(stream);
 								}
