@@ -3,7 +3,7 @@ package org.csie.mpp.buku;
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
-import org.csie.mpp.buku.helper.BookUpdater.OnUpdatStatusChangedListener;
+import org.csie.mpp.buku.helper.BookUpdater.OnUpdateStatusChangedListener;
 
 import com.facebook.android.BaseDialogListener;
 import com.facebook.android.SessionStore;
@@ -28,12 +28,14 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BookActivity extends Activity implements OnUpdatStatusChangedListener, View.OnClickListener {
+public class BookActivity extends Activity implements OnUpdateStatusChangedListener, View.OnClickListener {
 	public static final int REQUEST_CODE = 1437;
 	public static final int RESULT_ISBN_INVALID = 633;
 	public static final int RESULT_NOT_FOUND = 634;
 	public static final int RESULT_DELETE = 643;
+	
 	public static final String CHECK_DUPLICATE = "duplicate";
+	public static final String LINK = "link";
 	
 	private DBHelper db;
 	private BookEntry entry;
@@ -53,105 +55,114 @@ public class BookActivity extends Activity implements OnUpdatStatusChangedListen
 
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
-        if(Util.checkIsbn(isbn) == false) {
-        	setResult(RESULT_ISBN_INVALID);
-        	finish();
-        	return;
+        if(isbn == null) {
+        	String link = intent.getStringExtra(LINK);
+	        updater = BookUpdater.create(link);
+	        updater.setOnUpdateFinishedListener(this);
+	        updater.updateEntry();
+	        updater.updateInfo();
         }
-        entry = BookEntry.get(db.getReadableDatabase(), isbn);
-        
-        actionBar = ((ActionBar)findViewById(R.id.actionbar));
-        
-        // FB share button
-    	actionShare = new AbstractAction(R.drawable.ic_share) {
-			@Override
-			public void performAction(View view) {
-				if(App.fb.isSessionValid())
-					openShareDialog();
-				else {
-					FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
-					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+        else {
+	        if(Util.checkIsbn(isbn) == false) {
+	        	setResult(RESULT_ISBN_INVALID);
+	        	finish();
+	        	return;
+	        }
+	        entry = BookEntry.get(db.getReadableDatabase(), isbn);
+	        
+	        actionBar = ((ActionBar)findViewById(R.id.actionbar));
+	        
+	        // FB share button
+	    	actionShare = new AbstractAction(R.drawable.ic_share) {
+				@Override
+				public void performAction(View view) {
+					if(App.fb.isSessionValid())
+						openShareDialog();
+					else {
+						FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
+						App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+							@Override
+							public void onComplete(Bundle values) {
+								SessionStore.save(App.fb, BookActivity.this);
+								openShareDialog();
+							}
+						});
+					}
+				}
+				
+				private void openShareDialog() {
+					Bundle params = new Bundle();
+					if(entry.info.source == null || entry.info.description == null) {
+						params.putString("caption", entry.title);
+						params.putString("description", entry.author);
+					}
+					else {
+						params.putString("name", entry.title);
+						params.putString("link", entry.info.source);
+						params.putString("caption", entry.author);
+						params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
+					}
+					if(entry.coverLink != null)
+						params.putString("picture", entry.coverLink);
+					App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 						@Override
 						public void onComplete(Bundle values) {
-							SessionStore.save(App.fb, BookActivity.this);
-							openShareDialog();
+							if(values.containsKey("post_id"))
+								Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
 						}
 					});
 				}
-			}
-			
-			private void openShareDialog() {
-				Bundle params = new Bundle();
-				if(entry.info.source == null || entry.info.description == null) {
-					params.putString("caption", entry.title);
-					params.putString("description", entry.author);
-				}
-				else {
-					params.putString("name", entry.title);
-					params.putString("link", entry.info.source);
-					params.putString("caption", entry.author);
-					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
-				}
-				if(entry.coverLink != null)
-					params.putString("picture", entry.coverLink);
-				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+	    	};
+	        
+	        boolean updateAll = false;
+	        
+	        if(entry != null) {
+	        	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
+	        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
+	        	
+				actionDelete = new AbstractAction(R.drawable.ic_delete) {
 					@Override
-					public void onComplete(Bundle values) {
-						if(values.containsKey("post_id"))
-							Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+					public void performAction(View view) {
+						Intent data = new Intent();
+						data.putExtra(App.ISBN, entry.isbn);
+						setResult(RESULT_DELETE, data);
+						finish();
 					}
-				});
-			}
-    	};
-        
-        boolean updateAll = false;
-        
-        if(entry != null) {
-        	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
-        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
-        	
-			actionDelete = new AbstractAction(R.drawable.ic_delete) {
-				@Override
-				public void performAction(View view) {
-					Intent data = new Intent();
-					data.putExtra(App.ISBN, entry.isbn);
-					setResult(RESULT_DELETE, data);
-					finish();
-				}
-			};
-
-        	updateView(null);
-        	actionBar.addAction(actionDelete);
-        	actionBar.addAction(actionShare);
+				};
+	
+	        	updateView(null);
+	        	actionBar.addAction(actionDelete);
+	        	actionBar.addAction(actionShare);
+	        }
+	        else {
+	        	entry = new BookEntry();
+	        	entry.isbn = isbn;
+	        	updateAll = true;
+	        	
+				actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
+					@Override
+					public void performAction(View view) {
+						if(entry.insert(db.getWritableDatabase()) == false)
+							Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
+						
+						Intent data = new Intent();
+						data.putExtra(App.ISBN, entry.isbn);
+						setResult(RESULT_OK, data);
+	
+						Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
+						actionBar.removeAction(this);
+					}
+				};
+	        }	
+	        
+	        updater = BookUpdater.create(entry);
+	        updater.setOnUpdateFinishedListener(this);
+	  
+	       	if(updateAll)
+	       		updater.updateEntry();
+	       	else
+	       		updater.updateInfo();
         }
-        else {
-        	entry = new BookEntry();
-        	entry.isbn = isbn;
-        	updateAll = true;
-        	
-			actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
-				@Override
-				public void performAction(View view) {
-					if(entry.insert(db.getWritableDatabase()) == false)
-						Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
-					
-					Intent data = new Intent();
-					data.putExtra(App.ISBN, entry.isbn);
-					setResult(RESULT_OK, data);
-
-					Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
-					actionBar.removeAction(this);
-				}
-			};
-        }	
-        
-        updater = BookUpdater.create(entry);
-        updater.setOnUpdateFinishedListener(this);
-  
-       	if(updateAll)
-       		updater.updateEntry();
-       	else
-       		updater.updateInfo();
     }
     
     @Override

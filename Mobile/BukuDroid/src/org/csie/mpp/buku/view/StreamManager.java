@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.csie.mpp.buku.App;
+import org.csie.mpp.buku.BookActivity;
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.DBHelper;
@@ -16,19 +17,22 @@ import org.json.JSONObject;
 import com.facebook.android.BaseRequestListener;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class StreamManager extends ViewManager {
+public class StreamManager extends ViewManager implements OnItemClickListener {
 	private List<Stream> streams;
 	private ArrayAdapter<Stream> adapter;
 	
@@ -89,6 +93,7 @@ public class StreamManager extends ViewManager {
 			
 			ListView list = (ListView)frame.findViewById(R.id.list);
 			list.setAdapter(adapter);
+			list.setOnItemClickListener(this);
 		}
 	}
 
@@ -155,6 +160,19 @@ public class StreamManager extends ViewManager {
 					});
 				}
 			});
+		}
+	}
+	
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		Stream stream = streams.get(position);
+		if(stream.link == null) {
+			// TODO: display error message
+		}
+		else {
+			Intent intent = new Intent(activity, BookActivity.class);
+			intent.putExtra(BookActivity.LINK, stream.link);
+			activity.startActivity(intent);
 		}
 	}
 }

@@ -15,6 +15,7 @@ import org.csie.mpp.buku.App;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.BookEntry;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
@@ -23,10 +24,13 @@ import android.text.Spanned;
 import android.util.Log;
 
 public abstract class BookUpdater {
-	private static final String SOURCE_GOOGLE = "Google Books";
-	private static final String SOURCE_BOOKS = "博客來";
+	private static final String SOURCE_GOOGLE_BOOKS = "Google Books";
+	private static final String SOURCE_BOOKS_TW = "博客來";
+
+	private static final String BOOKS_TW_PREFIX = "http://www.books.com.tw/exep/prod/booksfile.php?item=";
+	private static final String GOOGLE_BOOKS_PREFIX = "http://books.google.com/books?id=";
 	
-	public static interface OnUpdatStatusChangedListener {
+	public static interface OnUpdateStatusChangedListener {
 		public enum Status {
 			OK_ENTRY,
 			OK_INFO,
@@ -56,23 +60,27 @@ public abstract class BookUpdater {
 		return new NormalUpdater(entry);
 	}
 	
+	public static BookUpdater create(String link) {
+		return new LinkUpdater(new BookEntry(), link);
+	}
+	
 	protected final BookEntry entry;
-	protected OnUpdatStatusChangedListener listener;
+	protected OnUpdateStatusChangedListener listener;
 	
 	protected BookUpdater(BookEntry e) {
 		entry = e;
 	}
 	
-	public void setOnUpdateFinishedListener(OnUpdatStatusChangedListener l) {
+	public void setOnUpdateFinishedListener(OnUpdateStatusChangedListener l) {
 		listener = l;
 	}
 	
 	public abstract void updateEntry();
 	public abstract void updateInfo();
 	
-	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, OnUpdatStatusChangedListener.Status> {
+	protected abstract class AsyncUpdater extends AsyncTask<URL, Integer, OnUpdateStatusChangedListener.Status> {
 		@Override
-		protected OnUpdatStatusChangedListener.Status doInBackground(URL... urls) {
+		protected OnUpdateStatusChangedListener.Status doInBackground(URL... urls) {
 			return update(urls);
 		}
 		
@@ -87,12 +95,12 @@ public abstract class BookUpdater {
 		}
 		
 		@Override
-		protected void onPostExecute(OnUpdatStatusChangedListener.Status result) {
+		protected void onPostExecute(OnUpdateStatusChangedListener.Status result) {
 			/* this will be run on UI thread */
 			listener.onUpdateFinish(result);
 		}
 		
-		protected abstract OnUpdatStatusChangedListener.Status update(URL... urls);
+		protected abstract OnUpdateStatusChangedListener.Status update(URL... urls);
 	}
 	
 	public static class NormalUpdater extends BookUpdater {
@@ -105,7 +113,7 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
+					protected OnUpdateStatusChangedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							entry.vid = json.getJSONArray("items").getJSONObject(0).getString("id");
@@ -113,28 +121,20 @@ public abstract class BookUpdater {
 							json = json.getJSONArray("items").getJSONObject(0).getJSONObject("volumeInfo");
 							entry.title = json.getString("title");
 							
-							JSONArray authors = json.getJSONArray("authors");
-							StringBuilder builder = new StringBuilder();
-							for(int i = 0; i < authors.length(); i++) {
-								if(i > 0)
-									builder.append(",");
-								builder.append(authors.getString(i));
-							}
-							entry.author = builder.toString();
+							entry.author = parseJSONArray(json.getJSONArray("authors"));
 							publishProgress();
 							
 							if(json.has("imageLinks"))	{
 								entry.coverLink = json.getJSONObject("imageLinks").getString("thumbnail");
-								URL imageUrl = new URL(entry.coverLink);
-								entry.cover = Util.urlToImage(imageUrl);
+								entry.cover = Util.urlToImage(new URL(entry.coverLink));
 							}
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdatStatusChangedListener.Status.UNKNOWN;
+							return OnUpdateStatusChangedListener.Status.UNKNOWN;
 						}
 
-						return OnUpdatStatusChangedListener.Status.OK_ENTRY;
+						return OnUpdateStatusChangedListener.Status.OK_ENTRY;
 					}
 				};
 				
@@ -151,7 +151,7 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
+					protected OnUpdateStatusChangedListener.Status update(URL... urls) {
 						try {
 							JSONObject json = new JSONObject(Util.urlToString(urls[0]));
 							json = json.getJSONObject("volumeInfo");
@@ -169,7 +169,7 @@ public abstract class BookUpdater {
 					    	HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
+					    		return OnUpdateStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -181,15 +181,15 @@ public abstract class BookUpdater {
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
 
-					    	entry.info.sourceName = SOURCE_GOOGLE;
-					    	entry.info.source = "http://books.google.com/books?id=" + entry.vid;
+					    	entry.info.sourceName = SOURCE_GOOGLE_BOOKS;
+					    	entry.info.source = GOOGLE_BOOKS_PREFIX + entry.vid;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdatStatusChangedListener.Status.UNKNOWN;
+							return OnUpdateStatusChangedListener.Status.UNKNOWN;
 						}
 						
-						return OnUpdatStatusChangedListener.Status.OK_INFO;
+						return OnUpdateStatusChangedListener.Status.OK_INFO;
 					}
 				};
 				
@@ -214,19 +214,19 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
+					protected OnUpdateStatusChangedListener.Status update(URL... urls) {
 						try {
 							HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = new DefaultHttpClient().execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
+					    		return OnUpdateStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
 					    	if(result.indexOf("item=")<0) {
-					    		return OnUpdatStatusChangedListener.Status.BOOK_NOT_FOUND;
+					    		return OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND;
 					    	}
 					    	
 					    	result = result.substring(result.indexOf("item=")+"item=".length());
@@ -246,11 +246,11 @@ public abstract class BookUpdater {
 						    	entry.author = result.substring(0, result.indexOf("\"")).trim();
 							}
 							
-					    	return OnUpdatStatusChangedListener.Status.OK_ENTRY;
+					    	return OnUpdateStatusChangedListener.Status.OK_ENTRY;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdatStatusChangedListener.Status.UNKNOWN;
+							return OnUpdateStatusChangedListener.Status.UNKNOWN;
 						}
 					}
 				};
@@ -268,14 +268,14 @@ public abstract class BookUpdater {
 			try {
 				AsyncUpdater async = new AsyncUpdater() {
 					@Override
-					protected OnUpdatStatusChangedListener.Status update(URL... urls) {
+					protected OnUpdateStatusChangedListener.Status update(URL... urls) {
 						try {
 							HttpClient httpclient = new DefaultHttpClient();
 						    HttpGet httpget = new HttpGet(urls[0].toURI());
 							HttpResponse response = httpclient.execute(httpget);
 					    	int statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
+					    		return OnUpdateStatusChangedListener.Status.UNKNOWN;
 					    	}
 
 					    	HttpEntity entity = response.getEntity();
@@ -290,7 +290,7 @@ public abstract class BookUpdater {
 					    	response = httpclient.execute(httpget);
 					    	statusCode = response.getStatusLine().getStatusCode();
 					    	if (statusCode != HttpStatus.SC_OK) {
-					    		return OnUpdatStatusChangedListener.Status.UNKNOWN;
+					    		return OnUpdateStatusChangedListener.Status.UNKNOWN;
 					    	}
 					    	entity = response.getEntity();
 					    	result = EntityUtils.toString(entity, "big5");
@@ -309,15 +309,15 @@ public abstract class BookUpdater {
 					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
 					    	}
 
-					    	entry.info.sourceName = SOURCE_BOOKS;
-					    	entry.info.source = "http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid;
+					    	entry.info.sourceName = SOURCE_BOOKS_TW;
+					    	entry.info.source = BOOKS_TW_PREFIX + entry.vid;
 						}
 						catch(Exception e) {
 							Log.e(App.TAG, e.toString());
-							return OnUpdatStatusChangedListener.Status.UNKNOWN;
+							return OnUpdateStatusChangedListener.Status.UNKNOWN;
 						}
 						
-						return OnUpdatStatusChangedListener.Status.OK_INFO;
+						return OnUpdateStatusChangedListener.Status.OK_INFO;
 					}
 				};
 				
@@ -329,5 +329,128 @@ public abstract class BookUpdater {
 				Log.e(App.TAG, e.toString());
 			}
 		}
+	}
+	
+	public static class LinkUpdater extends BookUpdater {
+		private String link;
+		
+		protected LinkUpdater(BookEntry e, String link) {
+			super(e);
+			
+			this.link = link;
+		}
+
+		@Override
+		public void updateEntry() {
+			try {
+				if(link.startsWith(BOOKS_TW_PREFIX)) {
+					AsyncUpdater async = new AsyncUpdater() {
+						@Override
+						protected OnUpdateStatusChangedListener.Status update(URL... urls) {
+							try {
+								HttpClient httpclient = new DefaultHttpClient();
+							    HttpGet httpget = new HttpGet(urls[0].toURI());
+								HttpResponse response = httpclient.execute(httpget);
+						    	int statusCode = response.getStatusLine().getStatusCode();
+						    	if (statusCode != HttpStatus.SC_OK) {
+						    		return OnUpdateStatusChangedListener.Status.UNKNOWN;
+						    	}
+	
+						    	HttpEntity entity = response.getEntity();
+						    	String result = EntityUtils.toString(entity, "big5");
+						    	result = result.substring(result.indexOf("?image=") + "?image=".length());
+						    	entry.coverLink = result.substring(0, result.indexOf("&"));
+								entry.cover = Util.urlToImage(new URL(entry.coverLink));
+								
+						    	result = result.substring(result.indexOf("class=\"prd001\""));
+						    	result = result.substring(result.indexOf("<h1"));
+						    	result = result.substring(result.indexOf("<span>") + "<span>".length());
+						    	entry.title = result.substring(0, result.indexOf("</span>"));
+						    	
+						    	result = result.substring(result.indexOf("class=\"prd002\""));
+						    	result = result.substring(result.indexOf("f=author\">") + "f=author\">".length());
+						    	entry.author = result.substring(0, result.indexOf("</a>"));
+						    	
+						    	result = result.substring(result.indexOf("ISBN"));
+						    	result = result.substring(result.indexOf("<dfn>") + "<dfn>".length());
+						    	entry.isbn = result.substring(0, result.indexOf("</dfn>"));
+							}
+							catch(Exception e) {
+								Log.e(App.TAG, e.toString());
+								return OnUpdateStatusChangedListener.Status.UNKNOWN;
+							}
+							return OnUpdateStatusChangedListener.Status.OK_ENTRY;
+						}
+					};
+					
+					URL url0 = new URL("http://www.books.com.tw/exep/prod/booksfile.php?item=" + link.substring(BOOKS_TW_PREFIX.length()));
+					async.execute(url0);
+				}
+				else if(link.startsWith(GOOGLE_BOOKS_PREFIX)) {
+					AsyncUpdater async = new AsyncUpdater() {
+						@Override
+						protected OnUpdateStatusChangedListener.Status update(URL... urls) {
+							try {
+								JSONObject json = new JSONObject(Util.urlToString(urls[0]));
+								json = json.getJSONObject("volumeInfo");
+								
+								String isbn10 = null, isbn13 = null;
+								JSONArray array = json.getJSONArray("industryIdentifiers");
+								for(int i = 0; i < array.length(); i++) {
+									JSONObject item = array.getJSONObject(i);
+									if(item.getString("type").equals("ISBN_10"))
+										isbn10 = item.getString("identifier");
+									else if(item.getString("type").equals("ISBN_13"))
+										isbn13 = item.getString("identifier");
+								}
+								
+								if(isbn13 != null)
+									entry.isbn = isbn13;
+								else if(isbn10 != null)
+									entry.isbn = isbn10;
+								else
+									return OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND;
+								
+								entry.title = json.getString("title");
+								entry.author = parseJSONArray(json.getJSONArray("authors"));
+								publishProgress();
+
+								if(json.has("imageLinks"))	{
+									entry.coverLink = json.getJSONObject("imageLinks").getString("thumbnail");
+									entry.cover = Util.urlToImage(new URL(entry.coverLink));
+								}
+							}
+							catch(Exception e) {
+								Log.e(App.TAG, e.toString());
+								return OnUpdateStatusChangedListener.Status.UNKNOWN;
+							}
+							return OnUpdateStatusChangedListener.Status.OK_ENTRY;
+						}
+					};
+					
+					URL url0 = new URL("https://www.googleapis.com/books/v1/volumes/" + link.substring(GOOGLE_BOOKS_PREFIX.length()));
+					async.execute(url0);
+				}
+			}
+			catch(MalformedURLException e) {
+				Log.e(App.TAG, e.toString());
+			}
+		}
+
+		@Override
+		public void updateInfo() {
+			if(entry.isbn != null)
+				BookUpdater.create(entry).updateInfo();
+		}
+	}
+	
+	protected String parseJSONArray(JSONArray array) throws JSONException {
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0; i < array.length(); i++) {
+			if(i > 0)
+				builder.append(",");
+			builder.append(array.getString(i));
+		}
+		return builder.toString();
 	}
 }
