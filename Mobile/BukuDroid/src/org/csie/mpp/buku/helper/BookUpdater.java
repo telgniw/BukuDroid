@@ -60,8 +60,8 @@ public abstract class BookUpdater {
 		return new NormalUpdater(entry);
 	}
 	
-	public static BookUpdater create(String link) {
-		return new LinkUpdater(new BookEntry(), link);
+	public static BookUpdater create(BookEntry entry, String link) {
+		return new LinkUpdater(entry, link);
 	}
 	
 	protected final BookEntry entry;
@@ -86,18 +86,21 @@ public abstract class BookUpdater {
 		
 		@Override
 		protected void onPreExecute() {
-			listener.onUpdateStart();
+			if(listener != null)
+				listener.onUpdateStart();
 		}
 		
 		@Override
 		protected void onProgressUpdate(Integer... progresses) {
-			listener.onUpdateProgress();
+			if(listener != null)
+				listener.onUpdateProgress();
 		}
 		
 		@Override
 		protected void onPostExecute(OnUpdateStatusChangedListener.Status result) {
 			/* this will be run on UI thread */
-			listener.onUpdateFinish(result);
+			if(listener != null)
+				listener.onUpdateFinish(result);
 		}
 		
 		protected abstract OnUpdateStatusChangedListener.Status update(URL... urls);
@@ -439,8 +442,11 @@ public abstract class BookUpdater {
 
 		@Override
 		public void updateInfo() {
-			if(entry.isbn != null)
-				BookUpdater.create(entry).updateInfo();
+			if(entry.isbn != null) {
+				BookUpdater updater = BookUpdater.create(entry);
+				updater.setOnUpdateFinishedListener(listener);
+				updater.updateInfo();
+			}
 		}
 	}
 	

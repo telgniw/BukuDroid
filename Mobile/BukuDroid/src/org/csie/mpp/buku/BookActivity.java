@@ -38,10 +38,12 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	public static final String LINK = "link";
 	
 	private DBHelper db;
+	
+	private boolean inShelf;
 	private BookEntry entry;
+	private BookUpdater updater;
 	private ActionBar actionBar;
 	private Action actionAdd, actionDelete, actionShare;
-	private BookUpdater updater;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,11 +55,14 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         
         db = new DBHelper(this);
 
+        inShelf = false;
+        
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
         if(isbn == null) {
         	String link = intent.getStringExtra(LINK);
-	        updater = BookUpdater.create(link);
+        	entry = new BookEntry();
+	        updater = BookUpdater.create(entry, link);
 	        updater.setOnUpdateFinishedListener(this);
 	        updater.updateEntry();
 	        updater.updateInfo();
@@ -70,89 +75,19 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	        }
 	        entry = BookEntry.get(db.getReadableDatabase(), isbn);
 	        
-	        actionBar = ((ActionBar)findViewById(R.id.actionbar));
-	        
-	        // FB share button
-	    	actionShare = new AbstractAction(R.drawable.ic_share) {
-				@Override
-				public void performAction(View view) {
-					if(App.fb.isSessionValid())
-						openShareDialog();
-					else {
-						FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
-						App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
-							@Override
-							public void onComplete(Bundle values) {
-								SessionStore.save(App.fb, BookActivity.this);
-								openShareDialog();
-							}
-						});
-					}
-				}
-				
-				private void openShareDialog() {
-					Bundle params = new Bundle();
-					if(entry.info.source == null || entry.info.description == null) {
-						params.putString("caption", entry.title);
-						params.putString("description", entry.author);
-					}
-					else {
-						params.putString("name", entry.title);
-						params.putString("link", entry.info.source);
-						params.putString("caption", entry.author);
-						params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
-					}
-					if(entry.coverLink != null)
-						params.putString("picture", entry.coverLink);
-					App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
-						@Override
-						public void onComplete(Bundle values) {
-							if(values.containsKey("post_id"))
-								Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
-						}
-					});
-				}
-	    	};
-	        
 	        boolean updateAll = false;
 	        
 	        if(entry != null) {
 	        	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
 	        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
-	        	
-				actionDelete = new AbstractAction(R.drawable.ic_delete) {
-					@Override
-					public void performAction(View view) {
-						Intent data = new Intent();
-						data.putExtra(App.ISBN, entry.isbn);
-						setResult(RESULT_DELETE, data);
-						finish();
-					}
-				};
 	
 	        	updateView(null);
-	        	actionBar.addAction(actionDelete);
-	        	actionBar.addAction(actionShare);
+	        	inShelf = true;
 	        }
 	        else {
 	        	entry = new BookEntry();
 	        	entry.isbn = isbn;
 	        	updateAll = true;
-	        	
-				actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
-					@Override
-					public void performAction(View view) {
-						if(entry.insert(db.getWritableDatabase()) == false)
-							Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
-						
-						Intent data = new Intent();
-						data.putExtra(App.ISBN, entry.isbn);
-						setResult(RESULT_OK, data);
-	
-						Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
-						actionBar.removeAction(this);
-					}
-				};
 	        }	
 	        
 	        updater = BookUpdater.create(entry);
@@ -163,6 +98,79 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	       	else
 	       		updater.updateInfo();
         }
+        
+        actionBar = ((ActionBar)findViewById(R.id.actionbar));
+        
+        // FB share button
+    	actionShare = new AbstractAction(R.drawable.ic_share) {
+			@Override
+			public void performAction(View view) {
+				if(App.fb.isSessionValid())
+					openShareDialog();
+				else {
+					FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
+					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+						@Override
+						public void onComplete(Bundle values) {
+							SessionStore.save(App.fb, BookActivity.this);
+							openShareDialog();
+						}
+					});
+				}
+			}
+			
+			private void openShareDialog() {
+				Bundle params = new Bundle();
+				if(entry.info.source == null || entry.info.description == null) {
+					params.putString("caption", entry.title);
+					params.putString("description", entry.author);
+				}
+				else {
+					params.putString("name", entry.title);
+					params.putString("link", entry.info.source);
+					params.putString("caption", entry.author);
+					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
+				}
+				if(entry.coverLink != null)
+					params.putString("picture", entry.coverLink);
+				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+					@Override
+					public void onComplete(Bundle values) {
+						if(values.containsKey("post_id"))
+							Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+					}
+				});
+			}
+    	};
+
+		actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
+			@Override
+			public void performAction(View view) {
+				if(entry.insert(db.getWritableDatabase()) == false)
+					Log.e(App.TAG, "Insert failed \"" + entry.isbn + "\".");
+				
+				Intent data = new Intent();
+				data.putExtra(App.ISBN, entry.isbn);
+				setResult(RESULT_OK, data);
+
+				Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
+				actionBar.removeAction(this);
+				actionBar.addAction(actionDelete, 0);
+			}
+		};
+		
+		actionDelete = new AbstractAction(R.drawable.ic_delete) {
+			@Override
+			public void performAction(View view) {
+				Intent data = new Intent();
+				data.putExtra(App.ISBN, entry.isbn);
+				setResult(RESULT_DELETE, data);
+				finish();
+			}
+		};
+		
+		if(inShelf)
+			actionBar.addAction(actionDelete, 0);
     }
     
     @Override
@@ -207,8 +215,9 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	public void onUpdateFinish(Status status) {
 		switch(status) {
 			case OK_ENTRY:
-				actionBar.addAction(actionAdd);
-				actionBar.addAction(actionShare);
+				if(!inShelf)
+					actionBar.addAction(actionAdd, 0);
+				actionBar.addAction(actionShare, 1);
 				updater.updateInfo();
 				updateView(status);
 				break;
