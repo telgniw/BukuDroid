@@ -347,6 +347,8 @@ public abstract class BookUpdater {
 		public void updateEntry() {
 			try {
 				if(link.startsWith(BOOKS_TW_PREFIX)) {
+					entry.vid = link.substring(BOOKS_TW_PREFIX.length());
+					
 					AsyncUpdater async = new AsyncUpdater() {
 						@Override
 						protected OnUpdateStatusChangedListener.Status update(URL... urls) {
@@ -386,10 +388,12 @@ public abstract class BookUpdater {
 						}
 					};
 					
-					URL url0 = new URL("http://www.books.com.tw/exep/prod/booksfile.php?item=" + link.substring(BOOKS_TW_PREFIX.length()));
+					URL url0 = new URL("http://www.books.com.tw/exep/prod/booksfile.php?item=" + entry.vid);
 					async.execute(url0);
 				}
 				else if(link.startsWith(GOOGLE_BOOKS_PREFIX)) {
+					entry.vid = link.substring(GOOGLE_BOOKS_PREFIX.length());
+					
 					AsyncUpdater async = new AsyncUpdater() {
 						@Override
 						protected OnUpdateStatusChangedListener.Status update(URL... urls) {
@@ -431,7 +435,7 @@ public abstract class BookUpdater {
 						}
 					};
 					
-					URL url0 = new URL("https://www.googleapis.com/books/v1/volumes/" + link.substring(GOOGLE_BOOKS_PREFIX.length()));
+					URL url0 = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
 					async.execute(url0);
 				}
 			}
