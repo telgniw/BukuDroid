@@ -11,6 +11,7 @@ import org.csie.mpp.buku.BookActivity;
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.db.FriendEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -42,27 +43,13 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 	
 	private static class Stream {
 		private String id;
+		private String source;
 		private String message;
 		private String book;
 		private String author;
 		private String link;
 		private Bitmap pic;
 		private Date time;
-		
-		public Stream(String id) {
-			this.id = id;
-		}
-		public void setDate(String dateString){
-			dateString = dateString.replace("T", " ");
-			dateString = dateString.replace("+0000", "");
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				time = sdf.parse(dateString);
-			}
-			catch(Exception e){
-				Log.e(App.TAG, e.toString());
-			}
-		}
 	}
 
 	private void createView(LinearLayout frame) {
@@ -104,13 +91,25 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		if(streams != null)
 			createView(frame);
 		else {
+			StringBuilder builder = new StringBuilder();
+			for(FriendEntry friend: FriendEntry.queryAll(rdb)) {
+				if(builder.length() > 0)
+					builder.append(",");
+				builder.append(friend.id);
+			}
+			String friends = builder.toString();
+			
 			Bundle params = new Bundle();
-			params.putString("fields", "id,message,name,picture,link,caption,description,application,created_time");
+			params.putString("q", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE source_id IN (" + friends
+				+ ") AND app_id = " + App.FB_APP_ID);
+			Log.d("Yi", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE source_id IN (" + friends
+				+ ") AND app_id = " + App.FB_APP_ID);
 			
 			// TODO: change to AsyncTask
-			App.fb_runner.request("me/feed", params, new BaseRequestListener() {
+			App.fb_runner.request("fql", params, new BaseRequestListener() {
 				@Override
 				public void onComplete(String response, Object state) {
+					Log.d("Yi", response);
 					streams = new ArrayList<Stream>();
 					
 					try {
@@ -119,34 +118,37 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 						for(int i = 0; i < data.length(); i++) {
 							try {
 								JSONObject item = data.getJSONObject(i);
-								if(item.has("application")) {
-									if(item.get("application") == JSONObject.NULL)
-										continue;
-									if(!item.getJSONObject("application").getString("id").equals(App.FB_APP_ID))
-										continue;
-									Stream stream = new Stream(item.getString("id"));
-									if(item.has("message"))
-										stream.message = item.getString("message");
-									if(item.has("picture"))
-										stream.pic = Util.urlToImage(new URL(item.getString("picture")));
-									if(item.has("name")) {
-										stream.book = item.getString("name");
-										stream.author = item.getString("caption");
-										stream.link = item.getString("link");
-									}
-									else {
-										stream.book = item.getString("caption");
-										stream.author = item.getString("description");
-									}
-									stream.setDate(item.getString("created_time"));
-									streams.add(stream);
+								Stream stream = new Stream();
+								stream.id = item.getString("post_id");
+								stream.source = item.getString("actor_id");
+								stream.message = item.getString("message");
+								
+								stream.time = new Date(Long.parseLong(item.getString("created_time")) + 1000);
+								
+								item = item.getJSONObject("attachment");
+								if(item.has("name")) {
+									stream.book = item.getString("name");
+									stream.author = item.getString("caption");
+									stream.link = item.getString("href");
 								}
+								else {
+									stream.book = item.getString("caption");
+									stream.author = item.getString("description");
+								}
+
+								try {
+									stream.pic = Util.urlToImage(new URL(item.getJSONArray("media").getJSONObject(0).getString("src")));
+								}
+								catch(Exception e) {
+									// No icon found.
+								}
+								
+								streams.add(stream);
 							}
 							catch(Exception e) {
 								Log.e(App.TAG, e.toString());
 							}
 						}
-						// TODO: parse next page
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());

@@ -66,7 +66,7 @@ public class FriendsManager extends ViewManager {
 		@Override
 		protected Boolean doInBackground(Integer... args) {
 			Bundle params = new Bundle();
-			params.putString("q", "SELECT uid,name,is_app_user FROM user WHERE uid IN(SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user=1");
+			params.putString("q", "SELECT uid,name,is_app_user FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
 			
 			try {
 				String response = App.fb.request("fql", params);
