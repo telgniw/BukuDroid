@@ -39,7 +39,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	
 	private DBHelper db;
 	
-	private boolean inShelf;
 	private BookEntry entry;
 	private BookUpdater updater;
 	private ActionBar actionBar;
@@ -54,8 +53,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         SessionStore.restore(App.fb, this);
         
         db = new DBHelper(this);
-
-        inShelf = false;
         
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
@@ -82,7 +79,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
 	
 	        	updateView(null);
-	        	inShelf = true;
 	        }
 	        else {
 	        	entry = new BookEntry();
@@ -169,8 +165,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 			}
 		};
 		
-		if(inShelf)
-			actionBar.addAction(actionDelete, 0);
     }
     
     @Override
@@ -215,7 +209,9 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	public void onUpdateFinish(Status status) {
 		switch(status) {
 			case OK_ENTRY:
-				if(!inShelf)
+				if(BookEntry.exists(db.getReadableDatabase(), entry.isbn))
+					actionBar.addAction(actionDelete, 0);
+				else
 					actionBar.addAction(actionAdd, 0);
 				actionBar.addAction(actionShare, 1);
 				updater.updateInfo();

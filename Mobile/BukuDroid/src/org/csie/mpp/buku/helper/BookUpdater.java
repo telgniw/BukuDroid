@@ -414,7 +414,7 @@ public abstract class BookUpdater {
 								if(isbn13 != null)
 									entry.isbn = isbn13;
 								else if(isbn10 != null)
-									entry.isbn = isbn10;
+									entry.isbn = Util.toIsbn13(isbn10);
 								else
 									return OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND;
 								
