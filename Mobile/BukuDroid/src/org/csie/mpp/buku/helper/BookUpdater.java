@@ -379,6 +379,9 @@ public abstract class BookUpdater {
 						    	result = result.substring(result.indexOf("ISBN"));
 						    	result = result.substring(result.indexOf("<dfn>") + "<dfn>".length());
 						    	entry.isbn = result.substring(0, result.indexOf("</dfn>"));
+						    	
+						    	if(entry.isbn.length() == 10)
+						    		entry.isbn = Util.toIsbn13(entry.isbn);
 							}
 							catch(Exception e) {
 								Log.e(App.TAG, e.toString());
