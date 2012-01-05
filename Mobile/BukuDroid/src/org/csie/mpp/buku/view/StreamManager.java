@@ -100,8 +100,8 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 			String friends = builder.toString();
 			
 			Bundle params = new Bundle();
-			params.putString("q", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE source_id = me() OR source_id IN (" + friends
-				+ ") AND app_id = " + App.FB_APP_ID);
+			params.putString("q", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE app_id = " + App.FB_APP_ID
+				+ " AND (source_id = me() OR source_id IN (" + friends + "))");
 			
 			// TODO: change to AsyncTask
 			App.fb_runner.request("fql", params, new BaseRequestListener() {
@@ -146,6 +146,8 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 							catch(Exception e) {
 								Log.e(App.TAG, e.toString());
 							}
+							
+							Log.d("Yi", "QQ" + i);
 						}
 					}
 					catch(Exception e) {

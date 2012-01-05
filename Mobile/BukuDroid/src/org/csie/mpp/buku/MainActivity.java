@@ -109,12 +109,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	super.onStart();
 
 		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
-    }
-    
-    @Override
-    public void onResume() {
-    	super.onResume();
-    	
     	ViewManager.updateAll();
     }
     
