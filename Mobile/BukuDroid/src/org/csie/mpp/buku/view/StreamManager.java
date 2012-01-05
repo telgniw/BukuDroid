@@ -120,7 +120,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 								stream.source = item.getString("actor_id");
 								stream.message = item.getString("message");
 
-								stream.time = new Date(Long.parseLong(item.getString("created_time")) + 1000);
+								stream.time = new Date(Long.parseLong(item.getString("created_time")) * 1000);
 
 								item = item.getJSONObject("attachment");
 								if(item.has("name")) {
