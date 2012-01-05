@@ -29,6 +29,10 @@ public abstract class ViewManager implements ViewPageFragmentListener {
 	protected LinearLayout getFrame() {
 		return frame;
 	}
+	
+	protected boolean viewCreated() {
+		return frame != null;
+	}
 
 	/* --- ViewPageFragmentListener	(start) --- */
 	@Override
