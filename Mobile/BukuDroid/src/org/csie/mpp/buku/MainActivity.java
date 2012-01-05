@@ -11,6 +11,7 @@ import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
 import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
 import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.StreamManager;
+import org.csie.mpp.buku.view.ViewManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
 import org.csie.mpp.buku.view.ViewPagerAdapter;
 
@@ -108,6 +109,13 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	super.onStart();
 
 		FlurryAgent.onStartSession(this, App.FLURRY_APP_KEY);
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	
+    	ViewManager.updateAll();
     }
     
     @Override
