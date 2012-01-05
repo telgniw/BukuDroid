@@ -1,7 +1,6 @@
 package org.csie.mpp.buku.view;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,8 +13,6 @@ import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.db.FriendEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.facebook.android.BaseRequestListener;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -104,64 +101,53 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 				+ " AND (source_id = me() OR source_id IN (" + friends + "))");
 			
 			// TODO: change to AsyncTask
-			App.fb_runner.request("fql", params, new BaseRequestListener() {
-				@Override
-				public void onComplete(String response, Object state) {
-					Log.d("Yi", response);
-					streams = new ArrayList<Stream>();
-					
+			try {
+				String response = App.fb.request("fql", params);
+				Log.d("Yi", response);
+				streams = new ArrayList<Stream>();
+				
+				JSONObject json = new JSONObject(response);
+				JSONArray data = json.getJSONArray("data");
+				for(int i = 0; i < data.length(); i++) {
 					try {
-						JSONObject json = new JSONObject(response);
-						JSONArray data = json.getJSONArray("data");
-						for(int i = 0; i < data.length(); i++) {
-							try {
-								JSONObject item = data.getJSONObject(i);
-								Stream stream = new Stream();
-								stream.id = item.getString("post_id");
-								stream.source = item.getString("actor_id");
-								stream.message = item.getString("message");
-								
-								stream.time = new Date(Long.parseLong(item.getString("created_time")) + 1000);
-								
-								item = item.getJSONObject("attachment");
-								if(item.has("name")) {
-									stream.book = item.getString("name");
-									stream.author = item.getString("caption");
-									stream.link = item.getString("href");
-								}
-								else {
-									stream.book = item.getString("caption");
-									stream.author = item.getString("description");
-								}
-
-								try {
-									stream.pic = Util.urlToImage(new URL(item.getJSONArray("media").getJSONObject(0).getString("src")));
-								}
-								catch(Exception e) {
-									// No icon found.
-								}
-								
-								streams.add(stream);
-							}
-							catch(Exception e) {
-								Log.e(App.TAG, e.toString());
-							}
-							
-							Log.d("Yi", "QQ" + i);
+						JSONObject item = data.getJSONObject(i);
+						Stream stream = new Stream();
+						stream.id = item.getString("post_id");
+						stream.source = item.getString("actor_id");
+						stream.message = item.getString("message");
+						
+						stream.time = new Date(Long.parseLong(item.getString("created_time")) + 1000);
+						
+						item = item.getJSONObject("attachment");
+						if(item.has("name")) {
+							stream.book = item.getString("name");
+							stream.author = item.getString("caption");
+							stream.link = item.getString("href");
 						}
+						else {
+							stream.book = item.getString("caption");
+							stream.author = item.getString("description");
+						}
+
+						try {
+							stream.pic = Util.urlToImage(new URL(item.getJSONArray("media").getJSONObject(0).getString("src")));
+						}
+						catch(Exception e) {
+							// No icon found.
+						}
+						
+						streams.add(stream);
 					}
 					catch(Exception e) {
 						Log.e(App.TAG, e.toString());
 					}
-					
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							createView(frame);
-						}
-					});
 				}
-			});
+			}
+			catch(Exception e) {
+				Log.e(App.TAG, e.toString());
+			}
+			
+			createView(frame);
 		}
 	}
 	
