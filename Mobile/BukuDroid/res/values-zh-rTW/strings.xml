@@ -49,6 +49,10 @@
     <string name="title_introduction">簡介</string>
     <string name="title_review">書評</string>
     
+    <!-- Stream -->
+    <string name="text_me">我</string>
+    <string name="text_says">說：</string>
+    
     <!-- Scan -->
     <string name="tab_barcode">條碼</string>
     <string name="tab_isbn">ISBN</string>

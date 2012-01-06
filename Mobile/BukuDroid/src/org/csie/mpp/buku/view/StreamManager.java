@@ -57,7 +57,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 		private final int resourceId;
 		private final List<Stream> entries;
 		
-		private final String says;
+		private final String me, says;
 		private final Map<String, String> names;
 		
 		public StreamAdapter(Activity activity, int resource, List<Stream> list, Map<String, String> map) {
@@ -67,6 +67,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 			resourceId = resource;
 			entries = list;
 			
+			me = activity.getString(R.string.text_me);
 			says = " " + activity.getString(R.string.text_says);
 			names = map;
 		}
@@ -77,7 +78,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 			View view = inflater.inflate(resourceId, parent, false);
 			if(stream.message != null) {
 				String name = names.get(stream.source);
-				String message = ((name != null)? (name + says) : name) + stream.message;
+				String message = ((name != null)? name : me) + says + stream.message;
 				((TextView)view.findViewById(R.id.list_message)).setText(message);
 			}
 			if(stream.image != null)
