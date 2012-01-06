@@ -302,10 +302,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 				Intent data = new Intent();
 				data.putExtra(App.ISBN, entry.isbn);
 				setResult(RESULT_ADD, data);
-
-				Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
-				actionBar.removeAction(this);
-				actionBar.addAction(actionDelete, 0);
+				finish();
 			}
 		};
 		
