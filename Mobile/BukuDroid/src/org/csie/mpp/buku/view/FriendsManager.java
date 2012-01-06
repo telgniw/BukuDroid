@@ -26,6 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class FriendsManager extends ViewManager {
+	public static interface OnListLoadListener {
+		public void onListLoaded(List<FriendEntry> entries);
+	}
+	
 	private List<FriendEntry> friends;
 	private FriendEntryAdapter adapter;
 	
@@ -66,7 +70,7 @@ public class FriendsManager extends ViewManager {
 		@Override
 		protected Boolean doInBackground(Integer... args) {
 			Bundle params = new Bundle();
-			params.putString("q", "SELECT uid,name,is_app_user FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
+			params.putString("q", "SELECT uid,first_name,name,is_app_user FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) AND is_app_user = 1");
 			
 			try {
 				String response = App.fb.request("fql", params);
@@ -87,8 +91,11 @@ public class FriendsManager extends ViewManager {
 							FriendEntry friend = new FriendEntry();
 							friend.id = id;
 							friend.name = item.getString("name");
+							friend.firstname = item.getString("first_name");
 							friend.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + friend.id + "/picture"));
 							friend.insert(rdb);
+							
+							friends.add(friend);
 						}
 					}
 					response = null;
@@ -112,8 +119,7 @@ public class FriendsManager extends ViewManager {
 		
 		@Override
 		protected void onProgressUpdate(Integer... progresses) {
-			if(progresses[0] % 5 == 0)
-				info.append(".");
+			adapter.notifyDataSetChanged();
 		}
 		
 		@Override
@@ -122,8 +128,13 @@ public class FriendsManager extends ViewManager {
 			info.setText("");
 			
 			if(result) {
-				updateFriendList();
+				if(friends.size() == 0)
+					createNoFriendView();
+				else
+					adapter.notifyDataSetChanged();
 			}
+			
+			listener.onListLoaded(friends);
 		}
 	}
 	
@@ -132,6 +143,14 @@ public class FriendsManager extends ViewManager {
 		
 		friends = new ArrayList<FriendEntry>();
 		adapter = new FriendEntryAdapter(activity, R.layout.list_item_friend, friends);
+	}
+	
+	private OnListLoadListener listener;
+	
+	public FriendsManager(Activity activity, DBHelper helper, OnListLoadListener callback) {
+		this(activity, helper);
+		
+		listener = callback;
 	}
 	
 	public void update() {

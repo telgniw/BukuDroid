@@ -3,6 +3,7 @@
     <!-- Global -->
     <string name="msg_deleted">删除成功</string>
     <string name="msg_delete_failed">删除失败：</string>
+    <string name="msg_updating">载入中...</string>
     
     <!-- About -->
     <!--
@@ -44,7 +45,6 @@
     <string name="msg_book_not_found">没有找到这本图书</string>
     <string name="msg_invalid_isbn">ISBN无效</string>
     <string name="msg_unexpected_error">未知的错误。请确认网路已连线或连络开发者。</string>
-    <string name="msg_updating">载入中...</string>
     <string name="text_no_data">没有资料</string>
     <string name="text_source">资料来源：</string>
     <string name="title_book_info">图书信息</string>

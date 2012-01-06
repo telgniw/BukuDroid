@@ -13,6 +13,9 @@ public class FriendEntry extends Entry {
 	@Column(name="name", type=Type.TEXT)
 	public String name;
 	
+	@Column(name="firstname", type=Type.TEXT)
+	public String firstname;
+	
 	@Column(name="icon", type=Type.IMAGE)
 	public Bitmap icon;
 	

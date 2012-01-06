@@ -64,6 +64,8 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 	private ViewPageFragment bookshelf, stream, friends;
 	
 	private BookshelfManager bookMan;
+	private StreamManager streamMan;
+	private FriendsManager friendsMan;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -223,10 +225,12 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     }
     
     private void createSessionView() {
-    	stream = new ViewPageFragment(getString(R.string.title_stream), new StreamManager(this, db));
+    	streamMan = new StreamManager(this, db);
+    	stream = new ViewPageFragment(getString(R.string.title_stream), streamMan);
 		viewpagerAdapter.addItem(stream);
 		
-		friends = new ViewPageFragment(getString(R.string.title_friends), new FriendsManager(this, db));
+		friendsMan = new FriendsManager(this, db, streamMan);
+		friends = new ViewPageFragment(getString(R.string.title_friends), friendsMan);
 		viewpagerAdapter.addItem(friends);
 		
 		viewpagerAdapter.notifyDataSetChanged();

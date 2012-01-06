@@ -3,6 +3,7 @@
     <!-- Globa -->
     <string name="msg_deleted">刪除成功</string>
     <string name="msg_delete_failed">刪除失敗：</string>
+    <string name="msg_updating">更新中...</string>
     
     <!-- About -->
     <!--
@@ -42,7 +43,6 @@
     <string name="msg_book_not_found">找不到這本書</string>
     <string name="msg_invalid_isbn">ISBN不合法</string>
     <string name="msg_unexpected_error">未知的錯誤。請確認網路已連線或連絡開發者。</string>
-    <string name="msg_updating">更新中...</string>
     <string name="text_no_data">沒有資料</string>
     <string name="text_source">資料來源: </string>
     <string name="title_book_info">書籍資訊</string>

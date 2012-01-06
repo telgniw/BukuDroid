@@ -5,7 +5,8 @@
     <string name="app_fb_fan_page">http://on.fb.me/BukuDroid</string>
     <string name="app_market_page">http://market.android.com/details?id=org.csie.mpp.buku</string>
     <string name="msg_deleted">Successfully deleted.</string>
-    <string name="msg_delete_failed">Delete failed: </string>
+    <string name="msg_delete_failed">Delete failed:\ </string>
+    <string name="msg_updating">Updating...</string>
     
     <!-- About -->
     <string name="text_find_out_more">Find out more on Facebook!</string>
@@ -44,12 +45,14 @@
     <string name="msg_book_not_found">Book not found.</string>
     <string name="msg_invalid_isbn">Invalid ISBN.</string>
     <string name="msg_unexpected_error">Unexpected error! Please check the network connection or contact the developers.</string>
-    <string name="msg_updating">Updating...</string>
     <string name="text_no_data">No data.</string>
-    <string name="text_source">Source: </string>
+    <string name="text_source">Source:\ </string>
     <string name="title_book_info">Information</string>
     <string name="title_introduction">Introduction</string>
     <string name="title_review">Reviews</string>
+    
+    <!-- Stream -->
+    <string name="text_says">Says: </string>
     
     <!-- Scan -->
     <string name="tab_barcode">Barcode</string>
