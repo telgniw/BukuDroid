@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 public class BookActivity extends Activity implements OnUpdateStatusChangedListener, View.OnClickListener {
 	public static final int REQUEST_CODE = 1437;
+	public static final int RESULT_ADD = 632;
 	public static final int RESULT_ISBN_INVALID = 633;
 	public static final int RESULT_NOT_FOUND = 634;
 	public static final int RESULT_DELETE = 643;
@@ -300,7 +301,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 				
 				Intent data = new Intent();
 				data.putExtra(App.ISBN, entry.isbn);
-				setResult(RESULT_OK, data);
+				setResult(RESULT_ADD, data);
 
 				Toast.makeText(BookActivity.this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
 				actionBar.removeAction(this);

@@ -173,9 +173,10 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     			}
     			break;
     		case BookActivity.REQUEST_CODE:
-    			if(resultCode == RESULT_OK) {
+    			if(resultCode == BookActivity.RESULT_ADD) {
     				String isbn = data.getStringExtra(App.ISBN);
     				bookMan.add(isbn);
+					indicator.setCurrentItem(0);
     			}
     			else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
     				Toast.makeText(this, getString(R.string.msg_invalid_isbn), App.TOAST_TIME).show();

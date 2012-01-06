@@ -223,7 +223,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 		else {
 			Intent intent = new Intent(activity, BookActivity.class);
 			intent.putExtra(BookActivity.LINK, stream.link);
-			activity.startActivity(intent);
+			activity.startActivityForResult(intent, BookActivity.REQUEST_CODE);
 		}
 	}
 
