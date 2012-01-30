@@ -1,5 +1,7 @@
 package org.csie.mpp.buku;
 
+import java.io.UnsupportedEncodingException;
+
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
@@ -22,6 +24,8 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -100,6 +104,27 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	       		actionBar.addAction(actionShare, 1);
 	       	}
         }
+    }
+    
+    private void createLikeButton() {
+        WebView like = (WebView)findViewById(R.id.like_button);
+        
+        WebSettings settings = like.getSettings();
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setJavaScriptEnabled(true);
+        settings.setSupportZoom(false);
+        
+        try {
+        	String likeUrl = "https://www.facebook.com/plugins/like.php?href=" +
+				java.net.URLEncoder.encode(entry.info.source, "ISO-8859-1") +
+				"&send=false&locale=zh_TW&layout=button_count&width=80&show_faces=false&action=like&colorscheme=light&font=arial&height=21";
+
+			like.loadUrl(likeUrl);
+			
+		}
+        catch(UnsupportedEncodingException e) {
+			Log.e(App.TAG, e.toString());
+		}
     }
     
     @Override
@@ -184,6 +209,9 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         	if(status == null)
         		((TextView)findViewById(R.id.title)).setText(R.string.msg_updating);
     	}
+    	
+    	if(BookUpdater.SOURCE_BOOKS_TW.equals(entry.info.sourceName))
+			createLikeButton();
         
         TextView description = ((TextView)findViewById(R.id.description));
         if(entry.info.description != null) {

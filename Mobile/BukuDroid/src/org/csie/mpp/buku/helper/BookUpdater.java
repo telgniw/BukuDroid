@@ -24,8 +24,8 @@ import android.text.Spanned;
 import android.util.Log;
 
 public abstract class BookUpdater {
-	private static final String SOURCE_GOOGLE_BOOKS = "Google Books";
-	private static final String SOURCE_BOOKS_TW = "博客來";
+	public static final String SOURCE_GOOGLE_BOOKS = "Google Books";
+	public static final String SOURCE_BOOKS_TW = "博客來";
 
 	private static final String BOOKS_TW_PREFIX = "http://www.books.com.tw/exep/prod/booksfile.php?item=";
 	private static final String GOOGLE_BOOKS_PREFIX = "http://books.google.com/books?id=";

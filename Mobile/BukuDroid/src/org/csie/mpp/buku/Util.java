@@ -118,10 +118,21 @@ public class Util {
 	}
 	
 	public static String urlToString(URL url) {
-		StringBuilder builder = new StringBuilder();
 		try {
 			URLConnection conn = url.openConnection();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			return streamToString(conn.getInputStream());
+		}
+		catch (Exception e) {
+			Log.e(App.TAG, e.toString());
+		}
+		
+		return null;
+	}
+	
+	public static String streamToString(InputStream is) {
+		StringBuilder builder = new StringBuilder();
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				builder.append(line);
