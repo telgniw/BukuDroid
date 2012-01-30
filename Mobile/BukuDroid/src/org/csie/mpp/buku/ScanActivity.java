@@ -21,7 +21,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -197,9 +196,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 			}
 			
 			final ProgressDialog progressDialog = ProgressDialog.show(KeywordSearchActivity.this, getString(R.string.key_search), getString(R.string.key_searching));
-			final Handler handler = new Handler();
-			
-
 			
 			// TODO: change to AsyncTask
 			URL url;
