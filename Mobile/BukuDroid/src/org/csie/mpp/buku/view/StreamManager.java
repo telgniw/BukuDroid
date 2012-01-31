@@ -126,15 +126,9 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 	
 							item = item.getJSONObject("attachment");
 							
-							if(item.has("name")) {
-								stream.book = item.getString("name");
-								stream.author = item.getString("caption");
-								stream.link = item.getString("href");
-							}
-							else {
-								stream.book = item.getString("caption");
-								stream.author = item.getString("description");
-							}
+							stream.book = item.getString("name");
+							stream.author = item.getString("caption");
+							stream.link = item.getString("href");
 	
 							try {
 								stream.image = Util.urlToImage(new URL(item.getJSONArray("media").getJSONObject(0).getString("src")));

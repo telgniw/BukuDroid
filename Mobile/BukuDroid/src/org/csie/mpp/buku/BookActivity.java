@@ -319,18 +319,15 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 			
 			private void openShareDialog() {
 				Bundle params = new Bundle();
-				if(entry.info.source == null || entry.info.description == null) {
-					params.putString("caption", entry.title);
-					params.putString("description", entry.author);
-				}
-				else {
-					params.putString("name", entry.title);
-					params.putString("link", entry.info.source);
-					params.putString("caption", entry.author);
+				params.putString("name", entry.title);
+				params.putString("link", entry.info.source != null? entry.info.source : App.FB_FAN_PAGE);
+				params.putString("caption", entry.author);
+				
+				if(entry.info.description != null)
 					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
-				}
 				if(entry.coverLink != null)
 					params.putString("picture", entry.coverLink);
+				
 				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 					@Override
 					public void onComplete(Bundle values) {

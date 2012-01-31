@@ -5,7 +5,7 @@
         android:title="@string/menu_search"
     />
     <item
-        android:icon="@drawable/ic_menu_none"
+        android:icon="@drawable/ic_menu_facebook"
         android:id="@+id/menu_account_sync"
         android:title="@string/menu_account_sync"
     />
