@@ -409,7 +409,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 		final List<FriendEntry> entries = new ArrayList<FriendEntry>();
 		final FriendEntryAdapter adapter = new FriendEntryAdapter(this, R.layout.list_item_friend, entries);
 		
-		new AsyncTask<String, Integer, Boolean>() {
+		final AsyncTask<String, Integer, Boolean> async = new AsyncTask<String, Integer, Boolean>() {
 			@Override
 			protected Boolean doInBackground(String... paths) {
 				try {
@@ -441,11 +441,16 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 			protected void onProgressUpdate(Integer... progresses) {
 				adapter.notifyDataSetChanged();
 			}
-		}.execute("me/friends");
+		};
+		
+		async.execute("me/friends");
 		
 		AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(adapter, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				async.cancel(true);
+				dialog.dismiss();
+				
 				FriendEntry entry = entries.get(which);
 				openShareDialog(entry.id);
 			}

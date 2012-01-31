@@ -70,7 +70,7 @@
     <string name="tab_search">搜索</string>
     
     <!-- Facebook -->
-    <string name="fb_message_posted">成功发布在你的时间线</string>
+    <string name="fb_message_posted">成功发布在时间线</string>
     
     <!-- Search -->
     <string name="search_no_result">查无结果!</string>

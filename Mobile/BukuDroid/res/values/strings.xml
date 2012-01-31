@@ -70,7 +70,7 @@
     <string name="tab_search">Search</string>
     
     <!-- Facebook -->
-    <string name="fb_message_posted">Posted to your wall.</string>
+    <string name="fb_message_posted">Message posted.</string>
     
     <!-- Search -->
     <string name="search_no_result">No result!</string>
