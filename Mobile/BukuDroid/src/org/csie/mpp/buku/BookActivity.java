@@ -409,6 +409,10 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 		final List<FriendEntry> entries = new ArrayList<FriendEntry>();
 		final FriendEntryAdapter adapter = new FriendEntryAdapter(this, R.layout.list_item_friend, entries);
 		
+		final FriendEntry[] friends = FriendEntry.queryAll(db.getReadableDatabase());
+		for(FriendEntry friend: friends)
+			entries.add(friend);
+		
 		final AsyncTask<String, Integer, Boolean> async = new AsyncTask<String, Integer, Boolean>() {
 			@Override
 			protected Boolean doInBackground(String... paths) {
@@ -417,10 +421,22 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 					JSONArray data = new JSONObject(response).getJSONArray("data");
 					for(int i = 0; i < data.length(); i++) {
 						JSONObject json = data.getJSONObject(i);
+						String id = json.getString("id");
+						
+						boolean flag = false;
+						for(FriendEntry friend: friends) {
+							if(friend.id.equals(id)) {
+								flag = true;
+								break;
+							}
+						}
+						
+						if(flag)
+							break;
 						
 						FriendEntry entry = new FriendEntry();
+						entry.id = id;
 						entry.name = json.getString("name");
-						entry.id = json.getString("id");
 						entry.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + entry.id + "/picture"));
 						
 						entries.add(entry);
