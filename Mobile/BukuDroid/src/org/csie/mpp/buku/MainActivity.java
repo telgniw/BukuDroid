@@ -107,13 +107,6 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         viewpager.setAdapter(viewpagerAdapter);
         indicator.setViewPager(viewpager);
         indicator.setOnPageChangeListener(this);
-    }
-    
-    @Override
-    public void onResume() {
-    	super.onResume();
-
-    	App.fb.extendAccessTokenIfNeeded(this, null);
     	
     	if(App.fb.isSessionValid())
         	createSessionView();
@@ -121,6 +114,13 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         	if(prefs.getBoolean(PREFS_ACCOUNT_ITEM + ITEM_FB, false))
         		loginFacebook();
         }
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+
+    	App.fb.extendAccessTokenIfNeeded(this, null);
     }
     
     @Override
