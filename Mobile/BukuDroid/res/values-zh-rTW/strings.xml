@@ -27,6 +27,8 @@
     <string name="menu_about">關於</string>
     <string name="menu_account_sync">設定帳號連結</string>
     <string name="menu_search">搜尋</string>
+    <string name="msg_no_friends">哎呀你沒有好友...●＾●</string>
+    <string name="msg_no_streams">哎呀沒有任何分享...●＾●</string>
     <string name="title_bookshelf">書櫃</string>
     <!--
     <string name="title_friends">Friends</string>

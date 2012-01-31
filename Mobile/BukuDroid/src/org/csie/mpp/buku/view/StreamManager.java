@@ -103,7 +103,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 		protected Boolean doInBackground(String... args) {
 			Bundle params = new Bundle();
 			params.putString("q", "SELECT actor_id,message,attachment,created_time FROM stream WHERE app_id = " + App.FB_APP_ID
-					+ " AND (source_id = me() OR source_id IN (" + args[0] + "))");
+					+ " AND (source_id = me() OR source_id IN (" + args[0] + ")) LIMIT 100");
 			
 			try {
 				String response = App.fb.request("fql", params);
@@ -211,7 +211,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 	private void createNoStreamView() {
 		LinearLayout frame = getFrame();
 		TextView text = (TextView)frame.findViewById(R.id.text);
-		text.setText("You have no streams. QQ"); // TODO: change to strings.xml
+		text.setText(R.string.msg_no_streams);
 	}
 	
 	@Override

@@ -31,6 +31,8 @@
     <string name="menu_about">About</string>
     <string name="menu_account_sync">Account Setting</string>
     <string name="menu_search">Search</string>
+    <string name="msg_no_friends">You have no friends... QQ</string>
+    <string name="msg_no_streams">You have no streams... QQ</string>
     <string name="title_bookshelf">Bookshelf</string>
     <string name="title_friends">Friends</string>
     <string name="title_stream">Stream</string>

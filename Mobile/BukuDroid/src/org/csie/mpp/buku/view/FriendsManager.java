@@ -196,6 +196,6 @@ public class FriendsManager extends ViewManager {
 		LinearLayout frame = getFrame();
 		
 		TextView text = (TextView)frame.findViewById(R.id.text);
-		text.setText("You have no friends. QQ"); // TODO: change to strings.xml
+		text.setText(R.string.msg_no_friends);
 	}
 }

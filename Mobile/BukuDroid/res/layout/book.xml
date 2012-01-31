@@ -47,6 +47,7 @@
                     android:id="@+id/author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/darkTextColor"
                     android:textSize="@dimen/fontMedian"
                 />
                 <LinearLayout
