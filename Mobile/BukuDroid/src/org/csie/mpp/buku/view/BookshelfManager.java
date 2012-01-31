@@ -18,10 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class BookshelfManager extends ViewManager {
-	public static interface ViewListener {
-		public void onListViewCreated(ListView view);
-	}
-	
 	public static class SearchEntryAdapter extends ArrayAdapter<BookEntry> {
 		private LayoutInflater inflater;
 		private int resourceId;
@@ -142,18 +138,10 @@ public class BookshelfManager extends ViewManager {
 	
 	private ListViewManager vm;
 	
-	public BookshelfManager(Activity activity, DBHelper helper) {
-		super(activity, helper);
+	public BookshelfManager(Activity activity, DBHelper helper, ViewListener callback) {
+		super(activity, helper, callback);
 		
 		vm = new ListViewManager();
-	}
-	
-	private ViewListener callback;
-	
-	public BookshelfManager(Activity activity, DBHelper helper, ViewListener callback) {
-		this(activity, helper);
-		
-		this.callback = callback;
 	}
 	
 	public void add(String isbn) {

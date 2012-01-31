@@ -8,7 +8,7 @@ import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.SearchSuggestionProvider;
 import org.csie.mpp.buku.view.BookshelfManager;
 import org.csie.mpp.buku.view.BookshelfManager.BookEntryAdapter;
-import org.csie.mpp.buku.view.BookshelfManager.ViewListener;
+import org.csie.mpp.buku.view.ViewManager.ViewListener;
 import org.csie.mpp.buku.view.FriendsManager;
 import org.csie.mpp.buku.view.StreamManager;
 import org.csie.mpp.buku.view.ViewPageFragment;
@@ -49,7 +49,7 @@ import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends FragmentActivity implements OnPageChangeListener, ViewListener, OnItemClickListener {
+public class MainActivity extends FragmentActivity implements OnPageChangeListener {
 	private static final String PREFS_PAGE_IDX = "VIEWPAGER_INDEX";
 	
 	private DBHelper db;
@@ -85,7 +85,18 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         /* initialize ViewPageFragments */
         viewpagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         
-        bookMan = new BookshelfManager(this, db, this);
+        bookMan = new BookshelfManager(this, db, new ViewListener() {
+        	@Override
+        	public void onListViewCreated(ListView view) {
+        		registerForContextMenu(view);
+        		view.setOnItemClickListener(new OnItemClickListener() {
+        			@Override
+        			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        				startBookActivity(bookMan.get(position).isbn);
+        			}
+        		});
+        	}
+        });
         bookshelf = new ViewPageFragment(getString(R.string.title_bookshelf), bookMan);
         viewpagerAdapter.addItem(bookshelf);
         
@@ -280,7 +291,7 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-    	switch(prefs.getInt(PREFS_PAGE_IDX, 1)) {
+    	switch(prefs.getInt(PREFS_PAGE_IDX, 0)) {
     		case 0:
     			menu.setGroupVisible(R.id.menu_books, true);
     			menu.setGroupVisible(R.id.menu_streams, false);
@@ -429,19 +440,4 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		editor.commit();
 	}
 	/* --- OnPageChageListener	(end) --- */
-
-	/* --- ViewListener			(start) --- */ 
-	@Override
-	public void onListViewCreated(ListView view) {
-		registerForContextMenu(view);
-		view.setOnItemClickListener(this);
-	}
-	/* --- ViewListener			(end) --- */
-
-	/* -- OnItemClickListener	(start) --- */
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		startBookActivity(bookMan.get(position).isbn);
-	}
-	/* --- OnItemClickListener	(end) --- */
 }

@@ -1,5 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/menu_books">
+    <group android:id="@+id/menu_books" android:visible="true">
         <item
             android:icon="@drawable/ic_menu_search"
             android:id="@+id/menu_search"

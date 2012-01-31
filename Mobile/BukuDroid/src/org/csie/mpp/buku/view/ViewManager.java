@@ -8,8 +8,13 @@ import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 public abstract class ViewManager implements ViewPageFragmentListener {
+	public static interface ViewListener {
+		public void onListViewCreated(ListView view);
+	}
+	
 	protected final Activity activity;
 	protected final DBHelper helper;
 	protected final SQLiteDatabase rdb, wdb;
@@ -17,8 +22,15 @@ public abstract class ViewManager implements ViewPageFragmentListener {
 	private LinearLayout frame;
 	
 	public ViewManager(Activity act, DBHelper db) {
+		this(act, db, null);
+	}
+	
+	protected final ViewListener callback;
+	
+	public ViewManager(Activity act, DBHelper db, ViewListener listener) {
 		activity = act;
 		helper = db;
+		callback = listener;
 
 		rdb = helper.getReadableDatabase();
 		wdb = helper.getWritableDatabase();
