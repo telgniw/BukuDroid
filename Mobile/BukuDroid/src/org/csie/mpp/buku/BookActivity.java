@@ -304,20 +304,20 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 			@Override
 			public void performAction(View view) {
 				if(App.fb.isSessionValid())
-					openShareDialog();
+					openShareDialog(null);
 				else {
 					FlurryAgent.logEvent(App.FlurryEvent.SHARE_ON_FB.toString());
 					App.fb.authorize(BookActivity.this, App.FB_APP_PERMS, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 						@Override
 						public void onComplete(Bundle values) {
 							SessionStore.save(App.fb, BookActivity.this);
-							openShareDialog();
+							openShareDialog(null);
 						}
 					});
 				}
 			}
 			
-			private void openShareDialog() {
+			private void openShareDialog(String who) {
 				Bundle params = new Bundle();
 				params.putString("name", entry.title);
 				params.putString("link", entry.info.source != null? entry.info.source : App.FB_FAN_PAGE);
@@ -327,6 +327,9 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
 				if(entry.coverLink != null)
 					params.putString("picture", entry.coverLink);
+				
+				if(who != null)
+					params.putString("to", who);
 				
 				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
 					@Override

@@ -278,6 +278,28 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	return true;
     }
     
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	switch(prefs.getInt(PREFS_PAGE_IDX, 1)) {
+    		case 0:
+    			menu.setGroupVisible(R.id.menu_books, true);
+    			menu.setGroupVisible(R.id.menu_streams, false);
+    			menu.setGroupVisible(R.id.menu_friends, false);
+    			break;
+    		case 1:
+    			menu.setGroupVisible(R.id.menu_books, false);
+    			menu.setGroupVisible(R.id.menu_streams, true);
+    			menu.setGroupVisible(R.id.menu_friends, false);
+    			break;
+    		case 2:
+    			menu.setGroupVisible(R.id.menu_books, false);
+    			menu.setGroupVisible(R.id.menu_streams, false);
+    			menu.setGroupVisible(R.id.menu_friends, true);
+    			break;
+    	}
+    	return true;
+    }
+    
     private static final String PREFS_ACCOUNT_ITEM = "ACCOUNT_SYNC";
     private static final int ITEM_FB = 0;
     
@@ -292,6 +314,19 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     			SearchManager sm = (SearchManager)getSystemService(SEARCH_SERVICE);
     			if(sm != null)
     				sm.startSearch(null, false, getComponentName(), null, false); 
+    			break;
+    		case R.id.menu_invite:
+    			Bundle params = new Bundle();
+    			params.putString("message", getString(R.string.msg_invite));
+    			
+    			App.fb.dialog(this, "apprequests", params, new BaseDialogListener(this, App.TOAST_TIME) {
+					@Override
+					public void onComplete(Bundle values) {
+						Log.d("Yi", values.toString());
+						if(values.containsKey("post_id"))
+							Toast.makeText(MainActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+					}
+				});
     			break;
     		case R.id.menu_account_sync:
     			if(accountItems == null) {
