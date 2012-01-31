@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class FriendsManager extends ViewManager {
 
 	public static class FriendEntryAdapter extends ArrayAdapter<FriendEntry> {
 		private LayoutInflater inflater;
+		private Resources resources;
 		private int resourceId;
 		private List<FriendEntry> entries;
 		
@@ -44,6 +46,7 @@ public class FriendsManager extends ViewManager {
 			super(activity, resource, list);
 			
 			inflater = activity.getLayoutInflater();
+			resources = activity.getResources();
 			resourceId = resource;
 			entries = list;
 		}
@@ -52,8 +55,14 @@ public class FriendsManager extends ViewManager {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			FriendEntry friend = entries.get(position);
 			View view = inflater.inflate(resourceId, parent, false);
-			((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(friend.icon);
-			((TextView)view.findViewById(R.id.list_name)).setText(friend.name);
+			TextView text = (TextView)view.findViewById(R.id.list_name);
+			if(friend.icon != null)
+				((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(friend.icon);
+			else {
+				view.setBackgroundColor(resources.getColor(R.color.lightLineColor));
+				text.setTextColor(resources.getColor(R.color.brightTextColor));
+			}
+			text.setText(friend.name);
 			return view;
 		}
 	}

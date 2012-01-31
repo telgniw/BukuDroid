@@ -55,7 +55,9 @@
     <string name="text_no_data">No data.</string>
     <string name="text_source">Source：</string>
     <string name="title_book_info">Information</string>
+    <string name="title_buku_friends">BukuDroid Friends</string>
     <string name="title_introduction">Introduction</string>
+    <string name="title_other_friends">Other Friends</string>
     <string name="title_review">Reviews</string>
     <string name="title_select_friend">Select a Friend</string>
     

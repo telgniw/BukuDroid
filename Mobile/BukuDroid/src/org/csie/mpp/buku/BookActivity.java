@@ -407,11 +407,26 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	
 	private void openShareToFriendDialog() {
 		final List<FriendEntry> entries = new ArrayList<FriendEntry>();
-		final FriendEntryAdapter adapter = new FriendEntryAdapter(this, R.layout.list_item_friend, entries);
+		final FriendEntryAdapter adapter = new FriendEntryAdapter(this, R.layout.list_item_friend, entries) {
+			public boolean isEnabled(int position) {
+				return entries.get(position).icon != null;
+			}
+			public boolean areAllItemsEnabled() {
+				return false;
+			}
+		};
+		
+		FriendEntry separator = new FriendEntry();
+		separator.name = getString(R.string.title_buku_friends);
+		entries.add(separator);
 		
 		final FriendEntry[] friends = FriendEntry.queryAll(db.getReadableDatabase());
 		for(FriendEntry friend: friends)
 			entries.add(friend);
+		
+		separator = new FriendEntry();
+		separator.name = getString(R.string.title_other_friends);
+		entries.add(separator);
 		
 		final AsyncTask<String, Integer, Boolean> async = new AsyncTask<String, Integer, Boolean>() {
 			@Override
