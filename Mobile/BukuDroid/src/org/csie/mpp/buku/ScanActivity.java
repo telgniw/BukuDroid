@@ -222,7 +222,6 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 				}
 				String urL = "https://www.googleapis.com/books/v1/volumes?q=" + java.net.URLEncoder.encode(prefix + keyword);
 				url = new URL(urL);
-				Log.d("APP", urL);
 				str = Util.urlToString(url);
 				
 				

@@ -335,9 +335,10 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     			App.fb.dialog(this, "apprequests", params, new BaseDialogListener(this, App.TOAST_TIME) {
 					@Override
 					public void onComplete(Bundle values) {
+						// TODO: check message
 						Log.d("Yi", values.toString());
-						if(values.containsKey("post_id"))
-							Toast.makeText(MainActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+//						if(values.containsKey("post_id"))
+//							Toast.makeText(MainActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
 					}
 				});
     			break;

@@ -45,6 +45,8 @@
     </string-array>
     
     <!-- Book -->
+    <string name="menu_share">Share</string>
+    <string name="menu_share_to">Share with Friend</string>
     <string name="msg_book_added">Successfully added to your bookshelf.</string>
     <string name="msg_book_already_exists">You already have this book in the bookshelf.</string>
     <string name="msg_book_not_found">Book not found.</string>
@@ -55,6 +57,7 @@
     <string name="title_book_info">Information</string>
     <string name="title_introduction">Introduction</string>
     <string name="title_review">Reviews</string>
+    <string name="title_select_friend">Select a Friend</string>
     
     <!-- Stream -->
     <string name="text_me">Me</string>

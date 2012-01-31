@@ -1,9 +1,19 @@
 package org.csie.mpp.buku;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
+import org.csie.mpp.buku.db.FriendEntry;
 import org.csie.mpp.buku.helper.BookUpdater;
 import org.csie.mpp.buku.helper.BookUpdater.OnUpdateStatusChangedListener;
+import org.csie.mpp.buku.view.FriendsManager.FriendEntryAdapter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.facebook.android.BaseDialogListener;
 import com.facebook.android.SessionStore;
@@ -14,12 +24,18 @@ import com.markupartist.android.widget.ActionBar.Action;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -105,6 +121,30 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	       	}
         }
     }
+
+    /* --- OptionsMenu			(start) --- */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.book, menu);
+    	return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    		case R.id.menu_share:
+    			openShareDialog(null);
+    			break;
+    		case R.id.menu_share_to:
+    			openShareToFriendDialog();
+    			break;
+    		default:
+    			break;
+    	}
+    	return true;
+    }
+    /* --- OptionsMenu			(end) --- */
     
     private void createLikeButton() {
         final WebView like = new WebView(this);
@@ -316,29 +356,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 					});
 				}
 			}
-			
-			private void openShareDialog(String who) {
-				Bundle params = new Bundle();
-				params.putString("name", entry.title);
-				params.putString("link", entry.info.source != null? entry.info.source : App.FB_FAN_PAGE);
-				params.putString("caption", entry.author);
-				
-				if(entry.info.description != null)
-					params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
-				if(entry.coverLink != null)
-					params.putString("picture", entry.coverLink);
-				
-				if(who != null)
-					params.putString("to", who);
-				
-				App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
-					@Override
-					public void onComplete(Bundle values) {
-						if(values.containsKey("post_id"))
-							Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
-					}
-				});
-			}
     	};
 
 		actionAdd = new AbstractAction(R.drawable.ic_bookshelf) {
@@ -364,6 +381,82 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 			}
 		};
     }
+	
+	private void openShareDialog(String who) {
+		Bundle params = new Bundle();
+		params.putString("name", entry.title);
+		params.putString("link", entry.info.source != null? entry.info.source : App.FB_FAN_PAGE);
+		params.putString("caption", entry.author);
+		
+		if(entry.info.description != null)
+			params.putString("description", Util.shortenString(entry.info.description.toString(), 120));
+		if(entry.coverLink != null)
+			params.putString("picture", entry.coverLink);
+		
+		if(who != null)
+			params.putString("to", who);
+		
+		App.fb.dialog(BookActivity.this, "feed", params, new BaseDialogListener(BookActivity.this, App.TOAST_TIME) {
+			@Override
+			public void onComplete(Bundle values) {
+				if(values.containsKey("post_id"))
+					Toast.makeText(BookActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+			}
+		});
+	}
+	
+	private void openShareToFriendDialog() {
+		final List<FriendEntry> entries = new ArrayList<FriendEntry>();
+		final FriendEntryAdapter adapter = new FriendEntryAdapter(this, R.layout.list_item_friend, entries);
+		
+		new AsyncTask<String, Integer, Boolean>() {
+			@Override
+			protected Boolean doInBackground(String... paths) {
+				try {
+					String response = App.fb.request(paths[0]);
+					JSONArray data = new JSONObject(response).getJSONArray("data");
+					for(int i = 0; i < data.length(); i++) {
+						JSONObject json = data.getJSONObject(i);
+						
+						FriendEntry entry = new FriendEntry();
+						entry.name = json.getString("name");
+						entry.id = json.getString("id");
+						entry.icon = Util.urlToImage(new URL("http://graph.facebook.com/" + entry.id + "/picture"));
+						
+						entries.add(entry);
+						
+						publishProgress(i);
+					}
+				}
+				catch(IOException e) {
+					Log.e(App.TAG, e.toString());
+				}
+				catch(JSONException e) {
+					Log.e(App.TAG, e.toString());
+				}
+				return null;
+			}
+			
+			@Override
+			protected void onProgressUpdate(Integer... progresses) {
+				adapter.notifyDataSetChanged();
+			}
+		}.execute("me/friends");
+		
+		AlertDialog dialog = new AlertDialog.Builder(this).setAdapter(adapter, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				FriendEntry entry = entries.get(which);
+				openShareDialog(entry.id);
+			}
+		}).setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface arg0) {
+				Toast.makeText(BookActivity.this, android.R.string.cancel, App.TOAST_TIME).show();
+			}
+		}).setTitle(R.string.title_select_friend).create();
+		dialog.show();
+	}
 
     private AlertDialog dialog;
     

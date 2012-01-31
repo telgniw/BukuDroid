@@ -45,6 +45,8 @@
     </string-array>
     
     <!-- Book -->
+    <string name="menu_share">分享</string>
+    <string name="menu_share_to">与好友分享</string>
     <string name="msg_book_added">成功添加到书架</string>
     <string name="msg_book_already_exists">这本图书已经在您的书架了</string>
     <string name="msg_book_not_found">没有找到这本图书</string>
@@ -55,6 +57,7 @@
     <string name="title_book_info">图书信息</string>
     <string name="title_introduction">简介</string>
     <string name="title_review">书评</string>
+    <string name="title_select_friend">选取好友</string>
     
     <!-- Stream -->
     <string name="text_me">我</string>

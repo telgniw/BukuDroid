@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_menu_none"
+        android:id="@+id/menu_share"
+        android:title="@string/menu_share"
+    />
+    <item
+        android:icon="@drawable/ic_menu_none"
+        android:id="@+id/menu_share_to"
+        android:title="@string/menu_share_to"
+    />
+</menu>
