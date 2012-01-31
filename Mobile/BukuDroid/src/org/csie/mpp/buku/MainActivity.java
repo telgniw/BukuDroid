@@ -251,7 +251,7 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     	stream = new ViewPageFragment(getString(R.string.title_stream), streamMan);
 		viewpagerAdapter.addItem(stream);
 		
-		friendsMan = new FriendsManager(this, db, streamMan);
+		friendsMan = new FriendsManager(this, db);
 		friends = new ViewPageFragment(getString(R.string.title_friends), friendsMan);
 		viewpagerAdapter.addItem(friends);
 		

@@ -27,10 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class FriendsManager extends ViewManager {
-	public static interface OnListLoadListener {
-		public void onListLoaded(List<FriendEntry> entries);
-	}
-	
 	private List<FriendEntry> friends;
 	private FriendEntryAdapter adapter;
 	
@@ -142,8 +138,6 @@ public class FriendsManager extends ViewManager {
 				else
 					adapter.notifyDataSetChanged();
 			}
-			
-			listener.onListLoaded(friends);
 		}
 	}
 	
@@ -152,14 +146,6 @@ public class FriendsManager extends ViewManager {
 		
 		friends = new ArrayList<FriendEntry>();
 		adapter = new FriendEntryAdapter(activity, R.layout.list_item_friend, friends);
-	}
-	
-	private OnListLoadListener listener;
-	
-	public FriendsManager(Activity activity, DBHelper helper, OnListLoadListener callback) {
-		this(activity, helper);
-		
-		listener = callback;
 	}
 	
 	public void update() {

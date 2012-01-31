@@ -12,8 +12,6 @@ import org.csie.mpp.buku.BookActivity;
 import org.csie.mpp.buku.R;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.DBHelper;
-import org.csie.mpp.buku.db.FriendEntry;
-import org.csie.mpp.buku.view.FriendsManager.OnListLoadListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,13 +32,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class StreamManager extends ViewManager implements OnItemClickListener, OnListLoadListener {
+public class StreamManager extends ViewManager implements OnItemClickListener {
 	private List<Stream> streams;
 	private Map<String, String> friends;
 	private ArrayAdapter<Stream> adapter;
-	
-	private String friendsString;
-	private Updater updater;
 	
 	public static class Stream {
 		private String source;
@@ -90,7 +85,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 		}
 	}
 	
-	protected class Updater extends AsyncTask<String, Integer, Boolean> {
+	protected class Updater extends AsyncTask<Integer, Integer, Boolean> {
 		private TextView info;
 		
 		public Updater() {
@@ -100,13 +95,14 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 		}
 		
 		@Override
-		protected Boolean doInBackground(String... args) {
+		protected Boolean doInBackground(Integer... args) {
 			Bundle params = new Bundle();
-			params.putString("q", "SELECT actor_id,message,attachment,created_time FROM stream WHERE app_id = " + App.FB_APP_ID
-					+ " AND (source_id = me() OR source_id IN (" + args[0] + ")) LIMIT 100");
+			params.putString("q", "SELECT actor_id,message,attachment,created_time FROM stream WHERE filter_key = 'nf'"
+					+ "AND app_id = " + App.FB_APP_ID + " LIMIT 100");
 			
 			try {
 				String response = App.fb.request("fql", params);
+				Log.d("Yi", response);
 				
 				int counter = 0;
 				while(response != null) {
@@ -186,10 +182,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 	protected void updateView() {
 		createStreamView();
 		
-		updater = new Updater();
-		
-		if(friendsString != null)
-			updater.execute(friendsString);
+		new Updater().execute(0);
 	}
 	
     private void createStreamView() {
@@ -219,22 +212,5 @@ public class StreamManager extends ViewManager implements OnItemClickListener, O
 			intent.putExtra(BookActivity.LINK, stream.link);
 			activity.startActivityForResult(intent, BookActivity.REQUEST_CODE);
 		}
-	}
-
-	@Override
-	public void onListLoaded(List<FriendEntry> entries) {
-		StringBuilder builder = new StringBuilder();
-		for(FriendEntry entry: entries) {
-			if(builder.length() > 0)
-				builder.append(",");
-			builder.append(entry.id);
-			
-			friends.put(entry.id, entry.firstname);
-		}
-
-		friendsString = builder.toString();
-		
-		if(updater != null)
-			updater.execute(friendsString);
 	}
 }
