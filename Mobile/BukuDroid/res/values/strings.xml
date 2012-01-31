@@ -45,6 +45,7 @@
     </string-array>
     
     <!-- Book -->
+    <string name="menu_delete">Delete</string>
     <string name="menu_share">Share</string>
     <string name="menu_share_to">Share with Friend</string>
     <string name="msg_book_added">Successfully added to your bookshelf.</string>

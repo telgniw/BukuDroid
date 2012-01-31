@@ -7,17 +7,13 @@
     <string name="msg_updating">载入中...</string>
     
     <!-- About -->
-    <!--
-    <string name="text_find_out_more">Find out more on Facebook!</string>
-    <string name="text_what_is_bukudroid">An app for bookworms!</string>
-    -->
+    <string name="text_find_out_more">在Facebook了解更多信息！</string>
+    <string name="text_what_is_bukudroid">一个专属爱書者的好App！</string>
     <string name="title_about_bukudroid">关于BukuDroid</string>
     
     <!-- Account -->
-    <!--
-    <string name="msg_login_success">Successfully Logged-in.</string>
-    <string name="msg_logout_success">Successfully Logged-out.</string>
-    -->
+    <string name="msg_login_success">登录成功</string>
+    <string name="msg_logout_success">退出成功</string>
     <string name="title_account_sync">帐户链接设置</string>
     
     <!-- Search -->
@@ -34,10 +30,8 @@
     <string name="msg_no_streams">哎呀沒有任何分享...〒_〒</string>
     <string name="msg_invite">加入BukuDroid，专属爱書者的好App！</string>
     <string name="title_bookshelf">书架</string>
-    <!--
-    <string name="title_friends">Friends</string>
-    <string name="title_stream">Stream</string>
-    -->
+    <string name="title_friends">好友</string>
+    <string name="title_stream">信息流</string>
     
     <string-array name="list_longclick">
         <item>图书信息</item>
@@ -45,6 +39,7 @@
     </string-array>
     
     <!-- Book -->
+    <string name="menu_delete">删除</string>
     <string name="menu_share">分享</string>
     <string name="menu_share_to">与好友分享</string>
     <string name="msg_book_added">成功添加到书架</string>

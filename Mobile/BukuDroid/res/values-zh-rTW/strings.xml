@@ -7,10 +7,8 @@
     <string name="msg_updating">更新中...</string>
     
     <!-- About -->
-    <!--
-    <string name="text_find_out_more">Find out more on Facebook!</string>
-    <string name="text_what_is_bukudroid">An app for bookworms!</string>
-    -->
+    <string name="text_find_out_more">在Facebook上查看更多資訊！</string>
+    <string name="text_what_is_bukudroid">一個愛書人專用的App！</string>
     <string name="title_about_bukudroid">關於BukuDroid</string>
     
     <!-- Account -->
@@ -32,10 +30,8 @@
     <string name="msg_no_streams">哎呀沒有任何分享...●＾●</string>
     <string name="msg_invite">加入BukuDroid，愛書人專用的好App！</string>
     <string name="title_bookshelf">書櫃</string>
-    <!--
-    <string name="title_friends">Friends</string>
-    <string name="title_stream">Stream</string>
-    -->
+    <string name="title_friends">好友</string>
+    <string name="title_stream">訊息串</string>
     
     <string-array name="list_longclick">
         <item>書籍資訊</item>
@@ -43,6 +39,7 @@
     </string-array>
     
     <!-- Book -->
+    <string name="menu_delete">刪除</string>
     <string name="menu_share">分享</string>
     <string name="menu_share_to">和好友分享</string>
     <string name="msg_book_added">成功加至書櫃</string>

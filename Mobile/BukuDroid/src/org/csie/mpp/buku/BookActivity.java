@@ -133,6 +133,9 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()) {
+    		case R.id.menu_delete:
+    			deleteBook();
+    			break;
     		case R.id.menu_share:
     			openShareDialog(null);
     			break;
@@ -374,12 +377,16 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 		actionDelete = new AbstractAction(R.drawable.ic_delete) {
 			@Override
 			public void performAction(View view) {
-				Intent data = new Intent();
-				data.putExtra(App.ISBN, entry.isbn);
-				setResult(RESULT_DELETE, data);
-				finish();
+				deleteBook();
 			}
 		};
+    }
+    
+    private void deleteBook() {
+    	Intent data = new Intent();
+		data.putExtra(App.ISBN, entry.isbn);
+		setResult(RESULT_DELETE, data);
+		finish();
     }
 	
 	private void openShareDialog(String who) {
