@@ -96,8 +96,15 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
         viewpager.setAdapter(viewpagerAdapter);
         indicator.setViewPager(viewpager);
         indicator.setOnPageChangeListener(this);
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
 
-        if(App.fb.isSessionValid())
+    	App.fb.extendAccessTokenIfNeeded(this, null);
+    	
+    	if(App.fb.isSessionValid())
         	createSessionView();
         else {
         	if(prefs.getBoolean(PREFS_ACCOUNT_ITEM + ITEM_FB, false))

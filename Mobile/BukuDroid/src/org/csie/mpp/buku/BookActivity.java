@@ -1,7 +1,5 @@
 package org.csie.mpp.buku;
 
-import java.io.UnsupportedEncodingException;
-
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.db.DBHelper;
 import org.csie.mpp.buku.helper.BookUpdater;
@@ -22,10 +20,12 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -107,24 +107,44 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
     }
     
     private void createLikeButton() {
-        WebView like = (WebView)findViewById(R.id.like_button);
+        final WebView like = new WebView(this);
+        final LinearLayout container = (LinearLayout)findViewById(R.id.like_button);
+        container.addView(like);
         
         WebSettings settings = like.getSettings();
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setJavaScriptEnabled(true);
         settings.setSupportZoom(false);
         
-        try {
-        	String likeUrl = "https://www.facebook.com/plugins/like.php?href=" +
-				java.net.URLEncoder.encode(entry.info.source, "ISO-8859-1") +
-				"&send=false&locale=zh_TW&layout=button_count&width=80&show_faces=false&action=like&colorscheme=light&font=arial&height=21";
+        like.setHorizontalScrollBarEnabled(false);
+        like.setVerticalScrollBarEnabled(false);
+        
+        like.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return (event.getAction() == MotionEvent.ACTION_MOVE);
+			}
+		});
 
-			like.loadUrl(likeUrl);
-			
-		}
-        catch(UnsupportedEncodingException e) {
-			Log.e(App.TAG, e.toString());
-		}
+        final String locale = getString(R.string.country_code);
+        String httpSrc = Util.streamToString(getResources().openRawResource(R.raw.fb_like)).replace(
+        	"#BOOK_TITLE#", entry.title
+        ).replace(
+        	"#BOOK_URL#", entry.info.source
+        ).replace(
+        	"#BOOK_IMAGE#", entry.coverLink
+        ).replace(
+        	"#SITE_NAME#", BookUpdater.SOURCE_BOOKS_TW
+        ).replace(
+        	"#COUNTRY_CODE#", locale
+        );
+        
+        like.loadDataWithBaseURL("https://www.facebook.com/", httpSrc, "text/html", "utf-8", null);
+        like.setWebViewClient(new WebViewClient() {
+        	@Override
+        	public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        		return true;
+        	}
+        });
     }
     
     @Override

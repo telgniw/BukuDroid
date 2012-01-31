@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Globa -->
+    <string name="country_code">zh_TW</string>
     <string name="msg_deleted">刪除成功</string>
     <string name="msg_delete_failed">刪除失敗：</string>
     <string name="msg_updating">更新中...</string>

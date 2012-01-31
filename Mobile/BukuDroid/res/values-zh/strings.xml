@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Global -->
+    <string name="country_code">zh_CN</string>
     <string name="msg_deleted">删除成功</string>
     <string name="msg_delete_failed">删除失败：</string>
     <string name="msg_updating">载入中...</string>

@@ -4,6 +4,7 @@
     <string name="app_name">BukuDroid</string>
     <string name="app_fb_fan_page">http://on.fb.me/BukuDroid</string>
     <string name="app_market_page">http://market.android.com/details?id=org.csie.mpp.buku</string>
+    <string name="country_code">en_US</string>
     <string name="msg_deleted">Successfully deleted.</string>
     <string name="msg_delete_failed">Delete failed:\ </string>
     <string name="msg_updating">Updating...</string>
