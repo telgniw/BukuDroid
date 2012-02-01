@@ -33,6 +33,7 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,6 +76,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         
         db = new DBHelper(this);
         
+        actionBar = ((ActionBar)findViewById(R.id.actionbar));
         createActionButtons();
         
         Intent intent = getIntent();
@@ -300,11 +302,12 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         LinearLayout reviews = (LinearLayout)findViewById(R.id.reviews);
         if(entry.info.reviews != null) {
         	if(reviews.getChildCount() == 1) {
+        		LayoutInflater inflater = getLayoutInflater();
         		reviews.removeAllViews();
         		
         		int size = entry.info.reviews.size();
 	        	for(int i = 0; i < size; i++) {
-	        		View view = getLayoutInflater().inflate(R.layout.list_item_review, null);
+	        		View view = inflater.inflate(R.layout.list_item_review, null);
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
 	        		if(entry.info.reviews.get(i).length()>100){
 	        			String shortContent = Util.shortenString(entry.info.reviews.get(i).toString(), 100);
@@ -340,8 +343,6 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
     }
     
     private void createActionButtons() {
-        actionBar = ((ActionBar)findViewById(R.id.actionbar));
-        
         // FB share button
     	actionShare = new AbstractAction(R.drawable.ic_share) {
 			@Override

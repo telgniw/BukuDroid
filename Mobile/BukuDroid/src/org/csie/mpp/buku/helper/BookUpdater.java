@@ -98,7 +98,6 @@ public abstract class BookUpdater {
 		
 		@Override
 		protected void onPostExecute(OnUpdateStatusChangedListener.Status result) {
-			/* this will be run on UI thread */
 			if(listener != null)
 				listener.onUpdateFinish(result);
 		}
@@ -145,7 +144,7 @@ public abstract class BookUpdater {
 				async.execute(url);
 			}
 			catch(MalformedURLException e) {
-				Log.e(App.TAG, e.toString());
+				listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
 			}
 		}
 
@@ -201,7 +200,7 @@ public abstract class BookUpdater {
 				async.execute(url0, url1);
 			}
 			catch(MalformedURLException e) {
-				Log.e(App.TAG, e.toString());
+				listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
 			}
 		}
 	}
@@ -262,7 +261,7 @@ public abstract class BookUpdater {
 				async.execute(url);
 			}
 			catch(MalformedURLException e) {
-				Log.e(App.TAG, e.toString());
+				listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
 			}
 		}
 		
@@ -329,7 +328,7 @@ public abstract class BookUpdater {
 				async.execute(url0, url1);
 			}
 			catch(MalformedURLException e) {
-				Log.e(App.TAG, e.toString());
+				listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
 			}
 		}
 	}
@@ -441,9 +440,12 @@ public abstract class BookUpdater {
 					URL url0 = new URL("https://www.googleapis.com/books/v1/volumes/" + entry.vid);
 					async.execute(url0);
 				}
+				else {
+					listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
+				}
 			}
 			catch(MalformedURLException e) {
-				Log.e(App.TAG, e.toString());
+				listener.onUpdateFinish(OnUpdateStatusChangedListener.Status.BOOK_NOT_FOUND);
 			}
 		}
 

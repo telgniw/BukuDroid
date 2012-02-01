@@ -3,13 +3,11 @@ package org.csie.mpp.buku.view;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.csie.mpp.buku.App;
-import org.csie.mpp.buku.BookActivity;
 import org.csie.mpp.buku.R;
+import org.csie.mpp.buku.StreamActivity;
 import org.csie.mpp.buku.Util;
 import org.csie.mpp.buku.db.DBHelper;
 import org.json.JSONArray;
@@ -34,11 +32,11 @@ import android.widget.TextView;
 
 public class StreamManager extends ViewManager implements OnItemClickListener {
 	private List<Stream> streams;
-	private Map<String, String> friends;
 	private ArrayAdapter<Stream> adapter;
 	
 	public static class Stream {
-		private String source;
+		private String id;
+		private String name;
 		private String message;
 		private String book;
 		private String author;
@@ -52,19 +50,16 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		private final int resourceId;
 		private final List<Stream> entries;
 		
-		private final String me, says;
-		private final Map<String, String> names;
+		private final String says;
 		
-		public StreamAdapter(Activity activity, int resource, List<Stream> list, Map<String, String> map) {
+		public StreamAdapter(Activity activity, int resource, List<Stream> list) {
 			super(activity, resource, list);
 			
 			inflater = activity.getLayoutInflater();
 			resourceId = resource;
 			entries = list;
 			
-			me = activity.getString(R.string.text_me);
 			says = " " + activity.getString(R.string.text_says);
-			names = map;
 		}
 		
 		@Override
@@ -72,8 +67,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 			Stream stream = entries.get(position);
 			View view = inflater.inflate(resourceId, parent, false);
 			if(stream.message != null) {
-				String name = names.get(stream.source);
-				String message = ((name != null)? name : me) + says + stream.message;
+				String message = stream.name + says + stream.message;
 				((TextView)view.findViewById(R.id.list_message)).setText(message);
 			}
 			if(stream.image != null)
@@ -96,41 +90,54 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		
 		@Override
 		protected Boolean doInBackground(Integer... args) {
+			if(streams.size() > 0)
+				return false;
+			
 			Bundle params = new Bundle();
-			params.putString("q", "SELECT actor_id,message,attachment,created_time FROM stream WHERE filter_key = 'nf'"
-					+ "AND app_id = " + App.FB_APP_ID + " LIMIT 100");
+			params.putString("q", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE filter_key IN ("
+					+ "SELECT filter_key FROM stream_filter WHERE uid = me() AND type = 'newsfeed'"
+					+ ") AND app_id = " + App.FB_APP_ID + " LIMIT 100");
 			
 			try {
 				String response = App.fb.request("fql", params);
-				Log.d("Yi", response);
+				Bundle fields = new Bundle();
+				fields.putString("fields", "first_name");
 				
 				int counter = 0;
 				while(response != null) {
-					JSONObject json = new JSONObject(response);
-					JSONArray data = json.getJSONArray("data");
+					JSONArray data = new JSONObject(response).getJSONArray("data");
 					
 					for(int i = 0; i < data.length(); i++) {
 						publishProgress(++counter);
 						
 						try {
-							JSONObject item = data.getJSONObject(i);
+							JSONObject json = data.getJSONObject(i);
 							Stream stream = new Stream();
-							stream.source = item.getString("actor_id");
-							stream.message = item.getString("message");
-	
-							stream.time = new Date(Long.parseLong(item.getString("created_time")) * 1000);
-	
-							item = item.getJSONObject("attachment");
+							stream.id = json.getString("post_id");
 							
-							stream.book = item.getString("name");
-							stream.author = item.getString("caption");
-							stream.link = item.getString("href");
-	
 							try {
-								stream.image = Util.urlToImage(new URL(item.getJSONArray("media").getJSONObject(0).getString("src")));
+								String user_res = App.fb.request(json.getString("actor_id"), fields);
+								stream.name = new JSONObject(user_res).getString("first_name");
 							}
 							catch(Exception e) {
-								// No icon found.
+								Log.e(App.TAG, e.toString());
+							}
+							
+							stream.message = json.getString("message");
+	
+							stream.time = new Date(Long.parseLong(json.getString("created_time")) * 1000);
+	
+							json = json.getJSONObject("attachment");
+							
+							stream.book = json.getString("name");
+							stream.author = json.getString("caption");
+							stream.link = json.getString("href");
+	
+							try {
+								stream.image = Util.urlToImage(new URL(json.getJSONArray("media").getJSONObject(0).getString("src")));
+							}
+							catch(Exception e) {
+								// icon not found
 							}
 	
 							streams.add(stream);
@@ -174,8 +181,7 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		super(activity, helper);
 		
 		streams = new ArrayList<Stream>();
-		friends = new HashMap<String, String>();
-		adapter = new StreamAdapter(activity, R.layout.list_item_stream, streams, friends);
+		adapter = new StreamAdapter(activity, R.layout.list_item_stream, streams);
 	}
 
 	@Override
@@ -204,13 +210,14 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Stream stream = streams.get(position);
-		if(stream.link == null) {
-			// TODO: display error message
-		}
-		else {
-			Intent intent = new Intent(activity, BookActivity.class);
-			intent.putExtra(BookActivity.LINK, stream.link);
-			activity.startActivityForResult(intent, BookActivity.REQUEST_CODE);
-		}
+		Intent intent = new Intent(activity, StreamActivity.class);
+		intent.putExtra(StreamActivity.POST_ID, stream.id);
+		intent.putExtra(StreamActivity.NAME, stream.name);
+		intent.putExtra(StreamActivity.MESSAGE, stream.message);
+		intent.putExtra(StreamActivity.BOOK, stream.book);
+		intent.putExtra(StreamActivity.AUTHOR, stream.author);
+		intent.putExtra(StreamActivity.LINK, stream.link);
+		intent.putExtra(StreamActivity.IMAGE, stream.image);
+		activity.startActivityForResult(intent, StreamActivity.REQUEST_CODE);
 	}
 }

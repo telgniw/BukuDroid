@@ -14,7 +14,7 @@ public class App {
 	public static final String FB_APP_SECRET 	= "ff5dbf9c9a9dff31bb5cd9a00281cabd";
 	
 	public static final String[] FB_APP_PERMS 	= {
-		"read_stream"
+		"read_stream", "publish_stream"
 	};
 	
 	public static final String FB_FAN_PAGE		= "http://www.facebook.com/pages/BukuDroid/316709318351180";

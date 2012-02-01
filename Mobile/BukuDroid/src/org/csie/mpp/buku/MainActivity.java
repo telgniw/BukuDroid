@@ -211,6 +211,9 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 					deleteBookEntry(entry);
 				}
     			break;
+    		case StreamActivity.REQUEST_CODE:
+    			// TODO:
+    			break;
     		default:
     			break;
     	}

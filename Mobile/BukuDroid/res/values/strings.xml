@@ -63,8 +63,9 @@
     <string name="title_select_friend">Select a Friend</string>
     
     <!-- Stream -->
-    <string name="text_me">Me</string>
+    <string name="text_posted_by">Posted by</string>
     <string name="text_says">Says：</string>
+    <string name="title_comments">Comments</string>
     
     <!-- Scan -->
     <string name="tab_barcode">Barcode</string>

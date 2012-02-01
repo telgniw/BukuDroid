@@ -40,6 +40,10 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
+            android:name=".StreamActivity" 
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".ScanActivity$IsbnInputActivity"
             android:screenOrientation="portrait"
             >
