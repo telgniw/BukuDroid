@@ -12,15 +12,19 @@ import com.markupartist.android.widget.ActionBar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,6 +44,9 @@ public class StreamActivity extends Activity {
 	public static final String IMAGE = "IMAGE";
 
 	private ActionBar actionBar;
+	private LinearLayout comments;
+	
+    private String post_id;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,29 +60,16 @@ public class StreamActivity extends Activity {
         
         Intent intent = getIntent();
         actionBar.setTitle(getString(R.string.text_posted_by) + " " + intent.getStringExtra(NAME));
+        comments = (LinearLayout)findViewById(R.id.comments);
         
-        final String post_id = intent.getStringExtra(StreamActivity.POST_ID);
+        post_id = intent.getStringExtra(StreamActivity.POST_ID);
+        
         fetchPost(post_id);
 
         actionBar.addAction(new ActionBar.AbstractAction(R.drawable.ic_delete) {
 			@Override
 			public void performAction(View view) {
-				new AlertDialog.Builder(StreamActivity.this).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Bundle params = new Bundle();
-						params.putString("method", "DELETE");
-						App.fb_runner.request(post_id, params, new BaseRequestListener() {
-							@Override
-							public void onComplete(String response, Object state) {
-								Intent data = new Intent();
-								data.putExtra(POST_ID, post_id);
-								setResult(StreamActivity.RESULT_DELETE, data);
-								finish();
-							}
-						});
-					}
-				}).setCancelable(true).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.msg_confirm_delete).show();
+				confirmDelete();
 			}
 		});
         
@@ -112,9 +106,6 @@ public class StreamActivity extends Activity {
 	}
 	
 	private void fetchPost(String post_id) {
-		final LinearLayout comments = (LinearLayout)findViewById(R.id.comments);
-		final LayoutInflater inflater = getLayoutInflater();
-		
 		AsyncTask<String, View, Boolean> async = new AsyncTask<String, View, Boolean>() {
 			@Override
 			protected Boolean doInBackground(String... args) {
@@ -125,27 +116,9 @@ public class StreamActivity extends Activity {
 					String response = App.fb.request(args[0] + "/comments", params);
 					JSONArray data = new JSONObject(response).getJSONArray("data");
 					for(int i = 0; i < data.length(); i++) {
-		        		View view = inflater.inflate(R.layout.list_item_comment, null);
-		        		
-						try {
-							JSONObject json = data.getJSONObject(i);
-							
-							JSONObject from = json.getJSONObject("from");
-							((TextView)view.findViewById(R.id.list_name)).setText(from.getString("name"));
-							((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(
-								Util.urlToImage(new URL("http://graph.facebook.com/" + from.getString("id") + "/picture"))
-							);
-							
-							((TextView)view.findViewById(R.id.list_comment)).setText(json.getString("message"));
-							((TextView)view.findViewById(R.id.list_time)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").parse(
-								json.getString("created_time").replace('T', ' ')
-							).toLocaleString());
-						}
-						catch(Exception e) {
-							continue;
-						}
-						
-						publishProgress(view);
+						View view = createComment(data.getJSONObject(i));
+						if(view != null)
+							publishProgress(view);
 					}
 				}
 				catch(Exception e) {
@@ -175,6 +148,28 @@ public class StreamActivity extends Activity {
 		
 		async.execute(post_id);
 	}
+	
+	private View createComment(JSONObject json) {
+		View view = getLayoutInflater().inflate(R.layout.list_item_comment, null);
+		
+		try {
+			JSONObject from = json.getJSONObject("from");
+			((TextView)view.findViewById(R.id.list_name)).setText(from.getString("name"));
+			((ImageView)view.findViewById(R.id.list_image)).setImageBitmap(
+				Util.urlToImage(new URL("http://graph.facebook.com/" + from.getString("id") + "/picture"))
+			);
+			
+			((TextView)view.findViewById(R.id.list_comment)).setText(json.getString("message"));
+			((TextView)view.findViewById(R.id.list_time)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ").parse(
+				json.getString("created_time").replace('T', ' ')
+			).toLocaleString());
+		}
+		catch(Exception e) {
+			return null;
+		}
+		
+		return view;
+	}
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -197,5 +192,92 @@ public class StreamActivity extends Activity {
     		default:
     			break;
     	}
+    }
+    
+    /* --- OptionsMenu			(start) --- */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.stream, menu);
+    	return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()) {
+    		case R.id.menu_delete:
+    			confirmDelete();
+    			break;
+    		case R.id.menu_comment:
+    			showCommentDialog();
+    			break;
+    		default:
+    			break;
+    	}
+    	return true;
+    }
+    /* --- OptionsMenu			(end) --- */
+    
+    private void confirmDelete() {
+    	new AlertDialog.Builder(this).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Bundle params = new Bundle();
+				params.putString("method", "DELETE");
+				App.fb_runner.request(post_id, params, new BaseRequestListener() {
+					@Override
+					public void onComplete(String response, Object state) {
+						Intent data = new Intent();
+						data.putExtra(POST_ID, post_id);
+						setResult(StreamActivity.RESULT_DELETE, data);
+						finish();
+					}
+				});
+			}
+		}).setCancelable(true).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.msg_confirm_delete).show();
+    }
+    
+    private void showCommentDialog() {
+    	final EditText editText = new EditText(this);
+    	editText.setLines(3);
+    	
+    	new AlertDialog.Builder(this).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Bundle params = new Bundle();
+				params.putString("method", "POST");
+				params.putString("message", editText.getText().toString());
+				
+				final ProgressDialog progress = ProgressDialog.show(
+					StreamActivity.this, getString(R.string.title_posting), getString(R.string.fb_posting)
+				);
+				
+				App.fb_runner.request(post_id + "/comments", params, new BaseRequestListener() {
+					@Override
+					public void onComplete(final String response, Object state) {
+						Log.d("Yi", response);
+						StreamActivity.this.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								progress.dismiss();
+								
+								Toast.makeText(StreamActivity.this, R.string.fb_message_posted, App.TOAST_TIME).show();
+								
+								try {
+									JSONObject json = new JSONObject(App.fb.request(
+										new JSONObject(response).getString("id")
+									));
+									View view = createComment(json);
+									comments.addView(view);
+								}
+								catch(Exception e) {
+									Log.e(App.TAG, e.toString());
+								}
+							}
+						});
+					}
+				});
+			}
+		}).setCancelable(true).setTitle(R.string.title_reply_post).setView(editText).show();
     }
 }
