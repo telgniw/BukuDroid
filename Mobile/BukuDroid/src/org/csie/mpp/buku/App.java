@@ -35,7 +35,7 @@ public class App {
 		fb_runner = new AsyncFacebookRunner(fb);
 	}
 	
-	public enum FlurryEvent {
+	public static enum FlurryEvent {
 		TAB_ISBN,
 		TAB_BARCODE,
 		TAB_SEARCH,

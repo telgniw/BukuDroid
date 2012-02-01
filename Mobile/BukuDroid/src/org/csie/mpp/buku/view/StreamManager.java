@@ -43,6 +43,11 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		private String link;
 		private Bitmap image;
 		private Date time;
+		
+		@Override
+		public boolean equals(Object o) {
+			return id == ((Stream)o).id;
+		}
 	}
 	
 	public static class StreamAdapter extends ArrayAdapter<Stream> {
@@ -90,9 +95,6 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		
 		@Override
 		protected Boolean doInBackground(Integer... args) {
-			if(streams.size() > 0)
-				return false;
-			
 			Bundle params = new Bundle();
 			params.putString("q", "SELECT post_id,actor_id,message,attachment,created_time FROM stream WHERE filter_key IN ("
 					+ "SELECT filter_key FROM stream_filter WHERE uid = me() AND type = 'newsfeed'"
@@ -114,6 +116,9 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 							JSONObject json = data.getJSONObject(i);
 							Stream stream = new Stream();
 							stream.id = json.getString("post_id");
+							
+							if(streams.contains(stream))
+								continue;
 							
 							try {
 								String user_res = App.fb.request(json.getString("actor_id"), fields);
@@ -182,6 +187,17 @@ public class StreamManager extends ViewManager implements OnItemClickListener {
 		
 		streams = new ArrayList<Stream>();
 		adapter = new StreamAdapter(activity, R.layout.list_item_stream, streams);
+	}
+	
+	public void remove(String post_id) {
+		for(int i = 0; i < streams.size(); i++) {
+			if(streams.get(i).id.equals(post_id)) {
+				streams.remove(i);
+				break;
+			}
+		}
+		
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override

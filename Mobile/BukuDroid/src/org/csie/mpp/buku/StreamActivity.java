@@ -6,10 +6,13 @@ import java.text.SimpleDateFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.facebook.android.BaseRequestListener;
 import com.facebook.android.SessionStore;
 import com.markupartist.android.widget.ActionBar;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -25,6 +28,9 @@ import android.widget.Toast;
 
 public class StreamActivity extends Activity {
 	public static final int REQUEST_CODE = 1438;
+	
+	public static final int RESULT_DELETE = 711;
+	
 	public static final String POST_ID = "POST_ID";
 	public static final String NAME = "NAME";
 	public static final String MESSAGE = "MESSAGE";
@@ -46,8 +52,32 @@ public class StreamActivity extends Activity {
         actionBar = ((ActionBar)findViewById(R.id.actionbar));
         
         Intent intent = getIntent();
-        fetchPost(intent.getStringExtra(StreamActivity.POST_ID));
         actionBar.setTitle(getString(R.string.text_posted_by) + " " + intent.getStringExtra(NAME));
+        
+        final String post_id = intent.getStringExtra(StreamActivity.POST_ID);
+        fetchPost(post_id);
+
+        actionBar.addAction(new ActionBar.AbstractAction(R.drawable.ic_delete) {
+			@Override
+			public void performAction(View view) {
+				new AlertDialog.Builder(StreamActivity.this).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Bundle params = new Bundle();
+						params.putString("method", "DELETE");
+						App.fb_runner.request(post_id, params, new BaseRequestListener() {
+							@Override
+							public void onComplete(String response, Object state) {
+								Intent data = new Intent();
+								data.putExtra(POST_ID, post_id);
+								setResult(StreamActivity.RESULT_DELETE, data);
+								finish();
+							}
+						});
+					}
+				}).setCancelable(true).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.msg_confirm_delete).show();
+			}
+		});
         
         String message = intent.getStringExtra(MESSAGE);
         if(message.length() > 0)
@@ -71,7 +101,7 @@ public class StreamActivity extends Activity {
 			public void onClick(View view) {
 				// the link will be our fan page link if the book link is not available when posted
 		        if(link == null || link.equals(App.FB_FAN_PAGE))
-		        	Toast.makeText(StreamActivity.this, R.string.msg_book_not_found, App.TOAST_TIME);
+		        	Toast.makeText(StreamActivity.this, R.string.msg_book_not_found, App.TOAST_TIME).show();
 		        else {
 		        	Intent intent = new Intent(StreamActivity.this, BookActivity.class);
 		        	intent.putExtra(BookActivity.LINK, link);

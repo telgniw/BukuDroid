@@ -193,26 +193,17 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
     			}
     			break;
     		case BookActivity.REQUEST_CODE:
-    			if(resultCode == BookActivity.RESULT_ADD) {
-    				String isbn = data.getStringExtra(App.ISBN);
-    				bookMan.add(isbn);
-					indicator.setCurrentItem(0);
-					Toast.makeText(this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
-    			}
-    			else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
-    				Toast.makeText(this, getString(R.string.msg_invalid_isbn), App.TOAST_TIME).show();
-    			}
-    			else if(resultCode == BookActivity.RESULT_NOT_FOUND) {
-    				Toast.makeText(this, getString(R.string.msg_book_not_found), App.TOAST_TIME).show();
-    			}
-				else if(resultCode == BookActivity.RESULT_DELETE) {
-					String isbn = data.getStringExtra(App.ISBN);
-					BookEntry entry = bookMan.get(isbn);
-					deleteBookEntry(entry);
-				}
+    			onBookActivityResult(resultCode, data);
     			break;
     		case StreamActivity.REQUEST_CODE:
-    			// TODO:
+    			if(resultCode == StreamActivity.RESULT_DELETE) {
+    				Toast.makeText(this, R.string.msg_deleted, App.TOAST_TIME).show();
+    				String post_id = data.getStringExtra(StreamActivity.POST_ID);
+    				streamMan.remove(post_id);
+    			}
+    			else {
+    				onBookActivityResult(resultCode, data);
+    			}
     			break;
     		default:
     			break;
@@ -230,6 +221,26 @@ public class MainActivity extends FragmentActivity implements OnPageChangeListen
 		intent.putExtra(App.ISBN, isbn);
 		intent.putExtra(BookActivity.CHECK_DUPLICATE, checkDuplicate);
 		startActivityForResult(intent, BookActivity.REQUEST_CODE);
+    }
+    
+    private void onBookActivityResult(int resultCode, Intent data) {
+    	if(resultCode == BookActivity.RESULT_ADD) {
+			String isbn = data.getStringExtra(App.ISBN);
+			bookMan.add(isbn);
+			indicator.setCurrentItem(0);
+			Toast.makeText(this, getString(R.string.msg_book_added), App.TOAST_TIME).show();
+		}
+		else if(resultCode == BookActivity.RESULT_ISBN_INVALID) {
+			Toast.makeText(this, getString(R.string.msg_invalid_isbn), App.TOAST_TIME).show();
+		}
+		else if(resultCode == BookActivity.RESULT_NOT_FOUND) {
+			Toast.makeText(this, getString(R.string.msg_book_not_found), App.TOAST_TIME).show();
+		}
+		else if(resultCode == BookActivity.RESULT_DELETE) {
+			String isbn = data.getStringExtra(App.ISBN);
+			BookEntry entry = bookMan.get(isbn);
+			deleteBookEntry(entry);
+		}
     }
     
     private void deleteBookEntry(BookEntry entry) {
