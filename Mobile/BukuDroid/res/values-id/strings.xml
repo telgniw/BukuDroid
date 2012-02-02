@@ -2,6 +2,7 @@
 <resources>
     <!-- Global -->
     <string name="country_code">id_ID</string>
+    <string name="msg_updating">Memuat...</string>
     
     <!-- About -->
     <string name="title_about_bukudroid">Tentang BukuDroid</string>
