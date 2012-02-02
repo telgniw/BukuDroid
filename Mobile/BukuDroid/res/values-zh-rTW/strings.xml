@@ -2,6 +2,7 @@
 <resources>
     <!-- Global -->
     <string name="country_code">zh_TW</string>
+    <string name="msg_confirm_delete">確認刪除？</string>
     <string name="msg_deleted">刪除成功</string>
     <string name="msg_delete_failed">刪除失敗：</string>
     <string name="msg_dialog_wait">請稍候...</string>
@@ -51,12 +52,19 @@
     <string name="text_no_data">沒有資料</string>
     <string name="text_source">資料來源: </string>
     <string name="title_book_info">書籍資訊</string>
+    <string name="title_buku_friends">Buku好友</string>
     <string name="title_introduction">簡介</string>
+    <string name="title_other_friends">其他好友</string>
     <string name="title_review">書評</string>
     <string name="title_select_friend">選擇好友</string>
     
     <!-- Stream -->
+    <string name="text_posted_by">來自</string>
     <string name="text_says">說：</string>
+    <string name="title_comments">回應</string>
+    <string name="title_posting">發佈中</string>
+    <string name="title_reply_post">回覆文章</string>
+    <string name="menu_comment">回覆文章</string>
     
     <!-- Scan -->
     <string name="tab_barcode">條碼</string>
@@ -79,5 +87,4 @@
 	    <item>作者</item>
 	    <item>出版商</item>
     </string-array>
-        
 </resources>

@@ -2,6 +2,7 @@
 <resources>
     <!-- Global -->
     <string name="country_code">zh_CN</string>
+    <string name="msg_confirm_delete">确定删除？</string>
     <string name="msg_deleted">删除成功</string>
     <string name="msg_delete_failed">删除失败：</string>
     <string name="msg_dialog_wait">请稍候...</string>
@@ -51,12 +52,19 @@
     <string name="text_no_data">没有资料</string>
     <string name="text_source">资料来源：</string>
     <string name="title_book_info">图书信息</string>
+    <string name="title_buku_friends">Buku好友</string>
     <string name="title_introduction">简介</string>
+    <string name="title_other_friends">其他好友</string>
     <string name="title_review">书评</string>
     <string name="title_select_friend">选取好友</string>
     
     <!-- Stream -->
+    <string name="text_posted_by">从</string>
     <string name="text_says">说：</string>
+    <string name="title_comments">回复</string>
+    <string name="title_posting">张贴中</string>
+    <string name="title_reply_post">张贴回复</string>
+    <string name="menu_comment">张贴回复</string>
     
     <!-- Scan -->
     <string name="tab_barcode">条码</string>
