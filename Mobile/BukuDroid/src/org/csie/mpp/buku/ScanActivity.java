@@ -2,12 +2,14 @@ package org.csie.mpp.buku;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.csie.mpp.buku.db.BookEntry;
 import org.csie.mpp.buku.view.BookshelfManager.SearchEntryAdapter;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.flurry.android.FlurryAgent;
@@ -20,6 +22,7 @@ import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -187,127 +190,110 @@ public class ScanActivity extends TabActivity implements OnTabChangeListener {
 
 		@Override
 		public void onClick(View v) {
+			String keyword = input.getText().toString();
 			
-			if( input.getText().toString().equals("") )
-			{
+			if(keyword.length() == 0) {
 				Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
 				return;
 			}
 			
-			final ProgressDialog progressDialog = ProgressDialog.show(KeywordSearchActivity.this, getString(R.string.key_search), getString(R.string.key_searching));
-			
-			// TODO: change to AsyncTask
-			URL url;
-			String str = "";
-			int type = spinner.getSelectedItemPosition();
-			String keyword = input.getText().toString();
-			String prefix = "";
-			
-			try {
-				switch(type)
-				{
-				case 0:
-					prefix = "";
-					break;
-				case 1:
-					prefix = "intitle:";
-					break;
-				case 2:
-					prefix = "inauthor:";
-					break;
-				case 3:
-					prefix = "inpublisher:";
-					break;
-				}
-				String urL = "https://www.googleapis.com/books/v1/volumes?q=" + java.net.URLEncoder.encode(prefix + keyword);
-				url = new URL(urL);
-				str = Util.urlToString(url);
-				
-				
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-			
 			final List<BookEntry> entries = new ArrayList<BookEntry>();
-			/* parse JSON */
-			try{
-				if ( !str.equals("") )
-				{
-					JSONObject json = new JSONObject(str);
-					if ( json.getInt("totalItems") != 0 )
-					{
-						JSONArray data = json.getJSONArray("items");
-						for ( int i = 0 ; i < data.length() && i < MAX_RESULT ; i++)
-						{
-							JSONObject p = data.getJSONObject(i);	
-							JSONObject vol = p.getJSONObject("volumeInfo");
-							
-							//String imgLink = p.getJSONObject("imageLinks").getString("smallThumbnail");
-							BookEntry book = new BookEntry();
-							if ( vol.has("title") )
-								book.title = vol.getString("title");
-							else
-								continue;
-							
-							if ( vol.has("authors") )
-								book.author = vol.getJSONArray("authors").getString(0);
-							else
-								book.author = "";
-							
-							if ( vol.has("industryIdentifiers") )
-							{	
-								JSONArray ary = vol.getJSONArray("industryIdentifiers");
-								JSONObject ind;
-								for ( int j = 0 ; j < ary.length() ; j++ )
-								{
-									ind = ary.getJSONObject(j);
-									if (ind.getString("type").equals("ISBN_10") || ind.getString("type").equals("ISBN_13"))
-									{
-										book.isbn = ind.getString("identifier");
-										break;
+			final ProgressDialog progressDialog = ProgressDialog.show(KeywordSearchActivity.this, getString(R.string.title_searching), getString(R.string.msg_dialog_wait));
+			
+			AsyncTask<URL, BookEntry, Boolean> async = new AsyncTask<URL, BookEntry, Boolean>() {
+				@Override
+				protected Boolean doInBackground(URL... urls) {
+					String response = Util.urlToString(urls[0]);
+					try {
+						JSONObject json = new JSONObject(response);
+						if(json.getInt("totalItems") != 0) {
+							JSONArray data = json.getJSONArray("items");
+							for(int i = 0; i < data.length() && i < MAX_RESULT; i++) {
+								try {
+									JSONObject vol = data.getJSONObject(i).getJSONObject("volumeInfo");
+									
+									BookEntry book = new BookEntry();
+									book.title = vol.getString("title");
+									book.author = vol.getJSONArray("authors").getString(0);
+									
+									JSONArray ary = vol.getJSONArray("industryIdentifiers");
+									for(int j = 0; j < ary.length(); j++) {
+										JSONObject ind = ary.getJSONObject(j);
+										if(ind.getString("type").equals("ISBN_10") || ind.getString("type").equals("ISBN_13")) {
+											book.isbn = ind.getString("identifier");
+											break;
+										}
 									}
+									if(book.isbn == null)
+										continue;
+									
+									publishProgress(book);
 								}
-								if ( book.isbn == null )
+								catch(JSONException e) {
 									continue;
-								
+								}
 							}
-							else
-								continue;
-							entries.add(book);
-							
 						}
 					}
-				}
-				
-				if ( entries.size() == 0 )
-				{
-					Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
-					progressDialog.dismiss();
-					return;
-				}
-				SearchEntryAdapter adapter = new SearchEntryAdapter(KeywordSearchActivity.this, R.layout.list_item_keyword, entries);
-
-				AlertDialog dialog = new AlertDialog.Builder(KeywordSearchActivity.this).setAdapter(adapter,  new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(
-							DialogInterface dialog,
-							int position) {
-						dialog.dismiss();
-						String isbn = entries.get(position).isbn;
-						Intent data = new Intent();
-			        	data.putExtra(App.ISBN, isbn);
-			        	setResultForTabActivity(RESULT_OK, data);
-			            finish();
+					catch(JSONException e) {
+						return false;
 					}
-				}).setTitle(R.string.title_search_result).create();
-				progressDialog.dismiss();
-				dialog.show();
+					return true;
+				}
 				
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
+				@Override
+				protected void onProgressUpdate(BookEntry ...books) {
+					entries.add(books[0]);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean result) {
+					progressDialog.dismiss();
+					
+					if(result == false || entries.size() == 0) {
+						Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
+						return;
+					}
+					
+					SearchEntryAdapter adapter = new SearchEntryAdapter(KeywordSearchActivity.this, R.layout.list_item_keyword, entries);
+					new AlertDialog.Builder(KeywordSearchActivity.this).setAdapter(adapter,  new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(
+								DialogInterface dialog,
+								int position) {
+							dialog.dismiss();
+							String isbn = entries.get(position).isbn;
+							Intent data = new Intent();
+				        	data.putExtra(App.ISBN, isbn);
+				        	setResultForTabActivity(RESULT_OK, data);
+				            finish();
+						}
+					}).setTitle(R.string.title_search_result).create().show();
+				}
+			};
 			
+			try {
+				String prefix;
+				switch(spinner.getSelectedItemPosition()) {
+					case 1:
+						prefix = "intitle:";
+						break;
+					case 2:
+						prefix = "inauthor:";
+						break;
+					case 3:
+						prefix = "inpublisher:";
+						break;
+					default:
+						prefix = "";
+						break;
+				}
+				URL url = new URL("https://www.googleapis.com/books/v1/volumes?q=" + URLEncoder.encode(prefix + keyword));
+				async.execute(url);
+			}
+			catch (MalformedURLException e) {
+				Toast.makeText(KeywordSearchActivity.this, R.string.search_no_result, App.TOAST_TIME).show();
+			}
 		}
     }
 }

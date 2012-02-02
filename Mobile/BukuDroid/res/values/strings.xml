@@ -7,7 +7,8 @@
     <string name="country_code">en_US</string>
     <string name="msg_confirm_delete">Delete this post?</string>
     <string name="msg_deleted">Successfully deleted.</string>
-    <string name="msg_delete_failed">Delete failed:\ </string>
+    <string name="msg_delete_failed">Delete failed:</string>
+    <string name="msg_dialog_wait">Please wait for a moment...</string>
     <string name="msg_updating">Updating...</string>
     
     <!-- About -->
@@ -79,19 +80,17 @@
     
     <!-- Facebook -->
     <string name="fb_message_posted">Message posted.</string>
-    <string name="fb_posting">Posting...</string>
     
     <!-- Search -->
     <string name="search_no_result">No result!</string>
     
     <!--  Books Keyword Search -->
-    <string-array name="keytype">
-	    <item>All types</item>
+    <string name="title_searching">Searching</string>
+    
+    <string-array name="list_keytype">
+	    <item>All</item>
 	    <item>Title</item>
 	    <item>Author</item>
 	    <item>Publisher</item>
     </string-array>
-    <string name="key_search">Searching</string>
-    <string name="key_searching">Please wait a moment...</string>
-    
 </resources>

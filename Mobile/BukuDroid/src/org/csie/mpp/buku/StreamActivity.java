@@ -249,7 +249,7 @@ public class StreamActivity extends Activity {
 				params.putString("message", editText.getText().toString());
 				
 				final ProgressDialog progress = ProgressDialog.show(
-					StreamActivity.this, getString(R.string.title_posting), getString(R.string.fb_posting)
+					StreamActivity.this, getString(R.string.title_posting), getString(R.string.msg_dialog_wait)
 				);
 				
 				App.fb_runner.request(post_id + "/comments", params, new BaseRequestListener() {

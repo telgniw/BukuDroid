@@ -4,6 +4,7 @@
     <string name="country_code">zh_CN</string>
     <string name="msg_deleted">删除成功</string>
     <string name="msg_delete_failed">删除失败：</string>
+    <string name="msg_dialog_wait">请稍候...</string>
     <string name="msg_updating">载入中...</string>
     
     <!-- About -->
@@ -70,12 +71,12 @@
     <string name="search_no_result">查无结果!</string>
         
     <!--  Books Keyword Search -->
-    <string-array name="keytype">
+    <string name="title_searching">搜寻中</string>
+    
+    <string-array name="list_keytype">
 	    <item>所有类型</item>
 	    <item>标题</item>
 	    <item>作者</item>
 	    <item>出版商</item>
     </string-array> 
-    <string name="key_search">搜寻中</string>
-    <string name="key_searching">请稍候一下</string>   
 </resources>

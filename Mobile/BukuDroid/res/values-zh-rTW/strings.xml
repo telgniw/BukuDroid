@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Globa -->
+    <!-- Global -->
     <string name="country_code">zh_TW</string>
     <string name="msg_deleted">刪除成功</string>
     <string name="msg_delete_failed">刪除失敗：</string>
+    <string name="msg_dialog_wait">請稍候...</string>
     <string name="msg_updating">更新中...</string>
     
     <!-- About -->
@@ -70,13 +71,13 @@
     <string name="search_no_result">找不到書籍!</string>
         
     <!--  Books Keyword Search -->
-    <string-array name="keytype">
+    <string name="title_searching">搜尋中</string>
+    
+    <string-array name="list_keytype">
 	    <item>所有類型</item>
 	    <item>標題</item>
 	    <item>作者</item>
 	    <item>出版商</item>
     </string-array>
-    <string name="key_search">搜尋中</string>
-    <string name="key_searching">請稍候...</string>
         
 </resources>
