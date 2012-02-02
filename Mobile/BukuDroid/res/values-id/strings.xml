@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Global -->
+    <string name="country_code">id_ID</string>
+    
+    <!-- About -->
+    <string name="title_about_bukudroid">Tentang BukuDroid</string>
+    
+    <!-- Account -->
+    <string name="title_account_sync">Akun</string>
+    
+    <!-- Search -->
+    <string name="hint_search">Penulis, Judul, ISBN</string>
+    <string name="title_search_result">Hasil Pencarian</string>
+    
+    <!-- ViewPager -->
+    <string name="menu_about">Tentang</string>
+    <string name="menu_account_sync">Pengaturan Akun</string>
+    <string name="menu_search">Pencarian</string>
+    <string name="title_friends">Teman</string>
+    
+    <string-array name="list_longclick">
+        <item>Informasi</item>
+        <item>Hapus</item>
+    </string-array>
+    
+    <!-- Book -->
+    <string name="menu_delete">Hapus</string>
+    <string name="menu_share">Bagikan</string>
+    <string name="menu_share_to">Bagikan ke teman.</string>
+    <string name="title_book_info">Informasi</string>
+    <string name="title_buku_friends">Teman BukuDroid</string>
+    <string name="title_other_friends">Teman Lain</string>
+    <string name="title_select_friend">Pilih nama teman.</string>
+    
+    <!-- Stream -->
+    <string name="title_comments">Komentar</string>
+    <string name="title_reply_post">Tulis Komentar</string>
+    <string name="menu_comment">Tulis Komentar</string>
+    
+    <!-- Scan -->
+    <string name="tab_search">Hasil</string>
+    
+    <!-- Facebook -->
+    
+    <!-- Search -->
+    
+    <!--  Books Keyword Search -->
+    <string-array name="list_keytype">
+	    <item>Semua Jenis</item>
+	    <item>Judul</item>
+	    <item>Penulis</item>
+	    <item>Penerbit</item>
+    </string-array>
+</resources>
