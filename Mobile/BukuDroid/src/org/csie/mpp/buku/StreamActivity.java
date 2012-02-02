@@ -185,7 +185,7 @@ public class StreamActivity extends Activity {
     				Toast.makeText(this, getString(R.string.msg_book_not_found), App.TOAST_TIME).show();
     			}
     			else {
-    				setResult(resultCode);
+    				setResult(resultCode, data);
     				finish();
     			}
     			break;
