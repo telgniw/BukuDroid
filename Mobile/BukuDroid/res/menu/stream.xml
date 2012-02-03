@@ -5,7 +5,7 @@
         android:title="@string/menu_delete"
     />
     <item
-        android:icon="@drawable/ic_menu_none"
+        android:icon="@drawable/ic_menu_comment"
         android:id="@+id/menu_comment"
         android:title="@string/menu_comment"
     />

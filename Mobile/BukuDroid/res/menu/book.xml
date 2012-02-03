@@ -5,12 +5,12 @@
         android:title="@string/menu_delete"
     />
     <item
-        android:icon="@drawable/ic_menu_none"
+        android:icon="@drawable/ic_menu_share"
         android:id="@+id/menu_share"
         android:title="@string/menu_share"
     />
     <item
-        android:icon="@drawable/ic_menu_none"
+        android:icon="@drawable/ic_menu_share_friends"
         android:id="@+id/menu_share_to"
         android:title="@string/menu_share_to"
     />

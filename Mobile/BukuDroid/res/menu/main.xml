@@ -10,7 +10,7 @@
     </group>
     <group android:id="@+id/menu_friends" android:visible="false">
         <item
-            android:icon="@drawable/ic_menu_none"
+            android:icon="@drawable/ic_menu_invite"
             android:id="@+id/menu_invite"
             android:title="@string/menu_invite"
         />
@@ -21,7 +21,7 @@
         android:title="@string/menu_account_sync"
     />
     <item
-        android:icon="@drawable/ic_menu_more"
+        android:icon="@drawable/icon"
         android:id="@+id/menu_about"
         android:title="@string/menu_about"
     />
