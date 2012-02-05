@@ -2,12 +2,20 @@
 <resources>
     <!-- Global -->
     <string name="country_code">id_ID</string>
+    <string name="msg_confirm_delete">Anda yakin untuk menghapusnya?</string>
+    <string name="msg_deleted">Penghapusan sukses.</string>
+    <string name="msg_delete_failed">Penghapusan gagal:</string>
+    <string name="msg_dialog_wait">Harap tunggu...</string>
     <string name="msg_updating">Memuat...</string>
     
     <!-- About -->
+    <string name="text_find_out_more">Silakan mencari tahu lebih lanjut di Facebook!</string>
+    <string name="text_what_is_bukudroid">Aplikasi untuk bookworms!</string>
     <string name="title_about_bukudroid">Tentang BukuDroid</string>
     
     <!-- Account -->
+    <string name="msg_login_success">Masukkan sukses.</string>
+    <string name="msg_logout_success">Keluaran sukses.</string>
     <string name="title_account_sync">Akun</string>
     
     <!-- Search -->
@@ -15,38 +23,61 @@
     <string name="title_search_result">Hasil Pencarian</string>
     
     <!-- ViewPager -->
+    <string name="hint_add_book_to_start">Pencet tombol di kanan atas untuk menambah beberapa buku.</string>
     <string name="menu_about">Tentang</string>
     <string name="menu_account_sync">Pengaturan Akun</string>
-    <string name="menu_search">Pencarian</string>
+    <string name="menu_search">Mencari</string>
+    <string name="menu_invite">Mengundang</string>
+    <string name="msg_no_friends">Anda tidak mempunyai teman...</string>
+    <string name="msg_no_streams">Anda tidak mempunyai posting baru...</string>
+    <string name="msg_invite">Bergabunglah dengan BukuDroid! Aplikasi untuk pencinta buku!</string>
+    <string name="title_bookshelf">Rak Buku</string>
     <string name="title_friends">Teman</string>
+    <string name="title_stream">Posting Baru</string>
     
     <string-array name="list_longclick">
         <item>Informasi</item>
-        <item>Hapus</item>
+        <item>Menghapus</item>
     </string-array>
     
     <!-- Book -->
     <string name="menu_delete">Hapus</string>
-    <string name="menu_share">Bagikan</string>
-    <string name="menu_share_to">Bagikan ke teman.</string>
+    <string name="menu_share">Membagikan</string>
+    <string name="menu_share_to">Membagikan dengan teman.</string>
+    <string name="msg_book_added">Sukses menambahkan ke data anda.</string>
+    <string name="msg_book_already_exists">Anda telah mempunyai buku ini di data anda.</string>
+    <string name="msg_book_not_found">Buku tidak ditemukan.</string>
+    <string name="msg_invalid_isbn">ISBN tidak valid.</string>
+    <string name="msg_unexpected_error">Tak terduga kesalahan! Mohon cek koneksi jaringan atau hubungi pengelola.</string>
+    <string name="text_no_data">Tidak ada data.</string>
+    <string name="text_source">Sumber：</string>
     <string name="title_book_info">Informasi</string>
     <string name="title_buku_friends">Teman BukuDroid</string>
-    <string name="title_other_friends">Teman Lain</string>
+    <string name="title_introduction">Pengenalan Buku</string>
+    <string name="title_other_friends">Teman Lainnya</string>
+    <string name="title_review">Ulasan Buku</string>
     <string name="title_select_friend">Pilih nama teman.</string>
     
     <!-- Stream -->
+    <string name="text_posted_by">Diposkan oleh</string>
+    <string name="text_says">Sebutkans：</string>
     <string name="title_comments">Komentar</string>
+    <string name="title_posting">Mempos Komentar</string>
     <string name="title_reply_post">Tulis Komentar</string>
-    <string name="menu_comment">Tulis Komentar</string>
+    <string name="menu_comment">Komentari</string>
     
     <!-- Scan -->
-    <string name="tab_search">Hasil</string>
+    <string name="tab_search">Pencarian</string>
     
     <!-- Facebook -->
+    <string name="fb_message_posted">Pesan pos.</string>
     
     <!-- Search -->
+    <string name="search_no_result">Tidak ada hasil!</string>
     
     <!--  Books Keyword Search -->
+    <string name="title_searching">Pencarian</string>
+    
     <string-array name="list_keytype">
 	    <item>Semua Jenis</item>
 	    <item>Judul</item>
