@@ -30,6 +30,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin"
+            android:background="@drawable/bg_stream_book"
         >
             <ImageView
                 android:id="@+id/image"

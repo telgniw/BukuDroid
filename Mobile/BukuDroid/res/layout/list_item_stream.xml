@@ -15,6 +15,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_streams_book"
     >
 	    <ImageView
 	        android:id="@+id/list_image"
