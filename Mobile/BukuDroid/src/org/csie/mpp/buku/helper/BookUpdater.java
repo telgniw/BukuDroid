@@ -66,7 +66,7 @@ public abstract class BookUpdater {
 	
 	protected final BookEntry entry;
 	protected OnUpdateStatusChangedListener listener;
-	
+
 	protected BookUpdater(BookEntry e) {
 		entry = e;
 	}
@@ -163,7 +163,7 @@ public abstract class BookUpdater {
 							if(json.has("ratingsCount"))
 								entry.info.ratingsCount = json.getInt("ratingsCount");
 							if(json.has("description"))
-								entry.info.description = Html.fromHtml(json.getString("description"));
+								entry.info.description = json.getString("description");
 							publishProgress();
 
 							HttpClient httpclient = new DefaultHttpClient();
@@ -177,10 +177,10 @@ public abstract class BookUpdater {
 					    	HttpEntity entity = response.getEntity();
 					    	String result = EntityUtils.toString(entity, "UTF-8");
 					    	result = result.substring(result.indexOf(">User reviews<") + ">User reviews<".length());
-					    	entry.info.reviews = new ArrayList<Spanned>();
+					    	entry.info.reviews = new ArrayList<String>();
 					    	while(result.indexOf("<p dir=ltr>")!=-1){
 					    		result = result.substring(result.indexOf("<p dir=ltr>") + "<p dir=ltr>".length());
-					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
+					    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
 					    	}
 
 					    	entry.info.sourceName = SOURCE_GOOGLE_BOOKS;
@@ -285,7 +285,7 @@ public abstract class BookUpdater {
 					    	result = result.substring(result.indexOf("class=\"content_word\"")+"class=\"content_word\"".length());
 					    	result = result.substring(result.indexOf("<BR><BR>")+"<BR><BR>".length());
 					    	result = result.substring(0, result.indexOf("</td>"));
-					    	entry.info.description = Util.htmlToText(result.trim());
+					    	entry.info.description = result.trim();
 					    	publishProgress();
 
 					    	httpget = new HttpGet(urls[1].toURI());
@@ -305,10 +305,10 @@ public abstract class BookUpdater {
 					    			tmp = tmp.substring(tmp.indexOf("images/m_bul11.gif") + "images/m_bul11.gif".length());
 					    		}
 					    	}
-					    	entry.info.reviews = new ArrayList<Spanned>();
+					    	entry.info.reviews = new ArrayList<String>();
 					    	while(result.indexOf("<p class=\"des\">")!=-1){
 					    		result = result.substring(result.indexOf("<p class=\"des\">") + "<p class=\"des\">".length());
-					    		entry.info.reviews.add(Util.htmlToText(result.substring(0, result.indexOf("</p>"))));
+					    		entry.info.reviews.add(result.substring(0, result.indexOf("</p>")));
 					    	}
 
 					    	entry.info.sourceName = SOURCE_BOOKS_TW;

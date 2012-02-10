@@ -51,7 +51,7 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 public class MainActivity extends FragmentActivity implements OnPageChangeListener {
 	private static final String PREFS_PAGE_IDX = "VIEWPAGER_INDEX";
-	
+
 	private DBHelper db;
 	private SharedPreferences prefs;
 	

@@ -1,5 +1,10 @@
 package org.csie.mpp.buku.db;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import android.database.Cursor;
@@ -7,19 +12,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.text.Spanned;
 
-public class BookEntry extends Entry {
+public class BookEntry extends Entry implements Serializable{
 	public static final Schema SCHEMA = new Schema(BookEntry.class);
 	
-	public static class Info {
+	public static class Info implements Serializable{
 		public float rating;
 		public int ratingsCount;
-		public Spanned description;
-		public ArrayList<Spanned> reviews;
+		public String description;
+		public ArrayList<String> reviews;
 		
 		public String sourceName;
 		public String source;
 	}
-	
+
 	@Column(name="isbn", type=Type.TEXT, primary=true, notNull=true)
 	public String isbn;
 	
@@ -44,6 +49,10 @@ public class BookEntry extends Entry {
 	public String coverLink;
 	
 	public Info info = new Info();
+
+	//for bitmap serialization
+	private static ByteBuffer dst;
+	private static byte[] bytesar;	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -103,5 +112,52 @@ public class BookEntry extends Entry {
 			SCHEMA.extract(cursor, entries[i]);
 		}
 		return entries;
+	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException{
+		out.writeObject(vid);
+		out.writeLong(time);
+		out.writeObject(title);
+		out.writeObject(author);
+		out.writeObject(coverLink);
+		out.writeObject(info);
+
+	    out.writeInt(cover.getRowBytes());
+	    out.writeInt(cover.getHeight());
+	    out.writeInt(cover.getWidth());
+	    out.writeInt(cover.getConfig().ordinal());
+
+	    final int bmSize = cover.getRowBytes() * cover.getHeight();
+	    if (dst == null || bmSize > dst.capacity()) {
+	        dst = ByteBuffer.allocate(bmSize);
+	    }
+	    dst.rewind();
+	    cover.copyPixelsToBuffer(dst);
+	    dst.flip();
+	    out.write(dst.array(), 0, bmSize);
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+		vid = (String)in.readObject();
+		time = in.readLong();
+		title = (String)in.readObject();
+		author = (String)in.readObject();
+		coverLink = (String)in.readObject();
+		info = (Info)in.readObject();
+
+		final int nbRowBytes = in.readInt();
+		final int height = in.readInt();
+		final int width = in.readInt();
+		final Bitmap.Config config = Bitmap.Config.values()[in.readInt()];
+
+		final int bmSize = nbRowBytes * height;
+		if (dst == null || bmSize > dst.capacity()) {
+			dst = ByteBuffer.allocate(bmSize);
+		}
+		dst.rewind();
+		in.read(dst.array(), 0, bmSize);
+
+		cover = Bitmap.createBitmap(width, height, config);
+		cover.copyPixelsFromBuffer(dst);
 	}
 }

@@ -1,8 +1,13 @@
 package org.csie.mpp.buku;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.csie.mpp.buku.db.BookEntry;
@@ -58,10 +63,13 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	
 	public static final String CHECK_DUPLICATE = "duplicate";
 	public static final String LINK = "link";
+	private static final String CACHE_PREFIX = "/BUKU_"; 
 	
 	private DBHelper db;
+	private HashSet<String> cachedSet; 
 	
 	private BookEntry entry;
+	private String cachedFilePath;
 	private BookUpdater updater;
 	private ActionBar actionBar;
 	private Action actionAdd, actionDelete, actionShare;
@@ -76,11 +84,19 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         
         db = new DBHelper(this);
         
+        try{
+        	cachedSet = (HashSet<String>)new ObjectInputStream(new FileInputStream(getApplicationContext().getCacheDir() + CACHE_PREFIX)).readObject();
+        }catch(Exception e){
+        	cachedSet = new HashSet<String>(); 
+        }
+
         actionBar = ((ActionBar)findViewById(R.id.actionbar));
         createActionButtons();
         
         Intent intent = getIntent();
         String isbn = intent.getStringExtra(App.ISBN);
+        cachedFilePath = getApplicationContext().getCacheDir() + CACHE_PREFIX + isbn;
+        //TODO(ianchou): cached the link case
         if(isbn == null) {
         	String link = intent.getStringExtra(LINK);
         	entry = new BookEntry();
@@ -95,10 +111,11 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	        	finish();
 	        	return;
 	        }
+	        
 	        entry = BookEntry.get(db.getReadableDatabase(), isbn);
 	        
 	        boolean updateAll = false;
-	        
+
 	        if(entry != null) {
 	        	if(intent.getBooleanExtra(CHECK_DUPLICATE, false))
 	        		Toast.makeText(this, R.string.msg_book_already_exists, App.TOAST_TIME).show();
@@ -111,6 +128,24 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	        	updateAll = true;
 	        }	
 	        
+	        //TODO(ianchou): check the date of cached
+	        //check cache
+	        if(entry != null && cachedSet.contains(isbn)) {
+	        	try{
+	        		entry.info = (BookEntry.Info)new ObjectInputStream(new FileInputStream(cachedFilePath)).readObject();	        		
+	        		updater = BookUpdater.create(entry);
+	        		onUpdateFinish(Status.OK_INFO);
+		       		actionBar.addAction(actionDelete, 0);
+		       		actionBar.addAction(actionShare, 1);
+	        		return;
+	        	}catch(Exception e){
+	        		e.printStackTrace();
+		        	entry = new BookEntry();
+		        	entry.isbn = isbn;
+		        	updateAll = true; 
+	        	}
+	        }
+
 	        updater = BookUpdater.create(entry);
 	        updater.setOnUpdateFinishedListener(this);
 	  
@@ -121,6 +156,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	       		actionBar.addAction(actionDelete, 0);
 	       		actionBar.addAction(actionShare, 1);
 	       	}
+
         }
     }
 
@@ -244,6 +280,22 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 				break;
 			case OK_INFO:
 				updateView(status);
+
+		        //write bookEntry to cache
+		        try{
+		        	ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(cachedFilePath));
+		        	outputStream.writeObject(entry.info);
+		        	outputStream.flush();
+		        	outputStream.close();
+		        	cachedSet.add(entry.isbn);
+		        	ObjectOutputStream outputStream2 = new ObjectOutputStream(new FileOutputStream(getApplicationContext().getCacheDir() + CACHE_PREFIX));
+		        	outputStream2.writeObject(cachedSet);
+		        	outputStream2.flush();
+		        	outputStream2.close();
+		        }catch(IOException e){
+		        	 e.printStackTrace();
+		        }
+
 				break;
 			case BOOK_NOT_FOUND:
 	    		FlurryAgent.logEvent(App.FlurryEvent.BOOK_NOT_FOUND.toString());
@@ -280,12 +332,12 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
         
         TextView description = ((TextView)findViewById(R.id.description));
         if(entry.info.description != null) {
-        	String shortContent = Util.shortenString(entry.info.description.toString(), 200);
+        	String shortContent = Util.shortenString(Util.htmlToText(entry.info.description).toString(), 200);
         	if(entry.info.description.length() > shortContent.length()) {
         		description.setOnClickListener(new OnClickListener() {
         	        @Override
         	        public void onClick(View v) {
-        	        	new AlertDialog.Builder(BookActivity.this).setMessage(entry.info.description).show();               
+        	        	new AlertDialog.Builder(BookActivity.this).setMessage(Util.htmlToText(entry.info.description)).show();               
         	        }
         	    });
         	}
@@ -310,13 +362,13 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	        		View view = inflater.inflate(R.layout.list_item_review, null);
 	        		TextView review = ((TextView)view.findViewById(R.id.list_review));
 	        		if(entry.info.reviews.get(i).length()>100){
-	        			String shortContent = Util.shortenString(entry.info.reviews.get(i).toString(), 100);
+	        			String shortContent = Util.shortenString(Util.htmlToText(entry.info.reviews.get(i)).toString(), 100);
 	        			review.setOnClickListener(this);
 	        			review.setId(i);
 			            review.setText(shortContent);
 	        		}
                     else {
-		        		review.setText(entry.info.reviews.get(i));
+		        		review.setText(Util.htmlToText(entry.info.reviews.get(i)));
 		        		review.setMovementMethod(LinkMovementMethod.getInstance());
 	        		}
 	        		reviews.addView(view);        	  
@@ -508,7 +560,7 @@ public class BookActivity extends Activity implements OnUpdateStatusChangedListe
 	public void onClick(View v) {
 		if(dialog == null)
 			dialog = new AlertDialog.Builder(BookActivity.this).create();
-		dialog.setMessage(entry.info.reviews.get(v.getId()));
+		dialog.setMessage(Util.htmlToText(entry.info.reviews.get(v.getId())));
 		dialog.show();
 		((TextView)dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
