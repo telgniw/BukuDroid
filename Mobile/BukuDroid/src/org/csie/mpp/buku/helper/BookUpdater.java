@@ -19,8 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 
 public abstract class BookUpdater {
